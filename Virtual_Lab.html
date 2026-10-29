@@ -163,6 +163,13 @@ ul.clean{padding-left:20px;margin:6px 0}
 .ar bdi[dir=ltr]{unicode-bidi:isolate}
 .en-help{margin:2px 0 12px;font-size:14.5px;color:var(--muted)}
 .ready .lessonlink{margin:6px 0}
+/* side menu: ☰ collapses it on wide screens too; groups fold open and closed */
+.menu-btn{display:inline-block}
+@media (min-width:861px){body.side-closed .layout{grid-template-columns:1fr} body.side-closed nav.side{display:none}}
+nav.side button.grp{display:flex;justify-content:space-between;align-items:center;width:calc(100% - 12px);background:none;border:0;border-radius:8px;padding:6px 6px;margin:12px 6px 4px;cursor:pointer;font:inherit;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left}
+nav.side button.grp:hover{background:var(--bg);color:var(--ink)}
+nav.side .caret{font-size:13px}
+nav.side .grpbody.closed{display:none}
 :root{--accent:#e0742b}
 :root[data-theme="dark"]{--accent:#ffa45c}
 .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;margin-top:6px}
@@ -595,6 +602,6 @@ main{min-width:0;overflow-wrap:anywhere}
   window.__LAB = { EX, fit, state, data };
 })();
 
-document.getElementById('menu').onclick=()=>document.getElementById('side').classList.toggle('open');document.getElementById('exlist').addEventListener('click',()=>document.getElementById('side').classList.remove('open'));</script>
+(function(){const side=document.getElementById('side'),wide=matchMedia('(min-width: 861px)');let closed=false;try{closed=localStorage.getItem('lab-side')==='closed'}catch(e){}document.body.classList.toggle('side-closed',closed);document.getElementById('menu').onclick=()=>{if(wide.matches){closed=!closed;document.body.classList.toggle('side-closed',closed);try{localStorage.setItem('lab-side',closed?'closed':'open')}catch(e){}}else side.classList.toggle('open');};})();document.getElementById('exlist').addEventListener('click',()=>document.getElementById('side').classList.remove('open'));</script>
 </body>
 </html>

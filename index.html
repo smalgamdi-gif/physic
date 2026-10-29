@@ -165,6 +165,44 @@ ul.clean{padding-left:20px;margin:6px 0}
 .ar bdi[dir=ltr]{unicode-bidi:isolate}
 .en-help{margin:2px 0 12px;font-size:14.5px;color:var(--muted)}
 .ready .lessonlink{margin:6px 0}
+/* side menu: ☰ collapses it on wide screens too; groups fold open and closed */
+.menu-btn{display:inline-block}
+@media (min-width:861px){body.side-closed .layout{grid-template-columns:1fr} body.side-closed nav.side{display:none}}
+nav.side button.grp{display:flex;justify-content:space-between;align-items:center;width:calc(100% - 12px);background:none;border:0;border-radius:8px;padding:6px 6px;margin:12px 6px 4px;cursor:pointer;font:inherit;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left}
+nav.side button.grp:hover{background:var(--bg);color:var(--ink)}
+nav.side .caret{font-size:13px}
+nav.side .grpbody.closed{display:none}
+/* exam: full-screen window with countdown */
+body.exam-open{overflow:hidden}
+.exam-ov{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column}
+.exhead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 18px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.extitle{font-weight:700;display:flex;flex-direction:column;line-height:1.3}
+.extitle small{font-weight:400;font-size:12.5px}
+.extimer{font:700 30px/1 Consolas,"Courier New",monospace;letter-spacing:.04em;padding:6px 14px;border-radius:10px;background:var(--brand-soft);color:var(--brand);min-width:120px;text-align:center}
+.extimer.low{background:var(--warn-soft);color:var(--warn)}
+.extimer.last{background:var(--bad-soft);color:var(--bad);animation:expulse 1s infinite}
+@keyframes expulse{50%{opacity:.55}}
+.exact{display:flex;align-items:center;gap:8px}
+.exact .tog{border:1px solid var(--line);background:transparent;border-radius:999px;padding:6px 11px;color:var(--ink)}
+.extime{height:5px;background:var(--line)}
+.extime i{display:block;height:100%;background:var(--brand);transition:width .25s linear}
+.exbody{flex:1;display:grid;grid-template-columns:230px 1fr;min-height:0}
+.expal{border-right:1px solid var(--line);background:var(--panel);padding:14px;overflow:auto;display:flex;flex-wrap:wrap;align-content:flex-start;gap:7px}
+.expal button{width:40px;height:40px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-weight:600;cursor:pointer}
+.expal button.ans{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.expal button.flag{box-shadow:inset 0 0 0 3px var(--warn)}
+.expal button.cur{outline:3px solid var(--ink);outline-offset:1px}
+.exkey{flex-basis:100%;display:flex;flex-direction:column;gap:4px;margin-top:10px;font-size:12.5px;color:var(--muted)}
+.exkey .k{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid var(--line);background:var(--bg);margin-right:6px;vertical-align:-1px}
+.exkey .k.ans{background:var(--brand);border-color:var(--brand)}
+.exkey .k.flag{box-shadow:inset 0 0 0 3px var(--warn)}
+.exmain{overflow:auto;padding:22px 28px 60px;max-width:900px;width:100%;margin:0 auto}
+.exmain .q{font-size:17px}
+.eflag{border:1px solid var(--line);background:transparent;border-radius:999px;padding:4px 10px;color:var(--muted);font-size:13px;cursor:pointer}
+.eflag.on{border-color:var(--warn);color:var(--warn);background:var(--warn-soft)}
+.exnav{justify-content:space-between;margin-top:16px}
+.exconf{border-color:var(--brand)}
+@media (max-width:860px){.exbody{grid-template-columns:1fr;grid-template-rows:auto 1fr}.expal{border-right:0;border-bottom:1px solid var(--line);flex-wrap:nowrap;overflow-x:auto;padding:8px 10px}.expal button{flex:none;width:36px;height:36px}.exkey{display:none}.exmain{padding:14px 14px 60px}.extimer{font-size:22px;min-width:90px}.exhead{padding:8px 10px}.extitle small{display:none}}
 </style>
 </head>
 <body>
@@ -3710,6 +3748,8 @@ window.SERWAY = {
       <div id="ebox"></div>
       ${hist ? `<h2>Previous attempts</h2><div class="card"><table><tr><th>Date</th><th>Qs</th><th>Score</th><th>Chapters</th></tr>${hist}</table></div>` : ''}`;
   };
+  // The exam runs in a full-screen window over the page: one question at a time, a question map, a countdown,
+  // answers can be changed until you submit, and nothing is graded before submitting.
   function afterExam() {
     $('#estart').onclick = () => {
       const chs = [...document.querySelectorAll('.ech:checked')].map(x => x.value);
@@ -3719,27 +3759,98 @@ window.SERWAY = {
       COURSE.filter(c => chs.includes(c.id)).forEach(c => c.lessons.forEach(l => { l.quiz.concat(l.checks).forEach(q => pool.push(Object.assign({ ch: c.id, lessonId: l.id }, q))); pool.push({ ch: c.id, lessonId: l.id, q: l.tryit.q, num: l.tryit.ans, tol: l.tryit.tol, unit: l.tryit.unit, sol: l.tryit.sol }); }));
       if ($('#egen').checked) genFor().filter(g => chs.includes(g.ch)).forEach(g => { for (let k = 0; k < 2; k++) { const p = g.f(); pool.push({ ch: g.ch, q: p.q, num: p.ans, unit: p.unit, tol: 0.01, sol: p.sol }); } });
       const qs = shuffle(pool).slice(0, n);
-      EXAM = { qs, ans: {}, end: Date.now() + mins * 60000, chs };
-      $('#esetup').style.display = 'none';
-      $('#ebox').innerHTML = `<div class="card row" style="justify-content:space-between;position:sticky;top:60px;z-index:5"><span>Answer every question, then submit.</span><span class="timer" id="etimer"></span><button class="btn" id="esubmit">Submit</button></div>` + qs.map((q, i) => `<div data-e="${i}"><div class="muted" style="font-size:13px;margin-top:10px">Q${i + 1} · ${COURSE.find(c => c.id === q.ch).title}</div>${qHTML(q, 'e' + i)}</div>`).join('');
-      qs.forEach((q, i) => wireQ(document.querySelector(`[data-e="${i}"]`), q, (ok, given) => { EXAM.ans[i] = { ok, given }; }, { silent: true, hideSol: true }));
-      $('#esubmit').onclick = finish;
-      const tick = () => { if (!EXAM) return; const left = Math.max(0, EXAM.end - Date.now()); $('#etimer').textContent = `${Math.floor(left / 60000)}:${String(Math.floor(left / 1000) % 60).padStart(2, '0')}`; if (left <= 0) finish(); else EXAM.t = setTimeout(tick, 500); };
-      tick();
+      EXAM = { qs, ans: {}, start: Date.now(), end: Date.now() + mins * 60000, mins, chs, cur: 0, flags: {}, hash: location.hash || '#exam' };
+      openExam();
     };
-    function finish() {
-      if (!EXAM) return; clearTimeout(EXAM.t);
-      const { qs, ans } = EXAM; const by = {};
-      let good = 0;
-      qs.forEach((q, i) => { const a = ans[i]; const ok = !!(a && a.ok); if (ok) good++; else logMistake(q, a ? a.given : '(blank)', q.lessonId); by[q.ch] = by[q.ch] || [0, 0]; by[q.ch][1]++; if (ok) by[q.ch][0]++; });
-      const pct = Math.round(good / qs.length * 100);
-      S.exams.unshift({ ts: Date.now(), n: qs.length, pct, chs: EXAM.chs.map(c => c.replace('ch', 'Ch ')), by }); save();
-      $('#ebox').innerHTML = `<div class="card"><h2 style="margin-top:0">Score: ${pct}% (${good}/${qs.length})</h2>
-        <table><tr><th>Chapter</th><th>Correct</th><th></th></tr>${Object.entries(by).map(([c, v]) => `<tr><td>${COURSE.find(x => x.id === c).title}</td><td>${v[0]}/${v[1]}</td><td style="width:40%">${bar(Math.round(v[0] / v[1] * 100))}</td></tr>`).join('')}</table>
-        <p>Wrong and blank answers were added to your <a href="#mistakes">Mistake journal</a>.</p><div class="row"><a class="btn" href="#exam">New exam</a><a class="btn ghost" href="#report">Progress report</a></div></div>
-        <h2>Review</h2>` + qs.map((q, i) => { const a = ans[i]; const ok = !!(a && a.ok); return `<div class="q"><div class="qt">Q${i + 1}. ${fx(q.q)}</div><div class="fb ${ok ? 'ok' : 'bad'}">${ok ? '✔' : '✘'} Your answer: ${esc(a ? (q.o ? a.given : a.given + ' ' + (q.unit || '')) : '(blank)')} · Correct: ${q.o ? q.o[q.a] : fmt(q.num) + ' ' + (q.unit || '')}<div class="sol">${fx(q.why || q.sol || '')}</div></div></div>`; }).join('');
-      EXAM = null; window.scrollTo(0, 0);
+  }
+  function openExam() {
+    const { qs } = EXAM, chName = id => COURSE.find(c => c.id === id);
+    const ov = document.createElement('div'); ov.className = 'exam-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'Exam');
+    ov.innerHTML = subs(`<header class="exhead">
+        <div class="extitle"><span>📝 Exam <span class="muted" style="font-weight:400">· الاختبار</span></span><small class="muted">${EXAM.chs.map(c => 'Ch ' + chName(c).n).join(', ')} · ${qs.length} questions · ${EXAM.mins} min</small></div>
+        <div class="extimer" id="etimer" aria-live="off">--:--</div>
+        <div class="exact"><span class="muted" id="eprog"></span><button class="btn" id="esubmit">Submit · تسليم</button><button class="tog" id="efs" title="Full screen">⛶</button><button class="tog" id="equit" title="Leave the exam">✕</button></div>
+      </header>
+      <div class="extime"><i id="etbar"></i></div>
+      <div class="exbody">
+        <nav class="expal" aria-label="Questions">${qs.map((q, i) => `<button data-go="${i}">${i + 1}</button>`).join('')}<div class="exkey"><span><i class="k ans"></i>answered</span><span><i class="k flag"></i>flagged</span><span><i class="k"></i>not yet</span></div></nav>
+        <section class="exmain">${qs.map((q, i) => `<div class="exq" data-e="${i}" hidden><div class="row" style="justify-content:space-between"><div class="muted" style="font-size:13px">Question ${i + 1} of ${qs.length} · Ch ${chName(q.ch).n}. ${esc(chName(q.ch).title)}</div><button class="tog eflag" data-flag="${i}">⚑ Flag for review</button></div>${qHTML(q, 'e' + i)}</div>`).join('')}
+          <div class="row exnav"><button class="btn ghost" id="eprev">← Previous</button><button class="btn" id="enext">Next →</button></div>
+          <div id="econfirm"></div></section>
+      </div>`);
+    document.body.appendChild(ov); document.body.classList.add('exam-open');
+    EXAM.ov = ov;
+    EXAM.h = qs.map((q, i) => wireQ(ov.querySelector(`[data-e="${i}"]`), q, (ok, given) => { EXAM.ans[i] = { ok, given }; }, { silent: true, hideSol: true, deferred: true }));
+    const answered = i => { const b = ov.querySelector(`[data-e="${i}"]`); return qs[i].o ? !!b.querySelector('.opt.sel') : b.querySelector('input').value.trim() !== ''; };
+    const paint = () => {
+      ov.querySelectorAll('[data-go]').forEach(b => { const i = +b.dataset.go; b.classList.toggle('ans', answered(i)); b.classList.toggle('flag', !!EXAM.flags[i]); b.classList.toggle('cur', i === EXAM.cur); });
+      ov.querySelectorAll('[data-flag]').forEach(b => b.classList.toggle('on', !!EXAM.flags[+b.dataset.flag]));
+      $('#eprog').textContent = `${qs.filter((q, i) => answered(i)).length} / ${qs.length} answered`;
+    };
+    const go = i => { EXAM.cur = Math.max(0, Math.min(qs.length - 1, i)); ov.querySelectorAll('.exq').forEach(d => d.hidden = +d.dataset.e !== EXAM.cur); $('#eprev').disabled = EXAM.cur === 0; $('#enext').textContent = EXAM.cur === qs.length - 1 ? 'Review & submit' : 'Next →'; paint(); const inp = ov.querySelector(`[data-e="${EXAM.cur}"] input`); if (inp) inp.focus(); ov.querySelector('.exmain').scrollTop = 0; };
+    EXAM.go = go;
+    ov.addEventListener('click', e => {
+      const t = e.target.closest('button'); if (!t) return;
+      if (t.dataset.go) go(+t.dataset.go);
+      else if (t.dataset.flag) { const i = +t.dataset.flag; EXAM.flags[i] = !EXAM.flags[i]; paint(); }
+      else if (t.classList.contains('opt')) setTimeout(paint);
+    });
+    ov.addEventListener('input', paint);
+    $('#eprev').onclick = () => go(EXAM.cur - 1);
+    $('#enext').onclick = () => EXAM.cur === qs.length - 1 ? askSubmit() : go(EXAM.cur + 1);
+    $('#esubmit').onclick = askSubmit;
+    $('#equit').onclick = () => { if (confirm('Leave the exam? Your answers will be lost. · هل تريد الخروج من الاختبار؟ ستضيع إجاباتك.')) closeExam(); };
+    $('#efs').onclick = () => { try { document.fullscreenElement ? document.exitFullscreen() : ov.requestFullscreen(); } catch (err) { /* full screen not allowed here */ } };
+    function askSubmit() {
+      const open = qs.map((q, i) => i).filter(i => !answered(i)), fl = Object.keys(EXAM.flags).filter(k => EXAM.flags[k]).map(Number);
+      $('#econfirm').innerHTML = `<div class="card exconf"><b>Submit the exam? · تسليم الاختبار؟</b>
+        ${open.length ? `<p>⚠ ${open.length} question(s) not answered: ${open.map(i => `<a href="#" data-jump="${i}">${i + 1}</a>`).join(', ')}. They count as wrong.</p><div class="ar">لم تجب عن ${open.length} سؤال، وستُحسب خاطئة.</div>` : '<p>All questions answered.</p>'}
+        ${fl.length ? `<p>⚑ Flagged for review: ${fl.map(i => `<a href="#" data-jump="${i}">${i + 1}</a>`).join(', ')}</p>` : ''}
+        <div class="row"><button class="btn" id="eyes">Yes, submit · نعم، سلّم</button><button class="btn ghost" id="eno">Back to the exam</button></div></div>`;
+      $('#econfirm').querySelectorAll('[data-jump]').forEach(a => a.onclick = e => { e.preventDefault(); $('#econfirm').innerHTML = ''; go(+a.dataset.jump); });
+      $('#eyes').onclick = finishExam; $('#eno').onclick = () => { $('#econfirm').innerHTML = ''; };
+      $('#econfirm').scrollIntoView({ block: 'nearest' });
     }
+    EXAM.keys = e => {
+      if (!EXAM) return;
+      if (e.key === 'Escape') { e.preventDefault(); $('#equit').click(); }
+      else if (!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) go(EXAM.cur + (e.key === 'ArrowRight' ? 1 : -1));
+    };
+    document.addEventListener('keydown', EXAM.keys);
+    const tick = () => {
+      if (!EXAM) return;
+      const left = Math.max(0, EXAM.end - Date.now()), total = EXAM.end - EXAM.start;
+      const t = $('#etimer'); t.textContent = `${String(Math.floor(left / 60000)).padStart(2, '0')}:${String(Math.floor(left / 1000) % 60).padStart(2, '0')}`;
+      t.classList.toggle('low', left <= Math.min(120000, total * 0.2)); t.classList.toggle('last', left <= 60000);
+      $('#etbar').style.width = (left / total * 100) + '%';
+      if (left <= 0) { finishExam(true); return; }
+      EXAM.t = setTimeout(tick, 250);
+    };
+    go(0); tick();
+  }
+  function closeExam() {
+    if (!EXAM) return;
+    clearTimeout(EXAM.t); document.removeEventListener('keydown', EXAM.keys);
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    EXAM.ov.remove(); document.body.classList.remove('exam-open');
+    EXAM = null;
+  }
+  function finishExam(timeUp) {
+    if (!EXAM) return;
+    EXAM.h.forEach(h => h.check());
+    const { qs, ans, chs } = EXAM; const by = {}, used = Math.round((Date.now() - EXAM.start) / 1000);
+    let good = 0;
+    qs.forEach((q, i) => { const a = ans[i]; const ok = !!(a && a.ok); if (ok) good++; else logMistake(q, a ? a.given : '(blank)', q.lessonId); by[q.ch] = by[q.ch] || [0, 0]; by[q.ch][1]++; if (ok) by[q.ch][0]++; });
+    const pct = Math.round(good / qs.length * 100);
+    S.exams.unshift({ ts: Date.now(), n: qs.length, pct, chs: chs.map(c => c.replace('ch', 'Ch ')), by }); save();
+    closeExam();
+    if (location.hash.split('/')[0] !== '#exam') location.hash = '#exam';
+    $('#esetup').style.display = 'none';
+    $('#ebox').innerHTML = fx(`<div class="card"><h2 style="margin-top:0">Score: ${pct}% (${good}/${qs.length})</h2>${timeUp ? '<p class="note">⏰ Time was up: the exam was submitted automatically. · انتهى الوقت وسُلِّم الاختبار تلقائيًا.</p>' : ''}<p class="muted">Time used: ${Math.floor(used / 60)} min ${used % 60} s</p>
+      <table><tr><th>Chapter</th><th>Correct</th><th></th></tr>${Object.entries(by).map(([c, v]) => `<tr><td>${COURSE.find(x => x.id === c).title}</td><td>${v[0]}/${v[1]}</td><td style="width:40%">${bar(Math.round(v[0] / v[1] * 100))}</td></tr>`).join('')}</table>
+      <p>Wrong and blank answers were added to your <a href="#mistakes">Mistake journal</a>.</p><div class="row"><button class="btn" onclick="location.hash='#exam';location.reload()">New exam</button><a class="btn ghost" href="#report">Progress report</a></div></div>
+      <h2>Review</h2>` + qs.map((q, i) => { const a = ans[i]; const ok = !!(a && a.ok); return `<div class="q"><div class="qt">Q${i + 1}. ${q.q}</div><div class="fb ${ok ? 'ok' : 'bad'}">${ok ? '✔' : '✘'} Your answer: ${a ? (q.o ? a.given : esc(a.given) + ' ' + (q.unit || '')) : '(blank)'} · Correct: ${q.o ? q.o[q.a] : fmt(q.num) + ' ' + (q.unit || '')}<div class="sol">${q.why || q.sol || ''}</div></div></div>`; }).join(''));
+    window.scrollTo(0, 0);
   }
 
   // ---------- flashcards (Leitner) ----------
@@ -4168,8 +4279,14 @@ window.SERWAY = {
 
   function sidebar(active) {
     const chs = COURSE.map(c => { const cm = chapterMastery(c); return `<a href="#chapter/${c.id}" class="${active === 'chapter/' + c.id ? 'active' : ''}"><span>${c.n}. ${esc(c.title)}</span><small>${cm.avg}%</small></a>`; }).join('');
-    const link = n => `<a href="#${n[0]}" class="${active.split('/')[0] === n[0] || (n[0] === 'found' && active.startsWith('skill')) ? 'active' : ''}"><span>${n[1]}</span><small>${n[2]}</small></a>`;
-    return NAV.map(link).join('') + `<div class="sec">Foundation · التأسيس</div>` + FNAV.map(link).join('') + `<div class="sec">Chapters</div>` + chs;
+    const on = n => active.split('/')[0] === n[0] || (n[0] === 'found' && active.startsWith('skill'));
+    const link = n => `<a href="#${n[0]}" class="${on(n) ? 'active' : ''}"><span>${n[1]}</span><small>${n[2]}</small></a>`;
+    // collapsible groups; the group holding the open page always stays open
+    const g = S.prefs.groups || {};
+    const group = (id, title, html, has) => { const open = has || g[id] !== false; return `<button class="sec grp" data-g="${id}" aria-expanded="${open}"><span>${title}</span><span class="caret">${open ? '▾' : '▸'}</span></button><div class="grpbody${open ? '' : ' closed'}">${html}</div>`; };
+    return link(NAV[0]) + group('tools', 'Study tools · أدوات المذاكرة', NAV.slice(1).map(link).join(''), NAV.slice(1).some(on))
+      + group('found', 'Foundation · التأسيس', FNAV.map(link).join(''), FNAV.some(on))
+      + group('chapters', 'Chapters · الفصول', chs, active.startsWith('chapter/') || active.startsWith('lesson/'));
   }
   function route() {
     const h = (location.hash || '#home').slice(1); const [v, arg] = h.split('/');
@@ -4201,13 +4318,20 @@ window.SERWAY = {
   document.addEventListener('DOMContentLoaded', () => {
     $('#tar').onclick = () => { S.prefs.ar = !S.prefs.ar; save(); applyPrefs(); };
     $('#tth').onclick = () => { S.prefs.theme = S.prefs.theme === 'dark' ? 'light' : 'dark'; save(); applyPrefs(); };
-    $('#menu').onclick = () => $('#side').classList.toggle('open');
+    // ☰ hides or shows the side menu: a slide-in panel on phones, a collapsible column on wider screens (remembered)
+    const wide = matchMedia('(min-width: 861px)');
+    const applySide = () => { document.body.classList.toggle('side-closed', S.prefs.side === false); $('#menu').setAttribute('aria-expanded', String(wide.matches ? S.prefs.side !== false : $('#side').classList.contains('open'))); };
+    $('#menu').onclick = () => { if (wide.matches) { S.prefs.side = S.prefs.side === false; save(); } else $('#side').classList.toggle('open'); applySide(); };
+    $('#side').addEventListener('click', e => { const b = e.target.closest('.grp'); if (!b) return; const body = b.nextElementSibling, open = body.classList.toggle('closed') === false;
+      b.setAttribute('aria-expanded', String(open)); b.querySelector('.caret').textContent = open ? '▾' : '▸'; S.prefs.groups = Object.assign({}, S.prefs.groups, { [b.dataset.g]: open }); save(); });
+    applySide();
     const sr = $('#search'), res = $('#results');
     sr.oninput = () => { const r = search(sr.value); res.innerHTML = r.length ? `<div class="card results">${r.join('')}</div>` : ''; };
     res.onclick = () => { res.innerHTML = ''; sr.value = ''; };
     applyPrefs(); route();
   });
-  window.addEventListener('hashchange', route);
+  window.addEventListener('hashchange', () => { if (EXAM) { history.replaceState(null, '', EXAM.hash); return; } route(); });
+  window.addEventListener('beforeunload', e => { if (EXAM) { e.preventDefault(); e.returnValue = ''; } });
   window.__PLL = { mastery, parseNum, numOk, dimOf, G, allLessons };
 })();
 </script>
