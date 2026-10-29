@@ -772,7 +772,7 @@
   function subs(html) { return html.split(/(<[^>]*>)/).map(p => p.startsWith('<') ? p : p.replace(/([A-Za-zθρΔσεμλαΣ])_([A-Za-z0-9]{1,6})/g, '$1<sub>$2</sub>')).join(''); }
 
   // ---------- router ----------
-  const NAV = [['home', '🏠 Home', 'الرئيسية'], ['course', '📚 Course map', 'خريطة المقرر'], ['practice', '♾️ Unlimited practice', 'تدريب'], ['exam', '⏱️ Exam simulator', 'محاكي الاختبار'], ['flashcards', '🃏 Flashcards', 'البطاقات'], ['mistakes', '📓 Mistake journal', 'دفتر الأخطاء'], ['formulas', '∑ Formula sheet', 'القوانين'], ['rearrange', '🔀 Rearranging laws', 'ترتيب القوانين'], ['tools', '🧰 Tools', 'أدوات'], ['plan', '🗓️ Study planner', 'مخطط المذاكرة'], ['report', '📈 Progress report', 'تقرير الإنجاز'], ['sources', '📘 Sources & gaps', 'المصادر']];
+  const NAV = [['home', '🏠 Home', 'الرئيسية'], ['course', '📚 Course map', 'خريطة المقرر'], ['practice', '♾️ Practice', 'تدريب'], ['exam', '⏱️ Exam', 'الاختبار'], ['flashcards', '🃏 Flashcards', 'البطاقات'], ['mistakes', '📓 Mistakes', 'دفتر الأخطاء'], ['formulas', '∑ Formulas', 'القوانين'], ['rearrange', '🔀 Law forms', 'أشكال القانون'], ['tools', '🧰 Tools', 'أدوات'], ['plan', '🗓️ Planner', 'مخطط المذاكرة'], ['report', '📈 Progress', 'تقرير الإنجاز'], ['sources', '📘 Sources', 'المصادر']];
   // ---------- Unit 0: foundation skills, placement test, readiness checks (content_found.js) ----------
   const SKILLS = () => window.FOUND || [];
   const skillById = id => SKILLS().find(k => k.id === id);
@@ -880,13 +880,13 @@
     next();
   }
 
-  const FNAV = [['placement', '🧭 Placement test', 'تحديد المستوى'], ['found', '🧱 Unit 0: Foundations', 'الوحدة صفر'], ['glossary', '🔤 Course glossary', 'قاموس المقرر'], ['phrases', '🗝️ Problem language', 'لغة المسائل']];
+  const FNAV = [['placement', '🧭 Placement', 'تحديد المستوى'], ['found', '🧱 Unit 0', 'الوحدة صفر'], ['glossary', '🔤 Glossary', 'قاموس المقرر'], ['phrases', '🗝️ Problem words', 'لغة المسائل']];
   views.course = () => `<h1>Course map</h1><p class="sub">General Physics · 10 chapters as ordered in your textbook. <span class="pill src">📘 BK chapter openers</span></p>` + COURSE.map(c => { const cm = chapterMastery(c); return `<div class="card"><div class="chap"><a href="#chapter/${c.id}"><b>Ch ${c.n}. ${esc(c.title)}</b></a><span class="muted"><bdi>${c.ar}</bdi> · ${c.src}</span></div>${bar(cm.avg)}${c.lessons.map((l, i) => { const m = mastery(l.id); const [lv, cls] = level(m); return `<a class="lessonlink" href="#lesson/${l.id}"><span>${c.n}.${i + 1} ${esc(l.title)}</span><span class="${cls}">${lv}${m != null ? ' ' + m + '%' : ''}</span></a>`; }).join('')}</div>`; }).join('');
 
   function sidebar(active) {
-    const chs = COURSE.map(c => { const cm = chapterMastery(c); return `<a href="#chapter/${c.id}" class="${active === 'chapter/' + c.id ? 'active' : ''}"><span>${c.n}. ${esc(c.title)}</span><small>${cm.avg}%</small></a>`; }).join('');
+    const chs = COURSE.map(c => { const cm = chapterMastery(c); return `<a href="#chapter/${c.id}" class="nl chl ${active === 'chapter/' + c.id ? 'active' : ''}"><span>${c.n}. ${esc(c.title)}</span><small>${cm.avg}%</small></a>`; }).join('');
     const on = n => active.split('/')[0] === n[0] || (n[0] === 'found' && active.startsWith('skill'));
-    const link = n => `<a href="#${n[0]}" class="${on(n) ? 'active' : ''}"><span>${n[1]}</span><small>${n[2]}</small></a>`;
+    const link = n => `<a href="#${n[0]}" class="nl ${on(n) ? 'active' : ''}" title="${n[1].replace(/^\S+\s/, '')} · ${n[2]}"><span>${n[1]}</span><small>${n[2]}</small></a>`;
     // collapsible groups; the group holding the open page always stays open
     const g = S.prefs.groups || {};
     const group = (id, title, html, has) => { const open = has || g[id] !== false; return `<button class="sec grp" data-g="${id}" aria-expanded="${open}"><span>${title}</span><span class="caret">${open ? '▾' : '▸'}</span></button><div class="grpbody${open ? '' : ' closed'}">${html}</div>`; };
