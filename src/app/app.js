@@ -892,7 +892,8 @@
     const group = (id, icon, en, ar, n, html, has) => { const open = has || g[id] !== false; return `<button class="grp" data-g="${id}" aria-expanded="${open}"><span class="gi" aria-hidden="true">${icon}</span><span class="gt">${en}</span><span class="ga">${ar}</span><span class="caret" aria-hidden="true"><svg viewBox="0 0 10 10" width="10" height="10"><path d="M3.5 1.5 7 5l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button><div class="grpbody${open ? '' : ' closed'}">${html}</div>`; };
     return link(NAV[0]) + group('tools', '🧰', 'Study tools', 'أدوات المذاكرة', NAV.length - 1, NAV.slice(1).map(link).join(''), NAV.slice(1).some(on))
       + group('found', '🧱', 'Foundation', 'التأسيس', FNAV.length, FNAV.map(link).join(''), FNAV.some(on))
-      + group('chapters', '📚', 'Chapters', 'الفصول', COURSE.length, chs, active.startsWith('chapter/') || active.startsWith('lesson/'));
+      + group('chapters', '📚', 'Chapters', 'الفصول', COURSE.length, chs, active.startsWith('chapter/') || active.startsWith('lesson/'))
+      + `<a class="sidelab" href="Virtual_Lab.html"><span>⚗ Virtual Lab</span><small dir="rtl">المعمل الافتراضي · 11 تجربة</small></a>`;
   }
   function route() {
     const h = (location.hash || '#home').slice(1); const [v, arg] = h.split('/');

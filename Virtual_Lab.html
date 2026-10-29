@@ -253,6 +253,21 @@ nav.side .grp .caret{display:grid;place-items:center;width:16px;height:16px;colo
 nav.side .grp[aria-expanded="true"] .caret{transform:rotate(90deg);color:var(--brand)}
 nav.side .grpbody{margin:0 0 4px 14px;padding-left:6px;border-left:2px solid var(--line)}
 @media (prefers-reduced-motion:reduce){nav.side button.grp,nav.side .grp .caret{transition:none}}
+/* the lab button: its own teal colour so it stands apart from the blue study controls */
+:root{--lab:#0f6e7a;--lab-ink:#ffffff;--lab-hover:#0b5862}
+:root[data-theme="dark"]{--lab:#3fb8c6;--lab-ink:#071a1d;--lab-hover:#6fd3de}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--lab:#3fb8c6;--lab-ink:#071a1d;--lab-hover:#6fd3de}}
+.labbtn{display:inline-flex;align-items:center;gap:8px;padding:7px 14px 7px 10px;border-radius:999px;background:var(--lab);color:var(--lab-ink);text-decoration:none;font-weight:700;font-size:14px;line-height:1.2;box-shadow:0 2px 8px rgba(15,110,122,.28);white-space:nowrap;transition:background .15s,transform .15s}
+.labbtn:hover{background:var(--lab-hover);transform:translateY(-1px)}
+.labbtn:focus-visible{outline:2px solid var(--lab);outline-offset:3px}
+.labbtn .lbi{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.22);font-size:14px}
+.labbtn .lba{font-weight:600;font-size:12.5px;opacity:.9;border-left:1px solid currentColor;padding-left:8px;direction:rtl}
+nav.side a.sidelab{display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin:18px 0 8px;padding:11px 12px;border-radius:10px;background:var(--lab);color:var(--lab-ink);font-weight:700;text-decoration:none}
+nav.side a.sidelab:hover{background:var(--lab-hover)}
+nav.side a.sidelab small{color:inherit;opacity:.85;font-weight:600}
+@media (max-width:860px){.labbtn{padding:6px 11px 6px 8px;font-size:13px}.labbtn .lba{display:none}}
+@media (prefers-reduced-motion:reduce){.labbtn{transition:none}.labbtn:hover{transform:none}}
+@media print{.labbtn{display:none}}
 :root{--accent:#e0742b}
 :root[data-theme="dark"]{--accent:#ffa45c}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--accent:#ffa45c}}
@@ -276,7 +291,7 @@ main{min-width:0;overflow-wrap:anywhere}
   <button class="tog menu-btn" id="menu" aria-label="Menu">☰</button>
   <div class="logo"><span class="atom">⚗</span>Physics Virtual Lab <span class="muted" style="font-weight:400;font-size:13px">· المعمل الافتراضي</span></div>
   <div class="grow"></div>
-  <a class="tog" href="index.html" style="text-decoration:none">📚 Tutor</a>
+  <a class="labbtn" href="index.html" title="Back to the lessons"><span class="lbi" aria-hidden="true">📚</span><span class="lbt">Back to lessons</span><span class="lba">الدروس</span></a>
   <button class="tog" id="theme">🌓 Theme</button>
 </header>
 <div class="layout">
