@@ -115,7 +115,6 @@ ul.clean{padding-left:20px;margin:6px 0}
   nav.side.open{transform:none}
   .menu-btn{display:inline-block}
   main{padding:18px 16px 80px}
-  .g2,.g3,.g4{grid-template-columns:1fr}
   .top{flex-wrap:wrap;padding:8px 12px;gap:8px}
   .logo{font-size:15px}
   .logo .muted{display:none}
@@ -218,3 +217,12 @@ nav.side a.nl>small{white-space:nowrap;direction:rtl;text-align:right;font-size:
 nav.side a.chl>span{white-space:normal}
 nav.side a.chl>small{font-variant-numeric:tabular-nums;direction:ltr}
 @media (max-width:860px){.layout{grid-template-columns:1fr} nav.side{width:min(290px,86vw)}}
+/* the content column follows the space it really has (side menu open or closed):
+   centred, a little wider with the menu closed, and card rows reflow by the column's own width */
+main{container-type:inline-size;margin-inline:auto}
+body.side-closed main{max-width:1180px}
+@container (max-width:760px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@container (max-width:620px){.g3{grid-template-columns:1fr}}
+@container (max-width:560px){.g2,.g4{grid-template-columns:1fr}}
+.grid>.card{margin:0}
+.grid{margin:12px 0}
