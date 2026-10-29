@@ -8,6 +8,14 @@ A private tutor and virtual lab for the first-year **General Physics** course (1
 
 Open either HTML file in a browser. Both work offline, and progress is saved in your browser.
 
+## Live links
+| | Claude link | GitHub Pages |
+|---|---|---|
+| Tutor | https://claude.ai/artifact/UNT2rrfNa1NrVedgyr6cEv | https://smalgamdi-gif.github.io/physic/ |
+| Virtual lab | opened from the ⚗ Lab button in the tutor | https://smalgamdi-gif.github.io/physic/Virtual_Lab.html |
+
+Both links show the same version, and both are updated together.
+
 ## Sources
 - 📘 = taken from the course files (slides S01–S10, the "Ch 9 Updated" deck, and the textbook as BK p.N).
 - 🧩 = additional design. This is not course content.
