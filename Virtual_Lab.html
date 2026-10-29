@@ -215,6 +215,14 @@ body.exam-open{overflow:hidden}
 .framed .printbtn{display:none!important}
 .inconf{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px;padding:10px 12px;border:1px solid var(--warn);background:var(--warn-soft);border-radius:10px}
 .copybox{width:100%;min-height:120px;margin-top:8px;font:12px Consolas,monospace;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:8px}
+/* side menu rows: English left, Arabic right, one line each; only chapter names may wrap */
+.layout{grid-template-columns:270px 1fr}
+nav.side a.nl{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:10px;padding:7px 10px;font-size:14px;line-height:1.35}
+nav.side a.nl>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+nav.side a.nl>small{white-space:nowrap;direction:rtl;text-align:right;font-size:12.5px}
+nav.side a.chl>span{white-space:normal}
+nav.side a.chl>small{font-variant-numeric:tabular-nums;direction:ltr}
+@media (max-width:860px){.layout{grid-template-columns:1fr} nav.side{width:min(290px,86vw)}}
 :root{--accent:#e0742b}
 :root[data-theme="dark"]{--accent:#ffa45c}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--accent:#ffa45c}}
