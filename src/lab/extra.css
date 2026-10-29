@@ -1,5 +1,6 @@
 :root{--accent:#e0742b}
 :root[data-theme="dark"]{--accent:#ffa45c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--accent:#ffa45c}}
 .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;margin-top:6px}
 .controls label{display:flex;flex-direction:column;gap:4px;font-size:14px}
 .controls input[type=range]{width:100%;accent-color:var(--brand)}

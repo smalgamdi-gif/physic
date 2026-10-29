@@ -12,6 +12,8 @@
   const roundTo = (x, res) => Math.round(x / res) * res;
   let NOISE = true;
   const noisy = (x, rel, res) => { let y = NOISE ? x * (1 + rel * gauss()) : x; return res ? roundTo(y, res) : y; };
+  const FRAMED = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
+  document.documentElement.classList.toggle('framed', FRAMED);
   const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
   // ---------- linear fit ----------
@@ -317,15 +319,15 @@
         <div class="card"><h3>⚠️ Sources of error & uncertainty</h3><ul>${e.errors.map(a => `<li>${a}</li>`).join('')}</ul><h3>✋ Skills that need the real apparatus</h3><ul>${e.skills.map(a => `<li>${a}</li>`).join('')}</ul><p class="muted" style="font-size:13px">A simulation cannot train these hands‑on skills: practise them in your real lab sessions.</p></div>
         <div class="card"><h3>💬 Discussion questions</h3>${e.discussion.map((d, i) => `<div class="dq"><b>${i + 1}. ${d[0]}</b><textarea data-n="${i}" placeholder="Write your answer first…">${esc((notes[e.id] || {})[i] || '')}</textarea><button class="btn small ghost" data-show="${i}">Show model answer</button><div class="model" id="m${i}" hidden>${d[1]}</div></div>`).join('')}</div>
       </div>
-      <div class="row noprint"><button class="btn" onclick="window.print()">🖨 Print lab report</button><span class="muted">Prints the procedure, your data, graph, result and answers.</span></div>`;
+      <div class="row noprint"><button class="btn printbtn" onclick="window.print()">🖨 Print lab report</button><span class="muted printbtn">Prints the procedure, your data, graph, result and answers.</span></div><div id="labmsg"></div>`;
     document.querySelectorAll('[data-k]').forEach(inp => inp.oninput = () => { const v = parseFloat(inp.value); s[inp.dataset.k] = v; const sp = document.querySelector(`[data-v="${inp.dataset.k}"]`); if (sp) sp.textContent = v; if (inp.tagName === 'SELECT') analyse(); });
     $('#noise').onchange = ev => { NOISE = ev.target.checked; };
     $('#rec').onclick = () => { const row = e.measure(s); data[e.id].push(row); persist(); analyse(); };
     $('#auto').onclick = () => { const k = e.controls.find(c => !c.options && ['h', 'm', 'mh', 'R', 'T', 'V', 'd', 'th', 'r', 'len', 'mw', 'f1'].includes(c.id)); if (!k) return; const sweepId = e.id === 'ohm' && s.mode === 3 ? 'len' : k.id; const kk = e.controls.find(c => c.id === sweepId); const old = s[sweepId]; for (let i = 0; i < 7; i++) { s[sweepId] = +(kk.min + (kk.max - kk.min) * (i + 1) / 8).toFixed(4); if (e.id === 'snell' && s.dir) s[sweepId] = +(5 + i * (Math.min(80, deg(Math.asin(1 / s.n)) + 8) - 5) / 6).toFixed(1); data[e.id].push(e.measure(s)); } s[sweepId] = old; persist(); analyse(); };
     $('#undo').onclick = () => { data[e.id].pop(); persist(); analyse(); };
-    $('#clr').onclick = () => { if (confirm('Clear all readings for this experiment?')) { data[e.id] = []; persist(); analyse(); } };
+    $('#clr').onclick = () => { $('#labmsg').innerHTML = `<div class="inconf"><span>Clear all readings for this experiment?</span><button class="btn small" id="clryes">Clear readings</button><button class="btn small ghost" id="clrno">Cancel</button></div>`; $('#clryes').onclick = () => { $('#labmsg').innerHTML = ''; data[e.id] = []; persist(); analyse(); }; $('#clrno').onclick = () => { $('#labmsg').innerHTML = ''; }; };
     if ($('#rev')) $('#rev').onclick = () => { $('#revbox').textContent = e.reveal(s); };
-    $('#csv').onclick = () => { const rows = [e.cols.join(',')].concat(data[e.id].map(r => r.join(','))); const b = new Blob([rows.join('\n')], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = e.id + '-data.csv'; a.click(); };
+    $('#csv').onclick = () => { const rows = [e.cols.join(',')].concat(data[e.id].map(r => r.join(','))); if (FRAMED) { $('#labmsg').innerHTML = '<p class="muted" style="margin:8px 0 0">Downloads are blocked here. Copy these rows into a spreadsheet or a .csv file:</p><textarea class="copybox" id="csvtxt" readonly></textarea>'; $('#csvtxt').value = rows.join('\n'); $('#csvtxt').select(); return; }  const b = new Blob([rows.join('\n')], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = e.id + '-data.csv'; a.click(); };
     document.querySelectorAll('[data-show]').forEach(b => b.onclick = () => { $('#m' + b.dataset.show).hidden = false; });
     document.querySelectorAll('textarea[data-n]').forEach(t => t.oninput = () => { notes[e.id] = notes[e.id] || {}; notes[e.id][t.dataset.n] = t.value; persist(); });
     analyse();
@@ -345,7 +347,7 @@
   function route() { const id = location.hash.slice(1); cur = EX.find(e => e.id === id) || EX[0]; renderList(); render(); window.scrollTo(0, 0); }
   window.addEventListener('hashchange', route);
   document.addEventListener('DOMContentLoaded', () => {
-    $('#theme').onclick = () => { const r = document.documentElement; r.dataset.theme = r.dataset.theme === 'dark' ? 'light' : 'dark'; analyse(); };
+    $('#theme').onclick = () => { const r = document.documentElement, cur = r.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); r.dataset.theme = cur === 'dark' ? 'light' : 'dark'; analyse(); };
     route(); requestAnimationFrame(loop);
   });
   window.__LAB = { EX, fit, state, data };

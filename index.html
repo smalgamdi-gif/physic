@@ -18,7 +18,16 @@
   --ok:#4cc985; --ok-soft:#173527; --bad:#ff7a6b; --bad-soft:#3a1e1b; --warn:#ffc65a; --warn-soft:#3a2f17;
   --src:#5fd0dc; --src-soft:#16323a; --add:#c3a2ff; --add-soft:#2a2240;
   --shadow:none;
+  color-scheme:dark;
 }
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11151d; --panel:#1a202b; --ink:#e7ebf3; --muted:#9aa4b6; --line:#2b3342;
+  --brand:#7d9bff; --brand-ink:#0d1220; --brand-soft:#232e4a;
+  --ok:#4cc985; --ok-soft:#173527; --bad:#ff7a6b; --bad-soft:#3a1e1b; --warn:#ffc65a; --warn-soft:#3a2f17;
+  --src:#5fd0dc; --src-soft:#16323a; --add:#c3a2ff; --add-soft:#2a2240;
+  --shadow:none;
+  color-scheme:dark;
+}}
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font:15.5px/1.6 "Segoe UI",system-ui,-apple-system,Roboto,Tahoma,Arial,sans-serif}
@@ -138,6 +147,7 @@ ul.clean{padding-left:20px;margin:6px 0}
 .opt.sel{border-color:var(--brand);background:var(--brand-soft);font-weight:600}
 .pill.ext{background:#e6f4ea;color:#1e6b3a}
 :root[data-theme="dark"] .pill.ext{background:#173527;color:#7fdca3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pill.ext{background:#173527;color:#7fdca3}}
 /* fractions: {{a // b}} drawn as a over b */
 .frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.2;margin:0 .12em}
 .frac>.nu{border-bottom:1.5px solid currentColor;padding:0 .25em .1em}
@@ -203,6 +213,10 @@ body.exam-open{overflow:hidden}
 .exnav{justify-content:space-between;margin-top:16px}
 .exconf{border-color:var(--brand)}
 @media (max-width:860px){.exbody{grid-template-columns:1fr;grid-template-rows:auto 1fr}.expal{border-right:0;border-bottom:1px solid var(--line);flex-wrap:nowrap;overflow-x:auto;padding:8px 10px}.expal button{flex:none;width:36px;height:36px}.exkey{display:none}.exmain{padding:14px 14px 60px}.extimer{font-size:22px;min-width:90px}.exhead{padding:8px 10px}.extitle small{display:none}}
+/* inside a Claude link printing and file downloads are blocked, so those buttons are hidden there */
+.framed .printbtn{display:none!important}
+.inconf{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px;padding:10px 12px;border:1px solid var(--warn);background:var(--warn-soft);border-radius:10px}
+.copybox{width:100%;min-height:120px;margin-top:8px;font:12px Consolas,monospace;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:8px}
 </style>
 </head>
 <body>
@@ -3418,7 +3432,7 @@ window.SERWAY = {
 
   // ---------- state ----------
   const KEY = 'physics-learning-lab-v1';
-  const blank = () => ({ lessons: {}, mistakes: [], cards: {}, exams: [], days: {}, plan: null, found: {}, placement: null, prefs: { ar: true, theme: 'light' } });
+  const blank = () => ({ lessons: {}, mistakes: [], cards: {}, exams: [], days: {}, plan: null, found: {}, placement: null, prefs: { ar: true, theme: null } });
   let S;
   try { S = Object.assign(blank(), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { S = blank(); }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
@@ -3448,6 +3462,21 @@ window.SERWAY = {
   const mathify = s => String(s).replace(/\{\{(.+?)\s*\/\/\s*(.+?)\}\}/g, (m, a, b) => `<span class="frac"><span class="nu">${a.trim()}</span><span class="de">${b.trim()}</span></span>`);
   (function deepMath(o) { for (const k in o) { const v = o[k]; if (typeof v === 'string') { if (v.includes('{{')) o[k] = mathify(v); } else if (v && typeof v === 'object') deepMath(v); } })([window.COURSE, window.FORMS || {}]);
   const fx = s => subs(mathify(s));
+  // inside a Claude link the page runs in a frame where print, downloads and confirm() are blocked
+  const FRAMED = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
+  document.documentElement.classList.toggle('framed', FRAMED);
+  // a yes/no question shown in the page itself (confirm() does not work everywhere)
+  function inlineConfirm(holder, html, onYes) {
+    holder.innerHTML = `<div class="inconf"><span>${html}</span><button class="btn small" data-y>Yes</button><button class="btn small ghost" data-n>Cancel</button></div>`;
+    holder.querySelector('[data-y]').onclick = () => { holder.innerHTML = ''; onYes(); };
+    holder.querySelector('[data-n]').onclick = () => { holder.innerHTML = ''; };
+  }
+  // text the viewer can copy when a file download is not possible
+  function copyBox(holder, text, label) {
+    holder.innerHTML = `<p class="muted" style="margin:8px 0 0">${label}</p><textarea class="copybox" id="copytxt" readonly></textarea><button class="btn small" id="copybtn">Copy</button> <span class="muted" id="copymsg"></span>`;
+    const ta = holder.querySelector('textarea'); ta.value = text;
+    holder.querySelector('#copybtn').onclick = () => { const done = () => holder.querySelector('#copymsg').textContent = 'Copied.'; try { navigator.clipboard.writeText(text).then(done, () => { ta.select(); holder.querySelector('#copymsg').textContent = 'Selected: press Ctrl+C to copy.'; }); } catch (e) { ta.select(); } };
+  }
   const fmt = (x, d = 3) => { if (!isFinite(x)) return String(x); const a = Math.abs(x); if (a !== 0 && (a >= 1e5 || a < 1e-3)) return x.toExponential(d - 1).replace('e', ' × 10^').replace('+', ''); return String(+x.toPrecision(d + 1)); };
 
   function parseNum(str) {
@@ -3744,7 +3773,7 @@ window.SERWAY = {
       <div class="row" style="margin-top:8px"><label>Questions <select id="en"><option>10</option><option selected>15</option><option>20</option><option>30</option></select></label>
       <label>Minutes <select id="em"><option>10</option><option selected>20</option><option>30</option><option>45</option><option>60</option></select></label>
       <label><input type="checkbox" id="egen" checked> include fresh‑number problems</label>
-      <button class="btn" id="estart">Start exam</button></div></div>
+      <button class="btn" id="estart">Start exam</button><span class="hint" id="emsg"></span></div></div>
       <div id="ebox"></div>
       ${hist ? `<h2>Previous attempts</h2><div class="card"><table><tr><th>Date</th><th>Qs</th><th>Score</th><th>Chapters</th></tr>${hist}</table></div>` : ''}`;
   };
@@ -3753,7 +3782,7 @@ window.SERWAY = {
   function afterExam() {
     $('#estart').onclick = () => {
       const chs = [...document.querySelectorAll('.ech:checked')].map(x => x.value);
-      if (!chs.length) return alert('Pick at least one chapter.');
+      if (!chs.length) { $('#emsg').textContent = 'Pick at least one chapter.'; return; }
       const n = +$('#en').value, mins = +$('#em').value;
       let pool = [];
       COURSE.filter(c => chs.includes(c.id)).forEach(c => c.lessons.forEach(l => { l.quiz.concat(l.checks).forEach(q => pool.push(Object.assign({ ch: c.id, lessonId: l.id }, q))); pool.push({ ch: c.id, lessonId: l.id, q: l.tryit.q, num: l.tryit.ans, tol: l.tryit.tol, unit: l.tryit.unit, sol: l.tryit.sol }); }));
@@ -3799,8 +3828,9 @@ window.SERWAY = {
     $('#eprev').onclick = () => go(EXAM.cur - 1);
     $('#enext').onclick = () => EXAM.cur === qs.length - 1 ? askSubmit() : go(EXAM.cur + 1);
     $('#esubmit').onclick = askSubmit;
-    $('#equit').onclick = () => { if (confirm('Leave the exam? Your answers will be lost. · هل تريد الخروج من الاختبار؟ ستضيع إجاباتك.')) closeExam(); };
-    $('#efs').onclick = () => { try { document.fullscreenElement ? document.exitFullscreen() : ov.requestFullscreen(); } catch (err) { /* full screen not allowed here */ } };
+    const quit = () => { $('#econfirm').innerHTML = `<div class="card exconf"><b>Leave the exam? · الخروج من الاختبار؟</b><p>Your answers will be lost and nothing is saved.</p><div class="ar">ستضيع إجاباتك ولن تُحفظ النتيجة.</div><div class="row"><button class="btn" id="eleave">Leave the exam</button><button class="btn ghost" id="estay">Back to the exam</button></div></div>`; $('#eleave').onclick = closeExam; $('#estay').onclick = () => { $('#econfirm').innerHTML = ''; }; $('#econfirm').scrollIntoView({ block: 'nearest' }); };
+    $('#equit').onclick = quit;
+    $('#efs').onclick = () => { try { const r = document.fullscreenElement ? document.exitFullscreen() : ov.requestFullscreen(); if (r && r.catch) r.catch(() => {}); } catch (err) { /* full screen not allowed here */ } };
     function askSubmit() {
       const open = qs.map((q, i) => i).filter(i => !answered(i)), fl = Object.keys(EXAM.flags).filter(k => EXAM.flags[k]).map(Number);
       $('#econfirm').innerHTML = `<div class="card exconf"><b>Submit the exam? · تسليم الاختبار؟</b>
@@ -3813,7 +3843,7 @@ window.SERWAY = {
     }
     EXAM.keys = e => {
       if (!EXAM) return;
-      if (e.key === 'Escape') { e.preventDefault(); $('#equit').click(); }
+      if (e.key === 'Escape') { e.preventDefault(); quit(); }
       else if (!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) go(EXAM.cur + (e.key === 'ArrowRight' ? 1 : -1));
     };
     document.addEventListener('keydown', EXAM.keys);
@@ -3831,7 +3861,7 @@ window.SERWAY = {
   function closeExam() {
     if (!EXAM) return;
     clearTimeout(EXAM.t); document.removeEventListener('keydown', EXAM.keys);
-    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    if (document.fullscreenElement) { try { document.exitFullscreen().catch(() => {}); } catch (e) { /* not in full screen */ } }
     EXAM.ov.remove(); document.body.classList.remove('exam-open');
     EXAM = null;
   }
@@ -3982,7 +4012,7 @@ window.SERWAY = {
   // formula in words: Arabic line, then the same in English
   const words = (l, i) => { const w = (window.WORDS || {})[l.id + '#' + i]; return w ? `<div class="words"><div class="ar"><bdi>🗣 ${w[0]}</bdi></div><div class="en">🗣 <b>In words:</b> ${w[1]}</div></div>` : ''; };
   views.formulas = (chId) => `<h1>Formula & unit sheet</h1><p class="sub">Every law in the course with symbols, units and conditions. Print it for revision. <span class="pill src">📘 course files</span></p>
-    <div class="row noprint"><button class="btn small" onclick="window.print()">Print / save as PDF</button>${COURSE.map(c => `<a class="btn small ghost" href="#formulas/${c.id}">Ch ${c.n}</a>`).join('')}<a class="btn small ghost" href="#formulas">All</a></div>
+    <div class="row noprint"><button class="btn small printbtn" onclick="window.print()">Print / save as PDF</button>${COURSE.map(c => `<a class="btn small ghost" href="#formulas/${c.id}">Ch ${c.n}</a>`).join('')}<a class="btn small ghost" href="#formulas">All</a></div>
     <div class="card noprint">🔀 Under each law you see all its forms: the <b>bold symbol</b> is what that form finds. Open a lesson to see how each form comes from the course law, or read <a href="#rearrange">Rearranging a law</a>.<div class="ar">تحت كل قانون تجد كل أشكاله، والرمز العريض هو ما يحسبه ذلك الشكل. وطريقة الوصول لكل شكل موجودة داخل الدرس وفي صفحة «ترتيب القوانين».</div></div>
     ${COURSE.filter(c => !chId || c.id === chId).map(c => `<h2>Ch ${c.n}. ${esc(c.title)} <span class="muted" style="font-size:14px;font-weight:400"><bdi>${c.ar}</bdi> · ${c.src}</span></h2>${c.lessons.map(l => l.formulas.map((f, fi) => `<div class="card"><div class="row" style="justify-content:space-between"><b>${f.name}</b><a class="muted" style="font-size:13px" href="#lesson/${l.id}">${esc(l.title)}</a></div><div class="formula">${f.f}</div>${words(l, fi)}<div style="font-size:14px">${f.sym.map(s => `<b>${s[0]}</b>: ${s[1]} (${s[2]})`).join(' · ')}</div>${f.cond !== '—' ? `<div class="muted" style="font-size:14px">Condition: ${f.cond}</div>` : ''}${FM(l, fi) ? `<div class="fchips">${FM(l, fi).map(x => `<span class="fchip" title="${esc(x.en)}"><b>${x.find}</b>${x.f}</span>`).join('')}</div>` : ''}</div>`).join('')).join('')}`).join('')}`;
 
@@ -4096,9 +4126,9 @@ window.SERWAY = {
     }
     return `<h1>Study planner</h1><p class="sub">Builds a day‑by‑day plan from your exam date and your mastery, weakest topics first. ${ADD}</p>
       <div class="ar">أدخل موعد اختبارك، وسيوزّع المخطط الدروس غير المتقنة على الأيام المتبقية بدءًا بالأضعف.</div>
-      <div class="card row noprint"><label>Exam date <input type="date" id="pdate" value="${p ? p.exam : ''}"></label><span>Chapters:</span>${COURSE.map(c => `<label><input type="checkbox" class="pch" value="${c.id}" ${!p || !p.chs.length || p.chs.includes(c.id) ? 'checked' : ''}> ${c.n}</label>`).join(' ')}<button class="btn" id="pgo">Build plan</button></div>${body}`;
+      <div class="card row noprint"><label>Exam date <input type="date" id="pdate" value="${p ? p.exam : ''}"></label><span>Chapters:</span>${COURSE.map(c => `<label><input type="checkbox" class="pch" value="${c.id}" ${!p || !p.chs.length || p.chs.includes(c.id) ? 'checked' : ''}> ${c.n}</label>`).join(' ')}<button class="btn" id="pgo">Build plan</button><span class="hint" id="pmsg"></span></div>${body}`;
   };
-  function afterPlan() { $('#pgo').onclick = () => { const v = $('#pdate').value; if (!v) return alert('Pick your exam date.'); S.plan = { exam: v, chs: [...document.querySelectorAll('.pch:checked')].map(x => x.value) }; save(); route(); }; }
+  function afterPlan() { $('#pgo').onclick = () => { const v = $('#pdate').value; if (!v) { $('#pmsg').textContent = 'Pick your exam date.'; return; } S.plan = { exam: v, chs: [...document.querySelectorAll('.pch:checked')].map(x => x.value) }; save(); route(); }; }
 
   // ---------- report ----------
   views.report = () => {
@@ -4109,7 +4139,7 @@ window.SERWAY = {
     const weak = ls.map(l => ({ l, m: mastery(l.id) })).filter(x => x.m != null && x.m < 60);
     const mByCh = {}; S.mistakes.forEach(m => { const l = m.lessonId && lessonById(m.lessonId); const k = l ? l.ch.title : 'Practice / exam'; mByCh[k] = (mByCh[k] || 0) + 1; });
     return `<h1>Progress report</h1><p class="sub">Generated ${new Date().toLocaleString()} · ${ADD}</p>
-      <div class="row noprint"><button class="btn small" onclick="window.print()">Print / save as PDF</button><button class="btn small ghost" id="exp">Export backup</button><label class="btn small ghost">Import backup<input type="file" id="imp" accept=".json" style="display:none"></label><button class="btn small ghost" id="reset">Reset progress</button></div>
+      <div class="row noprint"><button class="btn small printbtn" onclick="window.print()">Print / save as PDF</button><button class="btn small ghost" id="exp">Export backup</button><label class="btn small ghost">Import backup<input type="file" id="imp" accept=".json" style="display:none"></label><button class="btn small ghost" id="reset">Reset progress</button></div><div id="repmsg"></div>
       <div class="grid g3" style="margin-top:12px"><div class="card"><div class="stat">${ls.filter(l => (mastery(l.id) ?? 0) >= 80).length}/${ls.length}<small>lessons mastered</small></div></div><div class="card"><div class="stat">${mins} min<small>total study time</small></div></div><div class="card"><div class="stat">${S.exams[0] ? S.exams[0].pct + '%' : '—'}<small>last exam score (${S.exams.length} taken)</small></div></div></div>
       <h2>Mastery by chapter</h2><div class="card"><table><tr><th>Chapter</th><th>Lessons started</th><th>Mastery</th><th style="width:35%"></th></tr>${COURSE.map(c => { const cm = chapterMastery(c); return `<tr><td>Ch ${c.n}. ${esc(c.title)}</td><td>${cm.started}/${cm.total}</td><td><b>${cm.avg}%</b></td><td>${bar(cm.avg)}</td></tr>`; }).join('')}</table></div>
       <h2>Lessons</h2><div class="card"><table><tr><th>Lesson</th><th>Quiz best</th><th>Attempts</th><th>Mastery</th></tr>${ls.map(l => { const st = S.lessons[l.id] || {}; const m = mastery(l.id); const [lv, cls] = level(m); return `<tr><td>${l.ch.n}. ${esc(l.title)}</td><td>${st.quizBest != null ? st.quizBest + '%' : '—'}</td><td>${st.quizAttempts || 0}</td><td><span class="${cls}">${lv}${m != null ? ' ' + m + '%' : ''}</span></td></tr>`; }).join('')}</table></div>
@@ -4119,9 +4149,13 @@ window.SERWAY = {
       <h2>Recommendations</h2><div class="card"><ul class="clean">${weak.length ? weak.map(x => `<li>Review <a href="#lesson/${x.l.id}">${esc(x.l.title)}</a> (${x.m}%)</li>`).join('') : '<li>No lesson below 60%. Keep going.</li>'}<li>${recommend().why}</li></ul></div>`;
   };
   function afterReport() {
-    $('#exp').onclick = () => { const b = new Blob([JSON.stringify(S, null, 1)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `physics-lab-backup-${today()}.json`; a.click(); };
-    $('#imp').onchange = e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { try { S = Object.assign(blank(), JSON.parse(t)); save(); route(); } catch (err) { alert('Not a valid backup file.'); } }); };
-    $('#reset').onclick = () => { if (confirm('Erase all progress on this computer?')) { const p = S.prefs; S = blank(); S.prefs = p; save(); route(); } };
+    $('#exp').onclick = () => {
+      const json = JSON.stringify(S, null, 1);
+      if (FRAMED) return copyBox($('#repmsg'), json, 'Downloads are blocked here. Copy this text and save it as a .json file; use “Import backup” to load it again.');
+      const b = new Blob([json], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `physics-lab-backup-${today()}.json`; a.click();
+    };
+    $('#imp').onchange = e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { try { S = Object.assign(blank(), JSON.parse(t)); save(); route(); } catch (err) { $('#repmsg').innerHTML = '<p class="hint">That file is not a valid backup: choose a .json file saved with “Export backup”.</p>'; } }); };
+    $('#reset').onclick = () => inlineConfirm($('#repmsg'), 'Erase all progress on this device? This cannot be undone.', () => { const p = S.prefs; S = blank(); S.prefs = p; save(); route(); });
   }
 
   // ---------- sources & gap summary ----------
@@ -4310,14 +4344,16 @@ window.SERWAY = {
     window.scrollTo(0, 0);
   }
 
+  const effTheme = () => document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   function applyPrefs() {
     document.body.classList.toggle('hide-ar', !S.prefs.ar);
-    document.documentElement.dataset.theme = S.prefs.theme;
-    $('#tar').classList.toggle('on', S.prefs.ar); $('#tth').textContent = S.prefs.theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+    // no saved choice: follow the device (or the viewer's) setting
+    if (S.prefs.theme) document.documentElement.dataset.theme = S.prefs.theme;
+    $('#tar').classList.toggle('on', S.prefs.ar); $('#tth').textContent = effTheme() === 'dark' ? '☀️ Light' : '🌙 Dark';
   }
   document.addEventListener('DOMContentLoaded', () => {
     $('#tar').onclick = () => { S.prefs.ar = !S.prefs.ar; save(); applyPrefs(); };
-    $('#tth').onclick = () => { S.prefs.theme = S.prefs.theme === 'dark' ? 'light' : 'dark'; save(); applyPrefs(); };
+    $('#tth').onclick = () => { S.prefs.theme = effTheme() === 'dark' ? 'light' : 'dark'; save(); applyPrefs(); };
     // ☰ hides or shows the side menu: a slide-in panel on phones, a collapsible column on wider screens (remembered)
     const wide = matchMedia('(min-width: 861px)');
     const applySide = () => { document.body.classList.toggle('side-closed', S.prefs.side === false); $('#menu').setAttribute('aria-expanded', String(wide.matches ? S.prefs.side !== false : $('#side').classList.contains('open'))); };
