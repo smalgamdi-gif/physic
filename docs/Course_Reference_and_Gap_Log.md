@@ -231,4 +231,5 @@ Because the course's actual experiments are unknown, the Virtual Lab delivered w
 ## E. What was built (🧩 additional design)
 1. **Physics Learning Lab — tutor app** (`Physics Learning Lab/index.html`): 10 chapters, lessons in the 14-step structure, bilingual, source tags, adaptive mastery, quizzes that hide answers until you answer, mistake journal, flashcards with spaced repetition, formula & unit sheet, "Which law?" trainer, unit converter, dimensional-analysis checker, exam simulator, progress report.
 1a. **Law forms** (`src/app/content_forms.js`): every course law with all its rearranged forms, what each form finds, and the algebra steps (🧩 rearrangements of course laws, not new laws), plus the "Rearranging laws" page.
+1b. **Foundation (Unit 0)** (`src/app/content_found.js`): answers gap G‑03 with 11 prerequisite skills, a placement test, chapter readiness checks, a glossary of the lesson terms and a problem‑language page (🧩).
 2. **Virtual Lab** (`Physics Learning Lab/Virtual_Lab.html`): 11 simulations driven by the equations above, with data tables, graphs, fitting and error analysis.

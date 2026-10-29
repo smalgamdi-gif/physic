@@ -4,6 +4,8 @@ A private tutor and virtual lab for the first-year **General Physics** course (1
 
 - **`index.html`** is the tutor. Each lesson follows 14 steps, and every formula is also written out in words, first in Arabic and then in English. It also has unlimited practice, an exam simulator, flashcards, a mistake journal, a formula sheet, tools, a study planner and a progress report. Each lesson ends with a "Go deeper with Serway" section with extra problems.
   Every law is written with real fractions (numerator over denominator). Under each law, "One law, several forms" lists every form of it, what each form finds, and the algebra steps from the course form (for example Ohm's law: V = RI, R = V/I, I = V/R). The "Rearranging laws" page teaches the rules, with a practice drill.
+- **Foundation section** in the tutor: a placement test, Unit 0 (11 maths and reading skills the course assumes, each with an Arabic‑first explanation, a worked example and fresh practice), an "Are you ready?" check on each chapter page, a course glossary and a "Problem language" page (phrases such as *starts from rest* → vᵢ = 0).
+- Arabic text is shown right to left everywhere; formulas inside an Arabic sentence are kept left to right (`src/shared/rtl.js`).
 - **`Virtual_Lab.html`** is the virtual lab: 11 experiments built on the course laws, with data tables, graphs and a linear fit.
 - **`docs/Course_Reference_and_Gap_Log.md`** is the course reference and gap log, with a source for every item.
 

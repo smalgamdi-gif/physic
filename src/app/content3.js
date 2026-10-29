@@ -10,20 +10,20 @@ COURSE.push({
       explain: [
         { en: 'Thermometers use a property that changes with temperature: liquid volume, gas volume (constant P), gas pressure (constant V), solid dimensions, electrical resistance, emitted wavelength.', ar: 'الترمومتر يعتمد على خاصية فيزيائية تتغير بالحرارة.' },
         { en: 'Fixed points: Celsius 0–100, Fahrenheit 32–212 (180 divisions), Kelvin 273.15–373.15.', ar: 'نقاط التجمد والغليان في المقاييس الثلاثة.' },
-        { en: 'T_C/100 = (T_K − 273)/100 = (T_F − 32)/180 → T_C = 5/9 (T_F − 32), T_K = T_C + 273 (7.1, 7.2).', ar: 'العلاقة العامة بين المقاييس.' },
+        { en: '{{T_C // 100}} = {{T_K − 273 // 100}} = {{T_F − 32 // 180}} → T_C = {{5 // 9}} (T_F − 32), T_K = T_C + 273 (7.1, 7.2).', ar: 'العلاقة العامة بين المقاييس.' },
         { en: 'Absolute zero −273.15 °C = 0 K (gas pressure → 0, Fig 7.2). Write K, not °K (G‑17).', ar: 'الصفر المطلق −273.15 °C.' }
       ],
       terms: [['Temperature', 'درجة الحرارة', 'Measure of hotness'], ['Thermometer', 'مقياس الحرارة', 'Uses a thermometric property'], ['Absolute zero', 'الصفر المطلق', '0 K']],
-      formulas: [{ f: 'T_C = {{5 // 9}} (T_F − 32) ,  T_K = T_C + 273', name: '(7.1–7.2)', sym: [['T_C, T_F, T_K', 'temperatures', '°C, °F, K']], cond: 'ΔT in °C equals ΔT in K.' }],
+      formulas: [{ f: 'T_C = {{5 // 9}} (T_F − 32) ,  T_K = T_C + 273', name: '(7.1–7.2)', sym: [['T_C', 'Celsius temperature', '°C', 'درجة الحرارة السيليزية'], ['T_F', 'Fahrenheit temperature', '°F', 'درجة الحرارة الفهرنهايتية'], ['T_K', 'absolute temperature', 'K', 'درجة الحرارة المطلقة']], cond: 'ΔT in °C equals ΔT in K.' }],
       life: { en: 'A fever of 104 °F is 40 °C.', ar: 'حمى 104 فهرنهايت تساوي 40 مئوية.' },
-      worked: { src: 'S07 Ex 7.1 · BK p.107', q: 'Room temperature 100 °F in °C and K?', steps: ['T_C = 5/9 (100 − 32) = 37.8 °C', 'T_K = 37.8 + 273 = 310.8 K'], ans: '37.8 °C, 310.8 K' },
-      tryit: { src: 'BK p.120 Exercise 1', q: 'Oxygen freezes at −362 °F. Value in °C?', ans: -218.9, tol: 0.01, unit: '°C', hint: '5/9 × (−362 − 32)', sol: '5/9 × (−394) = −218.9 °C' },
+      worked: { src: 'S07 Ex 7.1 · BK p.107', q: 'Room temperature 100 °F in °C and K?', steps: ['T_C = {{5 // 9}} (100 − 32) = 37.8 °C', 'T_K = 37.8 + 273 = 310.8 K'], ans: '37.8 °C, 310.8 K' },
+      tryit: { src: 'BK p.120 Exercise 1', q: 'Oxygen freezes at −362 °F. Value in °C?', ans: -218.9, tol: 0.01, unit: '°C', hint: '{{5 // 9}} × (−362 − 32)', sol: '{{5 // 9}} × (−394) = −218.9 °C' },
       checks: [
-        { q: 'At what Celsius reading is the Fahrenheit reading twice it? (BK Ex 7.2)', o: ['160 °C', '−40 °C', '80 °C', '320 °C'], a: 0, why: 'x/100 = (2x − 32)/180 → x = 160.' },
-        { q: '−10 °C in °F (BK Ex.2)?', o: ['14 °F', '−14 °F', '50 °F', '−23 °F'], a: 0, why: '9/5(−10) + 32.' }
+        { q: 'At what Celsius reading is the Fahrenheit reading twice it? (BK Ex 7.2)', o: ['160 °C', '−40 °C', '80 °C', '320 °C'], a: 0, why: '{{x // 100}} = {{2x − 32 // 180}} → x = 160.' },
+        { q: '−10 °C in °F (BK Ex.2)?', o: ['14 °F', '−14 °F', '50 °F', '−23 °F'], a: 0, why: '{{9 // 5}}(−10) + 32.' }
       ],
-      mistakes: [['Adding 32 before multiplying by 9/5', 'T_F = 9/5 T_C + 32.'], ['Writing °K', 'Use K.']],
-      summary: ['°C 0–100, °F 32–212, K 273–373', 'T_C = 5/9(T_F − 32)', 'T_K = T_C + 273'],
+      mistakes: [['Adding 32 before multiplying by 9/5', 'T_F = {{9 // 5}} T_C + 32.'], ['Writing °K', 'Use K.']],
+      summary: ['°C 0–100, °F 32–212, K 273–373', 'T_C = {{5 // 9}}(T_F − 32)', 'T_K = T_C + 273'],
       quiz: [
         { q: '−40 °C in °F?', num: -40, tol: 0, unit: '°F', sol: '🧩 the two scales meet at −40.' },
         { q: '300 K in °C?', num: 27, tol: 0, unit: '°C', sol: '300 − 273 = 27 °C' }
@@ -42,12 +42,12 @@ COURSE.push({
         { en: 'A hole in a plate expands as if it were made of the plate material (Ex 7.4).', ar: 'الثقب في صفيحة يتمدد كأنه من مادة الصفيحة.' }
       ],
       terms: [['Linear expansion coefficient α', 'معامل التمدد الطولي', '°C⁻¹'], ['Surface coefficient γ', 'معامل التمدد السطحي', '2α'], ['Volume coefficient β', 'معامل التمدد الحجمي', '3α'], ['Anomaly of water', 'شذوذ الماء', 'Max density at 4 °C']],
-      formulas: [{ f: 'Δℓ = α ℓ ΔT ,  ΔS = γ S ΔT ,  ΔV = β V ΔT', name: '(7.3–7.5)', sym: [['α', 'linear coefficient', '°C⁻¹ or K⁻¹'], ['ΔT', 'temperature change', '°C or K']], cond: 'γ = 2α, β = 3α (small αΔT).' }],
+      formulas: [{ f: 'Δℓ = α ℓ ΔT ,  ΔS = γ S ΔT ,  ΔV = β V ΔT', name: '(7.3–7.5)', sym: [['Δℓ, ΔS, ΔV', 'change of length, area, volume', 'm, m², m³', 'تغير الطول والمساحة والحجم'], ['α', 'linear coefficient', '°C⁻¹ or K⁻¹', 'معامل التمدد الطولي'], ['γ, β', 'area / volume coefficient', '°C⁻¹', 'معاملا التمدد السطحي والحجمي'], ['ΔT', 'temperature change', '°C or K', 'تغير درجة الحرارة']], cond: 'γ = 2α, β = 3α (small αΔT).' }],
       life: { en: 'Power lines sag more in summer because they are longer.', ar: 'أسلاك الكهرباء تتدلى صيفًا لأنها أطول.' },
       worked: { src: 'S07 example · BK Ex 7.3 p.112', q: 'Copper bar 10 m at 0 °C heated to 500 °C, α = 1.8×10⁻⁵ °C⁻¹. Expansion?', steps: ['Δℓ = 1.8×10⁻⁵ × 10 × 500', 'Δℓ = 0.09 m → ℓ₂ = 10.09 m', 'β = 3α = 5.4×10⁻⁵ °C⁻¹'], ans: 'Δℓ = 0.09 m' },
       tryit: { src: 'S07 example · BK Ex 7.5 p.113', q: 'A 0.55 m³ metal box at 20 °C is heated to 100 °C, α = 1.7×10⁻⁵. ΔV = ?', ans: 0.002244, tol: 0.02, unit: 'm³', hint: 'β = 3α', sol: 'ΔV = 3·1.7×10⁻⁵·0.55·80 = 2.24×10⁻³ m³' },
       checks: [
-        { q: 'A square plate 100 cm side grows by 1 cm, α = 1.25×10⁻⁵ (BK Ex 7.4). ΔT?', o: ['800 °C', '80 °C', '8000 °C', '400 °C'], a: 0, why: 'ΔT = 1/(100·1.25×10⁻⁵).' },
+        { q: 'A square plate 100 cm side grows by 1 cm, α = 1.25×10⁻⁵ (BK Ex 7.4). ΔT?', o: ['800 °C', '80 °C', '8000 °C', '400 °C'], a: 0, why: 'ΔT = {{1 // 100 × 1.25×10⁻⁵}}.' },
         { q: 'Water has maximum density at…', o: ['0 °C', '4 °C', '100 °C', '−4 °C'], a: 1, why: 'Anomaly of water.' }
       ],
       mistakes: [['Using β = α for volumes', 'β = 3α.'], ['Thinking a hole shrinks on heating', 'It expands.']],
@@ -70,9 +70,9 @@ COURSE.push({
       ],
       terms: [['Specific heat c', 'الحرارة النوعية', 'J/kg·K or cal/g·°C'], ['Heat capacity C', 'السعة الحرارية', 'J/K'], ['Latent heat L', 'الحرارة الكامنة', 'J/kg'], ['Calorimeter', 'المسعر', 'Insulated container']],
       formulas: [
-        { f: 'Q = c m ΔT', name: '(7.6)', sym: [['c', 'specific heat', 'J/kg·K'], ['m', 'mass', 'kg']], cond: 'No phase change.' },
-        { f: 'Q = m L', name: '(7.8)', sym: [['L', 'latent heat', 'J/kg']], cond: 'Constant temperature during phase change.' },
-        { f: 'Σ Q_lost = Σ Q_gained', name: 'Heat balance', sym: [['Q', 'heat', 'J or cal']], cond: 'Insulated system.' }
+        { f: 'Q = c m ΔT', name: '(7.6)', sym: [['Q', 'heat', 'J', 'كمية الحرارة'], ['c', 'specific heat', 'J/kg·K', 'الحرارة النوعية'], ['m', 'mass', 'kg', 'الكتلة'], ['ΔT', 'temperature change', 'K or °C', 'تغير درجة الحرارة']], cond: 'No phase change.' },
+        { f: 'Q = m L', name: '(7.8)', sym: [['Q', 'heat', 'J', 'كمية الحرارة'], ['m', 'mass', 'kg', 'الكتلة'], ['L', 'latent heat', 'J/kg', 'الحرارة الكامنة']], cond: 'Constant temperature during phase change.' },
+        { f: 'Σ Q_lost = Σ Q_gained', name: 'Heat balance', sym: [['Q', 'heat', 'J or cal', 'كمية الحرارة'], ['T_f', 'final temperature', '°C', 'درجة الحرارة النهائية']], cond: 'Insulated system.' }
       ],
       life: { en: 'Sand on the beach gets hot quickly while the sea stays cool: water has a much larger c.', ar: 'الرمل يسخن بسرعة والبحر يبقى باردًا لأن الحرارة النوعية للماء أكبر.' },
       worked: { src: 'BK Ex 7.8 p.116', q: '75 g copper (c = 0.092) at 312 °C into 220 g water at 12 °C in glass (C = 45 cal/K). Final T?', steps: ['Heat lost = 75·0.092·(312 − T)', 'Heat gained = 220·1·(T − 12) + 45(T − 12)', '2152.8 − 6.9T = 265T − 3180 → 5332.8 = 271.9T', 'T = 19.6 °C'], ans: 'T = 19.6 °C' },
@@ -92,25 +92,25 @@ COURSE.push({
     },
     {
       id: 'ch7-l4', title: 'Heat transfer: conduction, convection, radiation', ar: 'انتقال الحرارة: التوصيل والحمل والإشعاع', src: 'S07 §4 · BK p.116–118',
-      goals: ['Use H = k_c A (T₁ − T₂)/x', 'Describe convection', 'Use Stefan–Boltzmann Q = σAT⁴'],
+      goals: ['Use H = {{k_c A (T₁ − T₂) // x}}', 'Describe convection', 'Use Stefan–Boltzmann Q = σAT⁴'],
       goalsAr: 'ستتعرف طرق انتقال الحرارة الثلاث وتحسب التوصيل والإشعاع.',
       why: { en: 'Insulation, cooking pots and the Sun warming Earth are the three modes in action.', ar: 'العزل وأواني الطبخ وتسخين الشمس للأرض أمثلة على الطرق الثلاث.' },
       explain: [
-        { en: 'Conduction: heat Q through a slab is ∝ A, (T₁ − T₂), t and ∝ 1/x. Rate H = Q/t = k_c A (T₁ − T₂)/x (7.9).', ar: 'التوصيل يعتمد على المساحة وفرق الحرارة والسمك.' },
+        { en: 'Conduction: heat Q through a slab is ∝ A, (T₁ − T₂), t and ∝ {{1 // x}}. Rate H = {{Q // t}} = {{k_c A (T₁ − T₂) // x}} (7.9).', ar: 'التوصيل يعتمد على المساحة وفرق الحرارة والسمك.' },
         { en: 'Convection: movement of the fluid itself; hot water rises because its density decreases (Fig 7.8).', ar: 'الحمل: انتقال المادة الساخنة نفسها.' },
         { en: 'Radiation: electromagnetic waves, no medium needed. Stefan–Boltzmann: Q = σAT⁴, σ = 5.67×10⁻⁸ W/m²K⁴, T in kelvin; Q here is energy per second of a black body (G‑16).', ar: 'الإشعاع لا يحتاج وسطًا، ويتناسب مع T⁴ بالكلفن.' }
       ],
       terms: [['Thermal conductivity k_c', 'معامل التوصيل الحراري', 'W/m·K'], ['Temperature gradient', 'الميل الحراري', '(T₁ − T₂)/x'], ['Convection', 'الحمل', 'Fluid motion'], ['Radiation', 'الإشعاع', 'EM waves'], ['Black body', 'الجسم الأسود', 'Ideal emitter']],
-      formulas: [{ f: 'H = {{k_c A (T₁ − T₂) // x}}', name: 'Conduction (7.9)', sym: [['H', 'heat rate', 'W or cal/s'], ['x', 'thickness', 'm']], cond: 'Steady state.' }, { f: 'Q = σ A T⁴', name: 'Stefan–Boltzmann (7.10)', sym: [['σ', '5.67×10⁻⁸', 'W/m²K⁴'], ['T', 'absolute temperature', 'K']], cond: 'Ideal black body; per second.' }],
+      formulas: [{ f: 'H = {{k_c A (T₁ − T₂) // x}}', name: 'Conduction (7.9)', sym: [['H', 'heat rate', 'W or cal/s', 'معدل انتقال الحرارة'], ['k_c', 'thermal conductivity', 'W/m·K', 'معامل التوصيل الحراري'], ['A', 'area', 'm²', 'المساحة'], ['T₁ − T₂', 'temperature difference', 'K or °C', 'فرق درجتي الحرارة'], ['x', 'thickness', 'm', 'السمك']], cond: 'Steady state.' }, { f: 'Q = σ A T⁴', name: 'Stefan–Boltzmann (7.10)', sym: [['Q', 'energy radiated per second', 'W', 'الطاقة المشعة في الثانية'], ['σ', '5.67×10⁻⁸', 'W/m²K⁴', 'ثابت ستيفان-بولتزمان'], ['A', 'surface area', 'm²', 'مساحة السطح'], ['T', 'absolute temperature', 'K', 'درجة الحرارة المطلقة']], cond: 'Ideal black body; per second.' }],
       life: { en: 'Double‑glazed windows trap air (poor conductor) to cut heat loss.', ar: 'النوافذ المزدوجة تحبس الهواء الرديء التوصيل.' },
-      worked: { src: '🧩 built on (7.9), data of BK Ex.5', q: 'Copper bar 1 m, A = 2 cm², ends at 100 °C and 0 °C, k = 0.2 cal/s·cm·°C. Heat in 10 min?', steps: ['H = 0.2 × 2 × 100/100 = 0.4 cal/s', 'Q = 0.4 × 600 = 240 cal'], ans: '240 cal ≈ 1004 J' },
+      worked: { src: '🧩 built on (7.9), data of BK Ex.5', q: 'Copper bar 1 m, A = 2 cm², ends at 100 °C and 0 °C, k = 0.2 cal/s·cm·°C. Heat in 10 min?', steps: ['H = {{0.2 × 2 × 100 // 100}} = 0.4 cal/s', 'Q = 0.4 × 600 = 240 cal'], ans: '240 cal ≈ 1004 J' },
       tryit: { src: '🧩 additional design', q: 'A black body of area 1 m² at 300 K. Radiated power?', ans: 459.3, tol: 0.01, unit: 'W', hint: 'σ T⁴ with T = 300 K', sol: '5.67×10⁻⁸ × 300⁴ = 459 W' },
       checks: [
         { q: 'Which needs no medium?', o: ['Conduction', 'Convection', 'Radiation'], a: 2, why: 'EM waves travel in vacuum.' },
-        { q: 'Doubling slab thickness makes H…', o: ['double', 'half', 'same', '4×'], a: 1, why: 'H ∝ 1/x.' }
+        { q: 'Doubling slab thickness makes H…', o: ['double', 'half', 'same', '4×'], a: 1, why: 'H ∝ {{1 // x}}.' }
       ],
       mistakes: [['Using °C in σT⁴', 'Convert to K.']],
-      summary: ['Conduction H = kA ΔT/x', 'Convection: fluid moves', 'Radiation σAT⁴ (K)'],
+      summary: ['Conduction H = {{k A ΔT // x}}', 'Convection: fluid moves', 'Radiation σAT⁴ (K)'],
       quiz: [{ q: 'If T (in K) doubles, radiated power becomes ×…', num: 16, tol: 0, unit: '', sol: '2⁴ = 16' }]
     }
   ]
@@ -332,7 +332,7 @@ COURSE.push({
         { en: 'Two mirrors at angle Φ: total deviation = 360° − 2Φ; at 90° the ray returns (retro‑reflection) (BK p.164–165).', ar: 'مرآتان بزاوية Φ: الانحراف 360 − 2Φ.' }
       ],
       terms: [['Normal', 'العمود المقام', 'Line ⟂ to surface'], ['Angle of incidence', 'زاوية السقوط', 'θ₁'], ['Diffuse reflection', 'الانعكاس المنتشر', 'From rough surfaces'], ['Photon', 'الفوتون', 'Light quantum']],
-      formulas: [{ f: 'θ₁ = θ₂', name: 'Law of reflection (10.1)', sym: [['θ', 'angle from the normal', '°']], cond: '—' }],
+      formulas: [{ f: 'θ₁ = θ₂', name: 'Law of reflection (10.1)', sym: [['θ₁', 'angle of incidence, from the normal', '°', 'زاوية السقوط مع العمود'], ['θ₂', 'angle of reflection, from the normal', '°', 'زاوية الانعكاس مع العمود']], cond: '—' }],
       life: { en: 'Bicycle reflectors use corner mirrors to send light back to the car.', ar: 'عاكسات الدراجة ترد الضوء إلى السيارة.' },
       worked: { src: 'S10 Ex 10.1 · BK p.164', q: 'Two mirrors at 90°. Total deviation?', steps: ['First reflection deviates 180° − 2θ', 'Second: 180° − 2(90° − θ)', 'Total = 360° − 180° = 180°'], ans: '180°' },
       tryit: { src: 'BK p.174 Exercise 9', q: 'Mirrors at 120°. Total deviation?', ans: 120, tol: 0, unit: '°', hint: '360 − 2Φ', sol: '360 − 240 = 120°' },
@@ -343,31 +343,31 @@ COURSE.push({
     },
     {
       id: 'ch10-l2', title: 'Refraction & Snell\'s law', ar: 'الانكسار وقانون سنل', src: 'S10 §3 · BK p.165–170',
-      goals: ['Use n = c/v and n₁ sin θ₁ = n₂ sin θ₂', 'Find wavelength in a medium λₙ = λ/n'],
+      goals: ['Use n = {{c // v}} and n₁ sin θ₁ = n₂ sin θ₂', 'Find wavelength in a medium λₙ = {{λ // n}}'],
       goalsAr: 'ستطبق قانون سنل وتحسب سرعة الضوء وطوله الموجي في الوسط.',
       why: { en: 'Glasses, cameras and the apparent depth of pools come from refraction.', ar: 'النظارات والكاميرات وظاهرة العمق الظاهري سببها الانكسار.' },
       explain: [
-        { en: 'Refraction laws: incident, reflected, refracted rays and the normal lie in one plane; sin θ₁/sin θ₂ = v₁/v₂ (10.2).', ar: 'نسبة الجيبين = نسبة السرعتين.' },
-        { en: 'Refractive index n = c/v (> 1). Snell: n₁ sin θ₁ = n₂ sin θ₂ (10.3). Vacuum n = 1.', ar: 'معامل الانكسار وقانون سنل.' },
-        { en: 'Frequency does not change between media; therefore n = λ/λₙ and n₁λ₁ = n₂λ₂.', ar: 'التردد لا يتغير، فيتغير الطول الموجي.' },
+        { en: 'Refraction laws: incident, reflected, refracted rays and the normal lie in one plane; {{sin θ₁ // sin θ₂}} = {{v₁ // v₂}} (10.2).', ar: 'نسبة الجيبين = نسبة السرعتين.' },
+        { en: 'Refractive index n = {{c // v}} (> 1). Snell: n₁ sin θ₁ = n₂ sin θ₂ (10.3). Vacuum n = 1.', ar: 'معامل الانكسار وقانون سنل.' },
+        { en: 'Frequency does not change between media; therefore n = {{λ // λₙ}} and n₁λ₁ = n₂λ₂.', ar: 'التردد لا يتغير، فيتغير الطول الموجي.' },
         { en: 'Into a denser medium the ray bends toward the normal; the path is reversible (Fig 10.6).', ar: 'عند الدخول لوسط أكبر معاملًا ينكسر مقتربًا من العمود.' }
       ],
-      terms: [['Refraction', 'الانكسار', 'Change of direction at a boundary'], ['Refractive index', 'معامل الانكسار', 'n = c/v'], ['Snell\'s law', 'قانون سنل', 'n₁ sin θ₁ = n₂ sin θ₂']],
-      formulas: [{ f: 'n = {{c // v}} = {{λ // λₙ}}', name: 'Refractive index', sym: [['c', '3×10⁸ m/s', 'm/s'], ['λₙ', 'wavelength in medium', 'm']], cond: 'f constant.' }, { f: 'n₁ sin θ₁ = n₂ sin θ₂', name: 'Snell (10.3)', sym: [['θ', 'angle from normal', '°']], cond: '—' }],
+      terms: [['Refraction', 'الانكسار', 'Change of direction at a boundary'], ['Refractive index', 'معامل الانكسار', 'n = {{c // v}}'], ['Snell\'s law', 'قانون سنل', 'n₁ sin θ₁ = n₂ sin θ₂']],
+      formulas: [{ f: 'n = {{c // v}} = {{λ // λₙ}}', name: 'Refractive index', sym: [['n', 'refractive index', '—', 'معامل الانكسار'], ['c', '3×10⁸ m/s', 'm/s', 'سرعة الضوء في الفراغ'], ['v', 'speed in the medium', 'm/s', 'سرعة الضوء في الوسط'], ['λ, λₙ', 'wavelength in vacuum / in the medium', 'm', 'الطول الموجي في الفراغ وفي الوسط']], cond: 'f constant.' }, { f: 'n₁ sin θ₁ = n₂ sin θ₂', name: 'Snell (10.3)', sym: [['n₁, n₂', 'refractive indices', '—', 'معاملا الانكسار'], ['θ₁, θ₂', 'angles from the normal', '°', 'الزاويتان مع العمود']], cond: '—' }],
       life: { en: 'A straw looks bent in a glass of water.', ar: 'الماصة تبدو مكسورة في كوب الماء.' },
-      worked: { src: 'S10 Ex 10.3 · BK p.168–169', q: '589 nm, air → glass (n = 1.52) at 30°. θ₂, v, λₙ?', steps: ['θ₂ = sin⁻¹(sin30°/1.52) = 19.2°', 'v = 3×10⁸/1.52 = 1.97×10⁸ m/s', 'λₙ = 589/1.52 = 388 nm'], ans: '19.2°, 1.97×10⁸ m/s, 388 nm' },
-      tryit: { src: 'BK p.174 Exercise 8', q: 'Air → medium n = 1.458 at θ₁ = 45°. θ₂?', ans: 29.0, tol: 0.01, unit: '°', hint: 'sin θ₂ = sin45°/1.458', sol: 'sin θ₂ = 0.485 → θ₂ = 29.0°' },
+      worked: { src: 'S10 Ex 10.3 · BK p.168–169', q: '589 nm, air → glass (n = 1.52) at 30°. θ₂, v, λₙ?', steps: ['θ₂ = sin⁻¹( {{sin 30° // 1.52}} ) = 19.2°', 'v = {{c // n}} = {{3×10⁸ // 1.52}} = 1.97×10⁸ m/s', 'λₙ = {{λ // n}} = {{589 // 1.52}} = 388 nm'], ans: '19.2°, 1.97×10⁸ m/s, 388 nm' },
+      tryit: { src: 'BK p.174 Exercise 8', q: 'Air → medium n = 1.458 at θ₁ = 45°. θ₂?', ans: 29.0, tol: 0.01, unit: '°', hint: 'sin θ₂ = {{sin 45° // 1.458}}', sol: 'sin θ₂ = 0.485 → θ₂ = 29.0°' },
       checks: [
         { q: 'Air → water (1.33) at 30° (Ex 10.2). θ₂?', o: ['22°', '42°', '30°', '48.8°'], a: 0, why: 'sin⁻¹(0.376).' },
         { q: 'When light enters glass, what stays constant? (BK Ex.2)', o: ['speed', 'wavelength', 'frequency'], a: 2, why: 'f is set by the source.' }
       ],
       mistakes: [['Thinking frequency changes', 'Speed and wavelength change; f does not.']],
-      summary: ['n = c/v', 'n₁ sin θ₁ = n₂ sin θ₂', 'λₙ = λ/n'],
+      summary: ['n = {{c // v}}', 'n₁ sin θ₁ = n₂ sin θ₂', 'λₙ = {{λ // n}}'],
       quiz: [
-        { q: 'λ = 495 nm in air, 434 nm in liquid (BK Ex.1). n?', num: 1.141, tol: 0.01, unit: '', sol: '495/434 = 1.14' },
-        { q: 'Glass n = 1.66 (BK Ex.6). Speed of light ×10⁸ m/s?', num: 1.807, tol: 0.01, unit: '×10⁸ m/s', sol: '3/1.66 = 1.81' },
-        { q: 'He‑Ne 632.8 nm (BK Ex.4). Frequency ×10¹⁴ Hz?', num: 4.74, tol: 0.01, unit: '×10¹⁴ Hz', sol: 'f = c/λ = 4.74×10¹⁴ Hz' },
-        { q: 'Same laser in glass n = 1.5 (BK Ex.5). λₙ?', num: 421.9, tol: 0.01, unit: 'nm', sol: '632.8/1.5' }
+        { q: 'λ = 495 nm in air, 434 nm in liquid (BK Ex.1). n?', num: 1.141, tol: 0.01, unit: '', sol: '{{495 // 434}} = 1.14' },
+        { q: 'Glass n = 1.66 (BK Ex.6). Speed of light ×10⁸ m/s?', num: 1.807, tol: 0.01, unit: '×10⁸ m/s', sol: '{{3 // 1.66}} = 1.81' },
+        { q: 'He‑Ne 632.8 nm (BK Ex.4). Frequency ×10¹⁴ Hz?', num: 4.74, tol: 0.01, unit: '×10¹⁴ Hz', sol: 'f = {{c // λ}} = 4.74×10¹⁴ Hz' },
+        { q: 'Same laser in glass n = 1.5 (BK Ex.5). λₙ?', num: 421.9, tol: 0.01, unit: 'nm', sol: '{{632.8 // 1.5}}' }
       ]
     },
     {
@@ -377,17 +377,17 @@ COURSE.push({
       why: { en: 'Fibre‑optic internet relies on total internal reflection.', ar: 'الإنترنت بالألياف البصرية يعتمد على الانعكاس الكلي الداخلي.' },
       explain: [
         { en: 'Dispersion: n depends on λ; red has a smaller n than violet, so each colour refracts at a different angle (prism, rainbow).', ar: 'التشتت: معامل الانكسار يقل بزيادة الطول الموجي.' },
-        { en: 'From larger n to smaller n the ray bends away from the normal. At θ₂ = 90° the incident angle is the critical angle: sin θ_c = n₂/n₁ (10.4).', ar: 'الزاوية الحرجة عند انكسار الشعاع موازيًا للسطح.' },
+        { en: 'From larger n to smaller n the ray bends away from the normal. At θ₂ = 90° the incident angle is the critical angle: sin θ_c = {{n₂ // n₁}} (10.4).', ar: 'الزاوية الحرجة عند انكسار الشعاع موازيًا للسطح.' },
         { en: 'If θ₁ > θ_c, all light is reflected back: total internal reflection (only when n₁ > n₂).', ar: 'إذا زادت زاوية السقوط عن الحرجة يحدث انعكاس كلي.' }
       ],
-      terms: [['Dispersion', 'التشتت (التحلل)', 'n depends on λ'], ['Critical angle', 'الزاوية الحرجة', 'sin θ_c = n₂/n₁'], ['Total internal reflection', 'الانعكاس الكلي الداخلي', 'θ₁ > θ_c']],
-      formulas: [{ f: 'sin θ_c = {{n₂ // n₁}}', name: '(10.4)', sym: [['n₁', 'denser medium', '—'], ['n₂', 'less dense', '—']], cond: 'n₁ > n₂ only.' }],
+      terms: [['Dispersion', 'التشتت (التحلل)', 'n depends on λ'], ['Critical angle', 'الزاوية الحرجة', 'sin θ_c = {{n₂ // n₁}}'], ['Total internal reflection', 'الانعكاس الكلي الداخلي', 'θ₁ > θ_c']],
+      formulas: [{ f: 'sin θ_c = {{n₂ // n₁}}', name: '(10.4)', sym: [['θ_c', 'critical angle', '°', 'الزاوية الحرجة'], ['n₁', 'denser medium', '—', 'الوسط الأكثف'], ['n₂', 'less dense medium', '—', 'الوسط الأقل كثافة']], cond: 'n₁ > n₂ only.' }],
       life: { en: 'Diamonds sparkle because their small critical angle (≈ 24°) traps light inside.', ar: 'يلمع الألماس لأن زاويته الحرجة صغيرة.' },
-      worked: { src: 'S10 Ex 10.5 · BK p.172', q: 'Glass (n = 1.5) → air. θ_c?', steps: ['sin θ_c = 1/1.5 = 0.667', 'θ_c = 42°'], ans: '42°' },
-      tryit: { src: 'BK p.174 Exercise 10', q: 'Water (n = 1.33) → air. θ_c?', ans: 48.75, tol: 0.01, unit: '°', hint: 'sin⁻¹(1/1.33)', sol: 'θ_c = 48.8°' },
+      worked: { src: 'S10 Ex 10.5 · BK p.172', q: 'Glass (n = 1.5) → air. θ_c?', steps: ['sin θ_c = {{1 // 1.5}} = 0.667', 'θ_c = 42°'], ans: '42°' },
+      tryit: { src: 'BK p.174 Exercise 10', q: 'Water (n = 1.33) → air. θ_c?', ans: 48.75, tol: 0.01, unit: '°', hint: 'sin⁻¹( {{1 // 1.33}} )', sol: 'θ_c = 48.8°' },
       checks: [{ q: 'TIR can happen when light goes…', o: ['air → glass', 'glass → air', 'both'], a: 1, why: 'Needs n₁ > n₂.' }],
       mistakes: [['Swapping n₁ and n₂ in sin θ_c', 'Smaller over larger.']],
-      summary: ['Red bends least', 'sin θ_c = n₂/n₁', 'TIR when θ > θ_c'],
+      summary: ['Red bends least', 'sin θ_c = {{n₂ // n₁}}', 'TIR when θ > θ_c'],
       quiz: [{ q: 'Which colour has the largest refractive index in glass?', o: ['Red', 'Green', 'Violet'], a: 2, why: 'Shorter λ → larger n.' }]
     }
   ]

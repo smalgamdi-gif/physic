@@ -14,7 +14,7 @@ COURSE.push({
         { en: 'Equilibrium method: draw forces, resolve into x and y, set each sum to zero, solve.', ar: 'طريقة الاتزان: ارسم القوى، حللها، اجعل مجموع كل محور صفرًا.' }
       ],
       terms: [['Net force', 'القوة المحصلة', 'Vector sum ΣF'], ['Inertia', 'القصور الذاتي', 'Resistance to change of motion'], ['Equilibrium', 'الاتزان', 'ΣF = 0'], ['Field force', 'قوة مجال', 'Acts without contact']],
-      formulas: [{ f: 'ΣF = 0  ⇔  ΣFₓ = 0 and ΣF_y = 0', name: 'First law / equilibrium (4.1)', sym: [['ΣF', 'net force', 'N']], cond: 'Body at rest or at constant velocity.' }],
+      formulas: [{ f: 'ΣF = 0  ⇔  ΣFₓ = 0 and ΣF_y = 0', name: 'First law / equilibrium (4.1)', sym: [['ΣF', 'net force', 'N', 'القوة المحصلة'], ['ΣFₓ, ΣF_y', 'components of the net force', 'N', 'مركبتا القوة المحصلة']], cond: 'Body at rest or at constant velocity.' }],
       life: { en: 'Passengers lurch forward when a bus brakes: their bodies keep moving (inertia).', ar: 'يندفع الركاب للأمام عند فرملة الحافلة بسبب القصور الذاتي.' },
       worked: { src: 'S04 Ex 4.2 · BK p.60', q: 'Static body: F₁ = 10 N at φ = 60° (up‑left), F₃ at θ = 30° (up‑right), F₂ down. Find F₃ and F₂.', steps: ['ΣFₓ: F₃ cos 30° − 10 cos 60° = 0 → F₃ = 5.8 N', 'ΣF_y: 10 sin 60° + 5.8 sin 30° − F₂ = 0 → F₂ = 11.6 N'], ans: 'F₃ = 5.8 N, F₂ = 11.6 N' },
       tryit: { src: 'BK p.66 Exercise 3', q: 'A 10 kg block hangs from two strings at 60° and 30° to the horizontal. Find the tension in the 60° string.', ans: 84.9, tol: 0.02, unit: 'N', hint: 'T₁cos60 = T₂cos30 and T₁sin60 + T₂sin30 = 98 N.', sol: 'T₁ = 84.9 N (60° string), T₂ = 49 N. 🧩 Assumes angles measured from the horizontal ceiling; check the figure.' },
@@ -41,19 +41,19 @@ COURSE.push({
         { en: 'Use components: ΣFₓ = maₓ, ΣF_y = ma_y. a points in the direction of the net force.', ar: 'نطبق القانون على كل محور على حدة.' }
       ],
       terms: [['Mass', 'الكتلة', 'Amount of inertia (kg)'], ['Weight', 'الوزن', 'Gravitational force mg (N)'], ['Newton (N)', 'نيوتن', 'kg·m/s²'], ['Tension', 'الشد', 'Force in a string']],
-      formulas: [{ f: 'ΣF = m a', name: 'Second law (4.2)', sym: [['ΣF', 'net force', 'N'], ['m', 'mass', 'kg'], ['a', 'acceleration', 'm/s²']], cond: 'Inertial frame; ΣF is the vector sum.' }, { f: 'F_w = m g', name: 'Weight', sym: [['g', '9.8 m/s²', 'm/s²']], cond: 'Near Earth\'s surface' }],
+      formulas: [{ f: 'ΣF = m a', name: 'Second law (4.2)', sym: [['ΣF', 'net force', 'N', 'القوة المحصلة'], ['m', 'mass', 'kg', 'الكتلة'], ['a', 'acceleration', 'm/s²', 'التسارع']], cond: 'Inertial frame; ΣF is the vector sum.' }, { f: 'F_w = m g', name: 'Weight', sym: [['F_w', 'weight', 'N', 'الوزن'], ['m', 'mass', 'kg', 'الكتلة'], ['g', '9.8 m/s²', 'm/s²', 'تسارع الجاذبية']], cond: 'Near Earth\'s surface' }],
       life: { en: 'In an elevator accelerating upward a scale shows more than your weight: n = m(g + a).', ar: 'في مصعد يتسارع للأعلى يقرأ الميزان أكثر من وزنك.' },
-      worked: { src: 'S04 slide example', q: 'F = 20 N at 30° acts on m = 5 kg. Find aₓ, a_y and a.', steps: ['Fₓ = 20 cos 30° = 17.3 N, F_y = 20 sin 30° = 10 N', 'aₓ = 17.3/5 = 3.46 m/s², a_y = 10/5 = 2 m/s²', 'a = 20/5 = 4 m/s² at 30° (same direction as F)'], ans: 'a = 4 m/s² at 30°' },
-      tryit: { src: 'BK p.66 Exercise 4', q: 'Masses 10 kg and 5 kg hang over a frictionless pulley. Find the acceleration.', ans: 3.27, tol: 0.02, unit: 'm/s²', hint: 'a = (m₁ − m₂)g/(m₁ + m₂).', sol: 'a = 5·9.8/15 = 3.27 m/s²; T = 2m₁m₂g/(m₁+m₂) = 65.3 N' },
+      worked: { src: 'S04 slide example', q: 'F = 20 N at 30° acts on m = 5 kg. Find aₓ, a_y and a.', steps: ['Fₓ = 20 cos 30° = 17.3 N, F_y = 20 sin 30° = 10 N', 'aₓ = {{17.3 // 5}} = 3.46 m/s², a_y = {{10 // 5}} = 2 m/s²', 'a = {{20 // 5}} = 4 m/s² at 30° (same direction as F)'], ans: 'a = 4 m/s² at 30°' },
+      tryit: { src: 'BK p.66 Exercise 4', q: 'Masses 10 kg and 5 kg hang over a frictionless pulley. Find the acceleration.', ans: 3.27, tol: 0.02, unit: 'm/s²', hint: 'a = {{(m₁ − m₂) g // m₁ + m₂}}.', sol: 'a = {{5 × 9.8 // 15}} = 3.27 m/s²; T = {{2 m₁ m₂ g // m₁ + m₂}} = 65.3 N' },
       checks: [
-        { q: 'Same force, mass tripled. Acceleration becomes (BK Quiz 2)…', o: ['a', 'a/3', '3a'], a: 1, why: 'a ∝ 1/m.' },
-        { q: 'A body weighs 24.4 N on Earth. Mass? (S04 Ex 4.4)', o: ['2.5 kg', '24.4 kg', '239 kg', '0.4 kg'], a: 0, why: '24.4/9.8.' }
+        { q: 'Same force, mass tripled. Acceleration becomes (BK Quiz 2)…', o: ['a', 'a/3', '3a'], a: 1, why: 'a ∝ {{1 // m}}.' },
+        { q: 'A body weighs 24.4 N on Earth. Mass? (S04 Ex 4.4)', o: ['2.5 kg', '24.4 kg', '239 kg', '0.4 kg'], a: 0, why: '{{24.4 // 9.8}}.' }
       ],
       mistakes: [['Using a single force instead of ΣF', 'Sum all forces first.'], ['Writing weight in kg', 'Weight is a force in N.']],
       summary: ['ΣF = ma (vector)', 'Weight = mg', 'Work per axis'],
       quiz: [
         { q: '80 kg person in an elevator accelerating up at 3 m/s². Scale reading? (BK Ex.5)', num: 1024, tol: 0.01, unit: 'N', sol: 'n = 80(9.8 + 3) = 1024 N (down: 544 N)' },
-        { q: '1200 kg car, 0 → 100 km/h in 10 s. Force? (BK Ex.8)', num: 3333, tol: 0.02, unit: 'N', sol: 'a = 27.78/10 = 2.778 → F = 3333 N' },
+        { q: '1200 kg car, 0 → 100 km/h in 10 s. Force? (BK Ex.8)', num: 3333, tol: 0.02, unit: 'N', sol: 'a = {{27.78 // 10}} = 2.778 → F = 3333 N' },
         { q: 'Ice block slides down a frictionless 20° incline. a = ? (BK Ex.2a)', num: 3.35, tol: 0.02, unit: 'm/s²', sol: 'a = g sin 20° = 3.35 m/s² down the slope' },
         { q: 'Child 30 kg pulled by 9 N (60° above x) and 12 N (30° below x). |a| = ? (BK Ex 4.3)', num: 0.5, tol: 0.03, unit: 'm/s²', sol: 'ΣFₓ = 14.89 N, ΣF_y = 1.79 N → aₓ = 0.496, a_y = 0.06 → a ≈ 0.50 m/s² at 6.9° (book prints a_y = 0.1, 11.3°: gap G‑26)' }
       ]
@@ -69,10 +69,10 @@ COURSE.push({
         { en: 'A book on a table: Earth pulls the book down (mg); the table pushes the book up (normal force n). For the book at rest n = mg (first law); the reaction to n is the book pushing the table.', ar: 'الكتاب على الطاولة: القوة العمودية تساوي الوزن هنا بسبب الاتزان.' }
       ],
       terms: [['Action–reaction pair', 'زوج الفعل ورد الفعل', 'Equal, opposite, on different bodies'], ['Normal force', 'القوة العمودية', 'Contact force ⟂ to surface']],
-      formulas: [{ f: 'F₁₂ = −F₂₁', name: 'Third law (4.3)', sym: [['F₁₂', 'force by 1 on 2', 'N']], cond: 'Always, for any interaction.' }],
+      formulas: [{ f: 'F₁₂ = −F₂₁', name: 'Third law (4.3)', sym: [['F₁₂', 'force by body 1 on body 2', 'N', 'قوة الجسم 1 على الجسم 2'], ['F₂₁', 'force by body 2 on body 1', 'N', 'قوة الجسم 2 على الجسم 1']], cond: 'Always, for any interaction.' }],
       life: { en: 'When you jump off a small boat, the boat moves backward.', ar: 'عندما تقفز من قارب صغير يتحرك القارب للخلف.' },
       worked: { src: 'S04 Ex 4.5 · BK p.65', q: 'An object of weight 200 N rests on a table. Reaction force n?', steps: ['Object at rest: ΣF_y = 0', 'n − W = 0 → n = W = 200 N'], ans: 'n = 200 N' },
-      tryit: { src: 'BK p.67 Exercise 7', q: 'A compressed spring pushes a 2 kg and a 1 kg ball apart on a frictionless table. If the 2 kg ball gets a = 3 m/s², what is the 1 kg ball\'s acceleration?', ans: 6, tol: 0.01, unit: 'm/s²', hint: 'Equal and opposite forces: F = 2 × 3 = 6 N on each.', sol: 'a = 6/1 = 6 m/s²: the lighter ball moves away faster. 🧩 numbers added to the book\'s conceptual question.' },
+      tryit: { src: 'BK p.67 Exercise 7', q: 'A compressed spring pushes a 2 kg and a 1 kg ball apart on a frictionless table. If the 2 kg ball gets a = 3 m/s², what is the 1 kg ball\'s acceleration?', ans: 6, tol: 0.01, unit: 'm/s²', hint: 'Equal and opposite forces: F = 2 × 3 = 6 N on each.', sol: 'a = {{6 // 1}} = 6 m/s²: the lighter ball moves away faster. 🧩 numbers added to the book\'s conceptual question.' },
       checks: [
         { q: 'Floor exerts a normal force on… (chair on rug, book on chair, BK Ex.10)', o: ['all three', 'only the book', 'only the rug', 'the chair'], a: 2, why: 'The floor touches only the rug.' },
         { q: 'Action and reaction cancel because they are opposite.', o: ['True', 'False'], a: 1, why: 'They act on different bodies.' }
@@ -101,13 +101,13 @@ COURSE.push({
         { en: 'θ = 90° ⇒ W = 0; θ > 90° ⇒ W < 0 (energy taken from the system).', ar: 'إذا كانت القوة عمودية على الإزاحة فالشغل صفر، وإذا كانت الزاوية منفرجة فالشغل سالب.' }
       ],
       terms: [['Work', 'الشغل', 'W = F·Δr'], ['Joule', 'الجول', 'N·m'], ['Displacement', 'الإزاحة', 'Δr']],
-      formulas: [{ f: 'W = F·Δr = F Δr cos θ', name: 'Work (5.1)', sym: [['F', 'force', 'N'], ['Δr', 'displacement', 'm'], ['θ', 'angle between F and Δr', '°']], cond: 'Constant force.' }],
+      formulas: [{ f: 'W = F·Δr = F Δr cos θ', name: 'Work (5.1)', sym: [['W', 'work', 'J', 'الشغل'], ['F', 'force', 'N', 'القوة'], ['Δr', 'displacement', 'm', 'الإزاحة'], ['θ', 'angle between F and Δr', '°', 'الزاوية بين القوة والإزاحة']], cond: 'Constant force.' }],
       life: { en: 'Pulling a suitcase by its handle at 60°: only half of your pull does work moving it forward.', ar: 'عند سحب حقيبة بزاوية 60° نصف قوتك فقط تبذل شغلًا للأمام.' },
       worked: { src: 'S05 Ex 5.4 · BK p.74', q: 'Two 200 N forces act; F₁ at 60° to the motion, F₂ perpendicular; Δr = 2 m. Total work?', steps: ['F₂ ⟂ motion → W₂ = 0', 'W₁ = 200 × 2 × cos 60° = 200 J'], ans: 'W = 200 J' },
       tryit: { src: 'BK p.82 Exercise 3', q: 'F = 15î + 25ĵ N moves an object from (2,7) to (5,9) m. Work?', ans: 95, tol: 0.01, unit: 'J', hint: 'Δr = 3î + 2ĵ', sol: 'W = 15·3 + 25·2 = 95 J' },
       checks: [
         { q: '2 N along +x, Δr = 2 m along +x. W = ? (S05 Ex 5.1)', o: ['4 J', '0', '1 J', '−4 J'], a: 0, why: '2·2·cos 0°.' },
-        { q: 'A man raises a 100 N bucket doing 1000 J. Depth? (BK Ex 5.2)', o: ['10 m', '100 m', '1 m', '0.1 m'], a: 0, why: 'Δr = W/F.' }
+        { q: 'A man raises a 100 N bucket doing 1000 J. Depth? (BK Ex 5.2)', o: ['10 m', '100 m', '1 m', '0.1 m'], a: 0, why: 'Δr = {{W // F}}.' }
       ],
       mistakes: [['Using sin θ for work', 'Work uses cos θ.'], ['Writing (5î + 4ĵ) × 4î for work', 'It is a dot product (·), see G‑19.']],
       summary: ['W = FΔr cos θ', 'Scalar, in J', '⟂ force does no work'],
@@ -128,7 +128,7 @@ COURSE.push({
         { en: 'Negative work (brakes) reduces KE.', ar: 'الشغل السالب يقلل الطاقة الحركية.' }
       ],
       terms: [['Kinetic energy', 'الطاقة الحركية', '½mv²'], ['Work–energy theorem', 'مبرهنة الشغل–الطاقة', 'W_net = ΔKE']],
-      formulas: [{ f: 'KE = ½ m v² ,  W = KE_f − KE_i', name: '(5.2)', sym: [['m', 'mass', 'kg'], ['v', 'speed', 'm/s']], cond: 'W is the net work.' }],
+      formulas: [{ f: 'KE = ½ m v² ,  W = KE_f − KE_i', name: '(5.2)', sym: [['KE', 'kinetic energy', 'J', 'الطاقة الحركية'], ['m', 'mass', 'kg', 'الكتلة'], ['v', 'speed', 'm/s', 'السرعة'], ['W', 'net work', 'J', 'الشغل الكلي']], cond: 'W is the net work.' }],
       life: { en: 'Doubling speed from 60 to 120 km/h quadruples KE, so braking distance is about four times longer.', ar: 'مضاعفة السرعة تضاعف الطاقة الحركية أربع مرات.' },
       worked: { src: 'S05 Ex 5.6 · BK p.76', q: '1200 kg car at 20 m/s stops in 30 m. Work by brakes?', steps: ['KE_f = 0', 'W = 0 − ½·1200·20² = −240 000 J'], ans: 'W = −2.4 × 10⁵ J' },
       tryit: { src: 'S05 Ex 5.5 · BK p.75–76 (see G‑07)', q: 'F = 5î + 4ĵ N moves a 5 kg body 4 m along x. KE_i = 5 J. Find KE_f.', ans: 25, tol: 0.01, unit: 'J', hint: 'W = 5·4 = 20 J = KE_f − KE_i', sol: 'KE_f = 20 + 5 = 25 J (the book prints 15 J; slides give 25 J)' },
@@ -154,7 +154,7 @@ COURSE.push({
         { en: 'Work and energy theory: "The work done of any system is equal to the sum of the change in the kinetic and potential energy": W = ΔKE + ΔPE (5.4).', ar: 'الشغل = التغير في الطاقة الحركية + التغير في طاقة الوضع.' }
       ],
       terms: [['Potential energy', 'طاقة الوضع', 'Energy of position'], ['Reference level', 'مستوى الإسناد', 'Where PE = 0'], ['Conservation of energy', 'حفظ الطاقة', 'Energy is not created or destroyed']],
-      formulas: [{ f: 'ΔPE = m g Δh', name: '(5.3)', sym: [['Δh', 'height change', 'm']], cond: 'Near Earth\'s surface.' }, { f: 'W = ΔKE + ΔPE', name: '(5.4)', sym: [['W', 'work by applied force', 'J']], cond: '—' }],
+      formulas: [{ f: 'ΔPE = m g Δh', name: '(5.3)', sym: [['ΔPE', 'change of potential energy', 'J', 'تغير طاقة الوضع'], ['m', 'mass', 'kg', 'الكتلة'], ['g', '9.8 m/s²', 'm/s²', 'تسارع الجاذبية'], ['Δh', 'height change', 'm', 'تغير الارتفاع']], cond: 'Near Earth\'s surface.' }, { f: 'W = ΔKE + ΔPE', name: '(5.4)', sym: [['W', 'work by the applied force', 'J', 'شغل القوة المؤثرة'], ['ΔKE', 'change of kinetic energy', 'J', 'تغير الطاقة الحركية'], ['ΔPE', 'change of potential energy', 'J', 'تغير طاقة الوضع']], cond: '—' }],
       life: { en: 'Hydro‑electric dams turn water\'s PE into electrical energy.', ar: 'السدود تحول طاقة وضع الماء إلى كهرباء.' },
       worked: { src: 'S05 Ex 5.8 · BK p.79', q: 'F = 10î + 20ĵ N moves a 2 kg particle (from rest) from 2î + ĵ to 4î + 3ĵ m (y vertical). Find W, ΔPE, v_f.', steps: ['Δr = 2î + 2ĵ → W = 20 + 40 = 60 J', 'ΔPE = 2·9.8·(3 − 1) = 39.2 J', '60 = ½·2·v_f² + 39.2 → v_f = 4.56 m/s'], ans: 'v_f = 4.56 m/s' },
       tryit: { src: 'BK p.82 Exercise 8', q: 'A 500 kg elevator rises from 3 m to 12 m. ΔPE?', ans: 44100, tol: 0.01, unit: 'J', hint: 'Δh = 9 m', sol: '500·9.8·9 = 44 100 J' },
@@ -172,22 +172,22 @@ COURSE.push({
     },
     {
       id: 'ch5-l4', title: 'Power', ar: 'القدرة', src: 'S05 §5 · BK p.80–81',
-      goals: ['Compute P = W/t', 'Use the watt'],
+      goals: ['Compute P = {{W // t}}', 'Use the watt'],
       goalsAr: 'ستحسب القدرة كمعدل لبذل الشغل.',
       why: { en: 'Two cranes may do the same work; the more powerful one does it faster.', ar: 'رافعتان تبذلان الشغل نفسه، والأقوى تنجزه أسرع.' },
       explain: [
-        { en: '"Power is defined as the rate of work done": P = dW/dt (5.5); average P = W/t.', ar: 'القدرة معدل بذل الشغل.' },
+        { en: '"Power is defined as the rate of work done": P = {{dW // dt}} (5.5); average P = {{W // t}}.', ar: 'القدرة معدل بذل الشغل.' },
         { en: 'Unit: watt W = J/s = kg·m²/s³. Do not confuse W (watt) with W (work).', ar: 'وحدتها الواط، لا تخلط بين رمز الواط ورمز الشغل.' }
       ],
       terms: [['Power', 'القدرة', 'Rate of work'], ['Watt', 'الواط', 'J/s']],
-      formulas: [{ f: 'P = {{dW // dt}}  (average: P = {{W // t}})', name: '(5.5)', sym: [['P', 'power', 'W'], ['t', 'time', 's']], cond: '—' }],
+      formulas: [{ f: 'P = {{dW // dt}}  (average: P = {{W // t}})', name: '(5.5)', sym: [['P', 'power', 'W', 'القدرة'], ['W', 'work', 'J', 'الشغل'], ['t', 'time', 's', 'الزمن']], cond: '—' }],
       life: { en: 'Climbing stairs fast feels harder: same work, more power.', ar: 'صعود الدرج بسرعة متعب أكثر: نفس الشغل بقدرة أكبر.' },
-      worked: { src: 'S05 Ex 5.10 · BK p.81', q: '2 kg raised 3 m in 5 s. Work and power?', steps: ['W = mgh = 2·9.8·3 = 58.8 J', 'P = 58.8/5 = 11.76 W'], ans: 'P = 11.76 W' },
-      tryit: { src: '🧩 additional design', q: 'A 60 kg student climbs 4 m of stairs in 8 s. Average power?', ans: 294, tol: 0.01, unit: 'W', hint: 'W = mgh', sol: '60·9.8·4/8 = 294 W' },
+      worked: { src: 'S05 Ex 5.10 · BK p.81', q: '2 kg raised 3 m in 5 s. Work and power?', steps: ['W = mgh = 2·9.8·3 = 58.8 J', 'P = {{58.8 // 5}} = 11.76 W'], ans: 'P = 11.76 W' },
+      tryit: { src: '🧩 additional design', q: 'A 60 kg student climbs 4 m of stairs in 8 s. Average power?', ans: 294, tol: 0.01, unit: 'W', hint: 'W = mgh', sol: 'P = {{60 × 9.8 × 4 // 8}} = 294 W' },
       checks: [{ q: '1 W equals…', o: ['1 J·s', '1 J/s', '1 N/s', '1 kg·m/s'], a: 1, why: 'Rate of work.' }],
-      mistakes: [['Dividing by distance instead of time', 'P = W/t.']],
-      summary: ['P = W/t', 'Watt = J/s'],
-      quiz: [{ q: 'A 1800 J job done in 2 min. P = ?', num: 15, tol: 0, unit: 'W', sol: '1800/120 = 15 W (🧩)' }]
+      mistakes: [['Dividing by distance instead of time', 'P = {{W // t}}.']],
+      summary: ['P = {{W // t}}', 'Watt = J/s'],
+      quiz: [{ q: 'A 1800 J job done in 2 min. P = ?', num: 15, tol: 0, unit: 'W', sol: 'P = {{1800 // 120}} = 15 W (🧩)' }]
     }
   ]
 });
@@ -201,82 +201,82 @@ COURSE.push({
       goalsAr: 'ستحسب الإجهاد والانفعال ومعاملات المرونة الثلاثة.',
       why: { en: 'Cable, bridge and bone design depend on how materials stretch.', ar: 'تصميم الكابلات والجسور يعتمد على استطالة المواد.' },
       explain: [
-        { en: 'Stress = F/A (N/m²): "the force affecting on the unit of areas". Strain = ΔL/L (unitless).', ar: 'الإجهاد قوة لكل وحدة مساحة، والانفعال تغير الطول النسبي بلا وحدة.' },
-        { en: 'Young\'s modulus Y = stress/strain → F/A = Y ΔL/L (6.1). Bulk: F/A = −B ΔV/V (6.2). Shear: F/A = S x/L (6.3).', ar: 'ثلاثة معاملات: للطول وللحجم وللشكل.' },
+        { en: 'Stress = {{F // A}} (N/m²): "the force affecting on the unit of areas". Strain = {{ΔL // L}} (unitless).', ar: 'الإجهاد قوة لكل وحدة مساحة، والانفعال تغير الطول النسبي بلا وحدة.' },
+        { en: 'Young\'s modulus Y = {{stress // strain}} → {{F // A}} = Y {{ΔL // L}} (6.1). Bulk: {{F // A}} = −B {{ΔV // V}} (6.2). Shear: {{F // A}} = S {{x // L}} (6.3).', ar: 'ثلاثة معاملات: للطول وللحجم وللشكل.' },
         { en: 'Stress–strain curve (Fig 6.2): elastic limit → yield point → breaking point. The formulas hold below the elastic limit.', ar: 'القوانين صحيحة تحت حد المرونة فقط.' },
-        { en: 'Area of a wire: A = πr² with r = diameter/2.', ar: 'مساحة مقطع السلك πr² ونصف القطر = القطر/2.' }
+        { en: 'Area of a wire: A = πr² with r = {{diameter // 2}}.', ar: 'مساحة مقطع السلك πr² ونصف القطر = القطر/2.' }
       ],
       terms: [['Stress', 'الإجهاد', 'F/A'], ['Strain', 'الانفعال', 'ΔL/L'], ['Young\'s modulus', 'معامل يونغ', 'Elasticity of length'], ['Bulk modulus', 'معامل المرونة الحجمي', 'Elasticity of volume'], ['Shear modulus', 'معامل القص', 'Elasticity of shape'], ['Elastic limit', 'حد المرونة', 'Max stress with full recovery']],
       formulas: [
-        { f: '{{F // A}} = Y {{ΔL // L}}', name: 'Young (6.1)', sym: [['Y', 'Young\'s modulus', 'N/m²'], ['ΔL', 'extension', 'm']], cond: 'Below elastic limit.' },
-        { f: '{{F // A}} = −B {{ΔV // V}}', name: 'Bulk (6.2)', sym: [['B', 'bulk modulus', 'N/m²']], cond: 'Minus: volume decreases as pressure increases.' },
-        { f: '{{F // A}} = S {{x // L}}', name: 'Shear (6.3)', sym: [['x', 'shift of top face', 'm']], cond: 'Tangential force.' }
+        { f: '{{F // A}} = Y {{ΔL // L}}', name: 'Young (6.1)', sym: [['F', 'force', 'N', 'القوة'], ['A', 'cross‑section area', 'm²', 'مساحة المقطع'], ['Y', 'Young\'s modulus', 'N/m²', 'معامل يونغ'], ['ΔL', 'extension', 'm', 'الاستطالة'], ['L', 'original length', 'm', 'الطول الأصلي']], cond: 'Below elastic limit.' },
+        { f: '{{F // A}} = −B {{ΔV // V}}', name: 'Bulk (6.2)', sym: [['F/A', 'pressure change', 'N/m²', 'تغير الضغط'], ['B', 'bulk modulus', 'N/m²', 'معامل المرونة الحجمي'], ['ΔV', 'change of volume', 'm³', 'تغير الحجم'], ['V', 'original volume', 'm³', 'الحجم الأصلي']], cond: 'Minus: volume decreases as pressure increases.' },
+        { f: '{{F // A}} = S {{x // L}}', name: 'Shear (6.3)', sym: [['F', 'tangential force', 'N', 'القوة المماسية'], ['A', 'area of the face', 'm²', 'مساحة الوجه'], ['S', 'shear modulus', 'N/m²', 'معامل القص'], ['x', 'shift of the top face', 'm', 'إزاحة الوجه العلوي'], ['L', 'height of the block', 'm', 'ارتفاع الجسم']], cond: 'Tangential force.' }
       ],
       life: { en: 'Elevator cables are chosen so the stress stays far below the elastic limit.', ar: 'كابلات المصاعد تُختار بحيث يبقى الإجهاد بعيدًا عن حد المرونة.' },
-      worked: { src: 'S06 Ex 6.1 · BK p.89', q: '2500 N on a 10 m wire of diameter 3.5 mm, extension 0.5 cm. Stress, strain, Y?', steps: ['A = π(1.75×10⁻³)² = 9.62×10⁻⁶ m²', 'Stress = 2500/9.62×10⁻⁶ = 2.6×10⁸ N/m²', 'Strain = 0.005/10 = 5×10⁻⁴', 'Y = 2.6×10⁸ / 5×10⁻⁴ = 5.2×10¹¹ N/m²'], ans: 'Y = 5.2 × 10¹¹ N/m²' },
-      tryit: { src: 'BK p.100 Exercise 1', q: '1000 N on a wire 100 m long, 0.003 m diameter, extends 0.5 m. Y = ?', ans: 2.83e10, tol: 0.02, unit: 'N/m²', hint: 'r = 0.0015 m', sol: 'Stress = 1000/7.07×10⁻⁶ = 1.415×10⁸; strain = 0.005; Y = 2.83×10¹⁰ N/m²' },
+      worked: { src: 'S06 Ex 6.1 · BK p.89', q: '2500 N on a 10 m wire of diameter 3.5 mm, extension 0.5 cm. Stress, strain, Y?', steps: ['A = π(1.75×10⁻³)² = 9.62×10⁻⁶ m²', 'Stress = {{F // A}} = {{2500 // 9.62×10⁻⁶}} = 2.6×10⁸ N/m²', 'Strain = {{ΔL // L}} = {{0.005 // 10}} = 5×10⁻⁴', 'Y = {{stress // strain}} = {{2.6×10⁸ // 5×10⁻⁴}} = 5.2×10¹¹ N/m²'], ans: 'Y = 5.2 × 10¹¹ N/m²' },
+      tryit: { src: 'BK p.100 Exercise 1', q: '1000 N on a wire 100 m long, 0.003 m diameter, extends 0.5 m. Y = ?', ans: 2.83e10, tol: 0.02, unit: 'N/m²', hint: 'r = 0.0015 m', sol: 'Stress = {{1000 // 7.07×10⁻⁶}} = 1.415×10⁸; strain = 0.005; Y = 2.83×10¹⁰ N/m²' },
       checks: [
         { q: 'The unit of strain is…', o: ['N/m²', 'm', 'none', 'N'], a: 2, why: 'Ratio of lengths.' },
-        { q: '10 cm cube, 10⁶ N tangential force, 0.03 cm shift. S = ? (S06 Ex 6.3)', o: ['3.3×10¹⁰ N/m²', '3.3×10⁶', '1×10⁸', '3×10⁻⁴'], a: 0, why: 'S = FL/(Ax). (Slide prints 106 N: G‑20)' }
+        { q: '10 cm cube, 10⁶ N tangential force, 0.03 cm shift. S = ? (S06 Ex 6.3)', o: ['3.3×10¹⁰ N/m²', '3.3×10⁶', '1×10⁸', '3×10⁻⁴'], a: 0, why: 'S = {{F L // A x}}. (Slide prints 106 N: G‑20)' }
       ],
       mistakes: [['Using the diameter in πr²', 'Halve it first.'], ['Giving strain a unit', 'Strain is dimensionless.']],
-      summary: ['Stress = F/A, strain = ΔL/L', 'Y, B, S moduli in N/m²', 'Valid below elastic limit'],
+      summary: ['Stress = {{F // A}}, strain = {{ΔL // L}}', 'Y, B, S moduli in N/m²', 'Valid below elastic limit'],
       quiz: [
-        { q: 'Copper cube Ex 6.2: B = FV/(AΔV) with the slide\'s numbers = ?', num: 1.5e7, tol: 0.02, unit: 'N/m²', sol: '1.5×10³·125×10⁻⁶ /(25×10⁻⁴·5×10⁻⁶) = 1.5×10⁷ (units issue: G‑10)' },
+        { q: 'Copper cube Ex 6.2: B = FV/(AΔV) with the slide\'s numbers = ?', num: 1.5e7, tol: 0.02, unit: 'N/m²', sol: 'B = {{1.5×10³ × 125×10⁻⁶ // 25×10⁻⁴ × 5×10⁻⁶}} = 1.5×10⁷ (units issue: G‑10)' },
         { q: 'Stress 2×10⁸ N/m², strain 1×10⁻³. Y = ?', num: 2e11, tol: 0.01, unit: 'N/m²', sol: '🧩 2×10¹¹ N/m²' }
       ]
     },
     {
       id: 'ch6-l2', title: 'Density & pressure in liquids', ar: 'الكثافة والضغط في السوائل', src: 'S06 §2–3 · BK p.91–93',
-      goals: ['Compute ρ = m/V', 'Compute P = F/A and P = P₀ + ρgh'],
+      goals: ['Compute ρ = {{m // V}}', 'Compute P = {{F // A}} and P = P₀ + ρgh'],
       goalsAr: 'ستحسب الكثافة والضغط والضغط عند عمق في سائل.',
       why: { en: 'Divers and dam engineers need pressure at depth.', ar: 'الغواصون ومهندسو السدود يحتاجون حساب الضغط على عمق.' },
       explain: [
-        { en: 'Density "is defined as mass per unit volume": ρ = m/V (kg/m³) (6.4). Density mostly decreases as temperature increases.', ar: 'الكثافة = الكتلة ÷ الحجم.' },
-        { en: 'Pressure is the perpendicular force per unit area: P = F/A, unit pascal Pa = N/m² (6.5).', ar: 'الضغط = القوة العمودية ÷ المساحة.' },
+        { en: 'Density "is defined as mass per unit volume": ρ = {{m // V}} (kg/m³) (6.4). Density mostly decreases as temperature increases.', ar: 'الكثافة = الكتلة ÷ الحجم.' },
+        { en: 'Pressure is the perpendicular force per unit area: P = {{F // A}}, unit pascal Pa = N/m² (6.5).', ar: 'الضغط = القوة العمودية ÷ المساحة.' },
         { en: 'Liquid column: F = mg = ρAhg ⇒ P = ρgh (6.6). With the atmosphere on top: P = P₀ + ρgh.', ar: 'ضغط عمود السائل ρgh، ويضاف الضغط الجوي إذا كان السطح مكشوفًا.' },
         { en: 'Pressure depends on depth, not on the shape of the container (BK p.93).', ar: 'الضغط يعتمد على العمق لا على شكل الإناء.' }
       ],
       terms: [['Density', 'الكثافة', 'm/V'], ['Pressure', 'الضغط', 'F/A'], ['Pascal', 'باسكال', 'N/m²'], ['Atmospheric pressure', 'الضغط الجوي', '≈ 1×10⁵ Pa']],
-      formulas: [{ f: 'ρ = {{m // V}}', name: '(6.4)', sym: [['ρ', 'density', 'kg/m³']], cond: '—' }, { f: 'P = {{F // A}} ,  P = P₀ + ρgh', name: '(6.5–6.6)', sym: [['h', 'depth', 'm'], ['P₀', 'atmospheric pressure', 'Pa']], cond: 'Fluid at rest.' }],
+      formulas: [{ f: 'ρ = {{m // V}}', name: '(6.4)', sym: [['ρ', 'density', 'kg/m³', 'الكثافة'], ['m', 'mass', 'kg', 'الكتلة'], ['V', 'volume', 'm³', 'الحجم']], cond: '—' }, { f: 'P = {{F // A}} ,  P = P₀ + ρgh', name: '(6.5–6.6)', sym: [['P', 'pressure', 'Pa', 'الضغط'], ['F', 'force', 'N', 'القوة'], ['A', 'area', 'm²', 'المساحة'], ['P₀', 'atmospheric pressure', 'Pa', 'الضغط الجوي'], ['ρ', 'liquid density', 'kg/m³', 'كثافة السائل'], ['h', 'depth', 'm', 'العمق']], cond: 'Fluid at rest.' }],
       life: { en: 'Every 10 m of sea water adds about 1 atmosphere of pressure on a diver.', ar: 'كل 10 أمتار من ماء البحر تضيف ضغطًا جويًا تقريبًا.' },
       worked: { src: 'S06 Ex 6.5 · BK p.93', q: 'Submarine at 30 m, hatch area 2 m², ρ = 1025 kg/m³. Force on hatch?', steps: ['P = P₀ + ρgh = 10⁵ + 1025·9.8·30 = 401 350 Pa', 'F = PA = 802 700 N'], ans: 'F = 8.03 × 10⁵ N' },
-      tryit: { src: 'BK p.100 Exercise 5', q: 'A 65 kg student stands on one foot of area 250 cm². Pressure on the ground?', ans: 25480, tol: 0.01, unit: 'Pa', hint: 'A = 0.025 m², F = mg', sol: '637/0.025 = 25 480 Pa (both feet: 12 740 Pa)' },
+      tryit: { src: 'BK p.100 Exercise 5', q: 'A 65 kg student stands on one foot of area 250 cm². Pressure on the ground?', ans: 25480, tol: 0.01, unit: 'Pa', hint: 'A = 0.025 m², F = mg', sol: 'P = {{637 // 0.025}} = 25 480 Pa (both feet: 12 740 Pa)' },
       checks: [
-        { q: '100 g of glycerol occupies 79.3 cm³. ρ? (S06 Ex 6.4)', o: ['1261 kg/m³', '1.261 kg/m³', '793 kg/m³', '12.6 kg/m³'], a: 0, why: '0.1/79.3×10⁻⁶.' },
+        { q: '100 g of glycerol occupies 79.3 cm³. ρ? (S06 Ex 6.4)', o: ['1261 kg/m³', '1.261 kg/m³', '793 kg/m³', '12.6 kg/m³'], a: 0, why: 'ρ = {{0.1 // 79.3×10⁻⁶}}.' },
         { q: 'Doubling the depth doubles…', o: ['total pressure', 'gauge pressure ρgh', 'density', 'P₀'], a: 1, why: 'ρgh ∝ h.' }
       ],
       mistakes: [['Forgetting P₀ when asked for total pressure', 'Read whether "total" or "due to the liquid".'], ['Using cm for h', 'Convert to m.']],
-      summary: ['ρ = m/V', 'P = F/A', 'P = P₀ + ρgh'],
+      summary: ['ρ = {{m // V}}', 'P = {{F // A}}', 'P = P₀ + ρgh'],
       quiz: [
-        { q: 'Liquid 10 kg in 0.5 m³ (BK Ex.2). ρ = ?', num: 20, tol: 0, unit: 'kg/m³', sol: '10/0.5' },
+        { q: 'Liquid 10 kg in 0.5 m³ (BK Ex.2). ρ = ?', num: 20, tol: 0, unit: 'kg/m³', sol: '{{10 // 0.5}}' },
         { q: 'Oil ρ = 900, 1 m deep (BK Ex.7a). Pressure due to oil?', num: 8820, tol: 0.01, unit: 'Pa', sol: '900·9.8·1 = 8820 Pa; total = 1.03×10⁵ + 8820 = 1.118×10⁵ Pa' },
-        { q: 'Block 2×3×4 m, 5000 kg (BK Ex.4). Largest pressure on ground?', num: 8167, tol: 0.01, unit: 'Pa', sol: '49 000 N / 6 m² = 8167 Pa (smallest: /12 = 4083 Pa)' }
+        { q: 'Block 2×3×4 m, 5000 kg (BK Ex.4). Largest pressure on ground?', num: 8167, tol: 0.01, unit: 'Pa', sol: 'P = {{49 000 N // 6 m²}} = 8167 Pa (smallest: {{49 000 N // 12 m²}} = 4083 Pa)' }
       ]
     },
     {
       id: 'ch6-l3', title: 'Pascal\'s law, barometer & manometer', ar: 'قاعدة باسكال والبارومتر والمانومتر', src: 'S06 §3 · BK p.93–95',
-      goals: ['Use f/a = F/A', 'Find atmospheric pressure with a barometer', 'Find gas pressure with a manometer'],
+      goals: ['Use {{f // a}} = {{F // A}}', 'Find atmospheric pressure with a barometer', 'Find gas pressure with a manometer'],
       goalsAr: 'ستطبق قاعدة باسكال وتحسب الضغط بالبارومتر والمانومتر.',
       why: { en: 'Car brakes and hydraulic lifts multiply force using Pascal\'s law.', ar: 'فرامل السيارة والرافعة الهيدروليكية تضاعف القوة بقاعدة باسكال.' },
       explain: [
-        { en: 'Pascal\'s law: "A change in pressure at any point in an enclosed fluid at rest is transmitted undiminished to all points in the fluid." Hydraulic press: f/a = F/A.', ar: 'الضغط ينتقل كاملًا في المائع المحصور.' },
-        { en: 'Areas scale with r² (or d²): F/f = (R/r)².', ar: 'النسبة بين القوتين تساوي مربع نسبة نصفي القطرين.' },
+        { en: 'Pascal\'s law: "A change in pressure at any point in an enclosed fluid at rest is transmitted undiminished to all points in the fluid." Hydraulic press: {{f // a}} = {{F // A}}.', ar: 'الضغط ينتقل كاملًا في المائع المحصور.' },
+        { en: 'Areas scale with r² (or d²): {{F // f}} = ( {{R // r}} )².', ar: 'النسبة بين القوتين تساوي مربع نسبة نصفي القطرين.' },
         { en: 'Barometer: P₀ = ρgh (mercury column 0.76 m). Manometer: P = P₀ + ρgh.', ar: 'البارومتر يقيس الضغط الجوي، والمانومتر يقيس ضغط غاز محصور.' }
       ],
       terms: [['Pascal\'s law', 'قاعدة باسكال', 'Pressure transmitted undiminished'], ['Hydraulic press', 'المكبس الهيدروليكي', 'Force multiplier'], ['Barometer', 'البارومتر', 'Measures P₀'], ['Manometer', 'المانومتر', 'Measures gas pressure']],
-      formulas: [{ f: '{{f // a}} = {{F // A}}', name: 'Hydraulic press', sym: [['a, A', 'small/large piston area', 'm²']], cond: 'Same level, fluid at rest.' }, { f: 'P₀ = ρgh ,  P = P₀ + ρgh', name: 'Barometer / manometer', sym: [['h', 'column height difference', 'm']], cond: '—' }],
+      formulas: [{ f: '{{f // a}} = {{F // A}}', name: 'Hydraulic press', sym: [['f, F', 'small/large piston force', 'N', 'قوة المكبس الصغير والكبير'], ['a, A', 'small/large piston area', 'm²', 'مساحة المكبس الصغير والكبير']], cond: 'Same level, fluid at rest.' }, { f: 'P₀ = ρgh ,  P = P₀ + ρgh', name: 'Barometer / manometer', sym: [['P₀', 'atmospheric pressure', 'Pa', 'الضغط الجوي'], ['ρ', 'liquid density', 'kg/m³', 'كثافة السائل'], ['h', 'column height difference', 'm', 'فرق ارتفاع عمود السائل']], cond: '—' }],
       life: { en: 'A garage lift raises a 1500 kg car with a small pump because the large piston has many times the area.', ar: 'رافعة الورشة ترفع سيارة بمضخة صغيرة لأن مساحة المكبس الكبير أكبر بكثير.' },
-      worked: { src: 'BK Ex 6.6 p.94', q: 'Piston radii 2 cm and 20 cm. Large piston force 2000 N. Small piston force?', steps: ['f = F·a/A = 2000·(π·0.02²)/(π·0.2²)', 'f = 2000/100 = 20 N'], ans: 'f = 20 N' },
-      tryit: { src: 'BK p.101 Exercise 9', q: 'Pistons of diameters 60 and 180 (same units). Small force 10 N. Large force?', ans: 90, tol: 0.01, unit: 'N', hint: '(180/60)² = 9', sol: 'F = 10 × 9 = 90 N' },
+      worked: { src: 'BK Ex 6.6 p.94', q: 'Piston radii 2 cm and 20 cm. Large piston force 2000 N. Small piston force?', steps: ['f = {{F a // A}} = {{2000 × π × 0.02² // π × 0.2²}}', 'f = {{2000 // 100}} = 20 N'], ans: 'f = 20 N' },
+      tryit: { src: 'BK p.101 Exercise 9', q: 'Pistons of diameters 60 and 180 (same units). Small force 10 N. Large force?', ans: 90, tol: 0.01, unit: 'N', hint: '( {{180 // 60}} )² = 9', sol: 'F = 10 × 9 = 90 N' },
       checks: [
-        { q: 'Water barometer height for P₀ = 10⁵ Pa (S06 Ex 6.7)?', o: ['10.2 m', '0.76 m', '1.02 m', '102 m'], a: 0, why: '10⁵/(1000·9.8).' },
+        { q: 'Water barometer height for P₀ = 10⁵ Pa (S06 Ex 6.7)?', o: ['10.2 m', '0.76 m', '1.02 m', '102 m'], a: 0, why: 'h = {{10⁵ // 1000 × 9.8}}.' },
         { q: 'Manometer: mercury 40 cm above (S06 Ex 6.8). Gas pressure?', o: ['153 312 Pa', '53 312 Pa', '100 000 Pa', '46 688 Pa'], a: 0, why: 'P₀ + ρgh.' }
       ],
       mistakes: [['Using the radius ratio without squaring', 'Area ratio = (radius ratio)².']],
-      summary: ['f/a = F/A', 'Barometer P₀ = ρgh', 'Manometer P = P₀ + ρgh'],
+      summary: ['{{f // a}} = {{F // A}}', 'Barometer P₀ = ρgh', 'Manometer P = P₀ + ρgh'],
       quiz: [
-        { q: 'Half diameters 20 and 40 cm (BK Ex.8). F₂ : F₁ = ?', num: 4, tol: 0, unit: '', sol: '(40/20)² = 4' },
+        { q: 'Half diameters 20 and 40 cm (BK Ex.8). F₂ : F₁ = ?', num: 4, tol: 0, unit: '', sol: '( {{40 // 20}} )² = 4' },
         { q: 'Mercury barometer: h = 0.76 m, ρ = 13 600. P₀ = ?', num: 101293, tol: 0.01, unit: 'Pa', sol: '13600·9.8·0.76 = 1.013×10⁵ Pa (🧩)' }
       ]
     },
@@ -292,19 +292,19 @@ COURSE.push({
         { en: 'Horizontal tube: P₁ − P₂ = ½ρ(v₂² − v₁²) → faster flow, lower pressure. Static fluid: P₁ − P₂ = (h₂ − h₁)ρg.', ar: 'في الأنبوب الأفقي: السرعة الأكبر تعني ضغطًا أقل.' }
       ],
       terms: [['Flow rate', 'معدل التدفق', 'R = Av'], ['Continuity equation', 'معادلة الاستمرارية', 'A₁v₁ = A₂v₂'], ['Streamline', 'خط الانسياب', 'Path of fluid particles'], ['Viscosity', 'اللزوجة', 'Internal friction']],
-      formulas: [{ f: 'A₁v₁ = A₂v₂', name: 'Continuity (6.7)', sym: [['A', 'cross‑section', 'm²'], ['v', 'speed', 'm/s']], cond: 'Incompressible fluid.' }, { f: 'P₁ + h₁ρg + ½ρv₁² = P₂ + h₂ρg + ½ρv₂²', name: 'Bernoulli (6.8)', sym: [['P', 'pressure', 'Pa'], ['h', 'height', 'm']], cond: 'Ideal fluid, along one streamline.' }],
+      formulas: [{ f: 'A₁v₁ = A₂v₂', name: 'Continuity (6.7)', sym: [['A', 'cross‑section area', 'm²', 'مساحة المقطع'], ['v', 'flow speed', 'm/s', 'سرعة السائل']], cond: 'Incompressible fluid.' }, { f: 'P₁ + h₁ρg + ½ρv₁² = P₂ + h₂ρg + ½ρv₂²', name: 'Bernoulli (6.8)', sym: [['P', 'pressure', 'Pa', 'الضغط'], ['h', 'height', 'm', 'الارتفاع'], ['ρ', 'density', 'kg/m³', 'الكثافة'], ['v', 'flow speed', 'm/s', 'سرعة السائل']], cond: 'Ideal fluid, along one streamline.' }],
       life: { en: 'Putting your thumb on a hose reduces A, so v increases and the water shoots farther.', ar: 'تضييق فوهة الخرطوم بالإبهام يزيد سرعة الماء.' },
       worked: { src: 'S06 Ex 6.10 · BK p.99', q: 'Horizontal tube: P₁ = 1332.8 Pa at v₁ = 0.5 m/s. P₂ where v₂ = 0.8 m/s?', steps: ['P₂ = P₁ − ½ρ(v₂² − v₁²)', '= 1332.8 − ½·10³·(0.64 − 0.25) = 1332.8 − 195', 'P₂ = 1137.8 Pa'], ans: '1137.8 N/m²' },
-      tryit: { src: 'BK p.101 Exercise 11', q: 'A 0.25 m diameter gas pipe delivers 1.55 m³/s. Gas speed?', ans: 31.58, tol: 0.02, unit: 'm/s', hint: 'v = R/A, A = π(0.125)²', sol: 'v = 1.55/0.0491 = 31.6 m/s' },
+      tryit: { src: 'BK p.101 Exercise 11', q: 'A 0.25 m diameter gas pipe delivers 1.55 m³/s. Gas speed?', ans: 31.58, tol: 0.02, unit: 'm/s', hint: 'v = {{R // A}}, A = π(0.125)²', sol: 'v = {{1.55 // 0.0491}} = 31.6 m/s' },
       checks: [
-        { q: 'Tube radius 0.2 m → 0.1 m, v₁ = 1 m/s (BK Ex 6.9). v₂?', o: ['4 m/s', '2 m/s', '0.25 m/s', '1 m/s'], a: 0, why: '(0.2/0.1)² = 4.' },
+        { q: 'Tube radius 0.2 m → 0.1 m, v₁ = 1 m/s (BK Ex 6.9). v₂?', o: ['4 m/s', '2 m/s', '0.25 m/s', '1 m/s'], a: 0, why: '( {{0.2 // 0.1}} )² = 4.' },
         { q: 'In a horizontal pipe, where v is larger, P is…', o: ['larger', 'smaller', 'same'], a: 1, why: 'Bernoulli.' }
       ],
       mistakes: [['Using the radius ratio without squaring', 'A ∝ r².'], ['Applying Bernoulli to viscous flow', 'Only ideal fluids.']],
       summary: ['R = Av', 'A₁v₁ = A₂v₂', 'P + ρgh + ½ρv² = const'],
       quiz: [
         { q: 'Hole 16 m below the water surface of an open tank (BK Ex.10a). Exit speed?', num: 17.71, tol: 0.02, unit: 'm/s', sol: 'v = √(2gh) = √313.6 = 17.7 m/s (🧩 Torricelli from Bernoulli)' },
-        { q: 'Same hole, flow 2.5×10⁻³ m³/min (BK Ex.10b). Hole diameter in mm?', num: 1.73, tol: 0.03, unit: 'mm', sol: 'R = 4.17×10⁻⁵ m³/s, A = R/v = 2.35×10⁻⁶ m² → d = 1.73 mm' }
+        { q: 'Same hole, flow 2.5×10⁻³ m³/min (BK Ex.10b). Hole diameter in mm?', num: 1.73, tol: 0.03, unit: 'mm', sol: 'R = 4.17×10⁻⁵ m³/s, A = {{R // v}} = 2.35×10⁻⁶ m² → d = 1.73 mm' }
       ]
     }
   ]

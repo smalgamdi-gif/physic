@@ -71,7 +71,7 @@ body.hide-ar .ar{display:none}
 table{border-collapse:collapse;width:100%;font-size:14.5px}
 th,td{border-bottom:1px solid var(--line);text-align:left;padding:7px 8px;vertical-align:top}
 th{color:var(--muted);font-weight:600;font-size:13px}
-td.arcell{direction:rtl;text-align:right}
+td.arcell,th.arcell{direction:rtl;text-align:right}
 body.hide-ar td.arcell, body.hide-ar th.arcell{display:none}
 ul.clean{padding-left:20px;margin:6px 0}
 .q{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:10px 0;background:var(--panel)}
@@ -162,6 +162,9 @@ ul.clean{padding-left:20px;margin:6px 0}
 .fchip b{color:var(--brand)}
 @media (max-width:860px){.formula.big{font-size:18px}.form .formula{font-size:16px}.chain{font-size:15px}.form{gap:8px}.form .find{min-width:44px;font-size:16px}}
 @media print{.form{break-inside:avoid}}
+.ar bdi[dir=ltr]{unicode-bidi:isolate}
+.en-help{margin:2px 0 12px;font-size:14.5px;color:var(--muted)}
+.ready .lessonlink{margin:6px 0}
 </style>
 </head>
 <body>
@@ -178,7 +181,55 @@ ul.clean{padding-left:20px;margin:6px 0}
   <nav class="side" id="side"></nav>
   <main id="main"></main>
 </div>
-<script>/* Physics Learning Lab — course content, chapters 1–3.
+<script>/* Arabic reads right to left. Inside an Arabic sentence each run of Latin text, numbers or formulas is wrapped in
+   <bdi dir="ltr"> so it stays one left‑to‑right unit: "R = V/I" or a drawn fraction is never reordered by the bidi
+   algorithm. Runs on every .ar / .arcell element as soon as it appears on the page. */
+(function () {
+  const A = '؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿';
+  const HAS_AR = new RegExp('[' + A + ']');
+  const TOK = new RegExp('([' + A + ']+)|(\\s+)|([^\\s' + A + ']+)', 'g');
+  const SEL = '.ar, .arcell';
+  function fix(el) {
+    if (el.dataset.rtl) return; el.dataset.rtl = '1';
+    const atoms = [];
+    [...el.childNodes].forEach(n => {
+      if (n.nodeType === 3) {
+        let m; TOK.lastIndex = 0;
+        while ((m = TOK.exec(n.data))) {
+          if (m[1]) atoms.push({ t: 'A', s: m[0] });
+          else if (m[2]) atoms.push({ t: 'S', s: m[0] });
+          else { const p = m[0].match(/^([«»"“”]*)(.*?)([.,;:!?،؛«»"“”]*)$/); if (p[1]) atoms.push({ t: 'P', s: p[1] }); if (p[2]) atoms.push({ t: 'L', s: p[2] }); if (p[3]) atoms.push({ t: 'P', s: p[3] }); }
+        }
+      } else if (n.nodeType === 1 && n.tagName !== 'BR' && !HAS_AR.test(n.textContent)) atoms.push({ t: 'L', n });
+      else { if (n.nodeType === 1 && n.tagName !== 'BR') fix(n); atoms.push({ t: 'A', n }); }
+    });
+    if (!atoms.some(a => a.t === 'L')) return;
+    const out = document.createDocumentFragment(), node = a => a.n || document.createTextNode(a.s);
+    let run = null, gap = [];
+    // a bracket belongs to the formula only if its partner is inside it too: "(ليس …)" keeps its brackets in the Arabic text
+    const balance = () => {
+      const txt = () => run.map(a => a.s || '').join(''), cnt = c => txt().split(c).length - 1;
+      while (run.length && run[0].s && run[0].s[0] === '(' && cnt('(') > cnt(')')) { out.appendChild(document.createTextNode('(')); run[0] = { t: 'L', s: run[0].s.slice(1) }; if (!run[0].s) run.shift(); }
+      let tail = '';
+      while (run.length && run[run.length - 1].s && /\)$/.test(run[run.length - 1].s) && cnt(')') > cnt('(')) { const l = run[run.length - 1]; tail = ')' + tail; run[run.length - 1] = { t: 'L', s: l.s.slice(0, -1) }; if (!run[run.length - 1].s) run.pop(); }
+      return tail;
+    };
+    const close = () => { let tail = ''; if (run) tail = balance(); if (run && !run.length) run = null; if (run) { const b = document.createElement('bdi'); b.dir = 'ltr'; run.forEach(a => b.appendChild(node(a))); out.appendChild(b); run = null; } if (tail) out.appendChild(document.createTextNode(tail)); gap.forEach(a => out.appendChild(node(a))); gap = []; };
+    atoms.forEach(a => {
+      if (a.t === 'L') { if (run) { gap.forEach(g => run.push(g)); gap = []; run.push(a); } else { gap.forEach(g => out.appendChild(node(g))); gap = []; run = [a]; } }
+      else if (a.t === 'S') { if (run) gap.push(a); else out.appendChild(node(a)); }
+      else { close(); out.appendChild(node(a)); }
+    });
+    close();
+    el.textContent = ''; el.appendChild(out);
+  }
+  const scan = root => { if (root.matches && root.matches(SEL)) fix(root); if (root.querySelectorAll) root.querySelectorAll(SEL).forEach(fix); };
+  new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) scan(n); }))).observe(document.body, { childList: true, subtree: true });
+  scan(document.body);
+  window.__RTL = { fix, scan };
+})();
+
+/* Physics Learning Lab — course content, chapters 1–3.
    Source codes: S01..S10 = slide decks, S09U = "Ch 9 Updated", BK p.N = textbook printed page.
    Fields named life / mistakes / checks / quiz and every tryit solution are additional design (🧩). */
 window.COURSE = window.COURSE || [];
@@ -195,15 +246,15 @@ COURSE.push({
         { en: '<b>Fundamental quantities</b> "are not expressed in terms of other physical quantities": length, mass, time, electric current, temperature, luminous intensity, amount of substance.', ar: 'الكميات الأساسية لا تُعرَّف بدلالة كميات أخرى، وهي سبع.' },
         { en: '<b>Derived quantities</b> "are defined in terms of the fundamental physical quantities": volume, velocity, density, acceleration, energy, power…', ar: 'الكميات المشتقة تُبنى من الأساسية، مثل السرعة = طول ÷ زمن.' },
         { en: 'SI base units: metre (m), kilogram (kg), second (s), ampere (A), kelvin (K), candela (cd), mole (mol).', ar: 'وحدات النظام الدولي: المتر، الكيلوغرام، الثانية، الأمبير، الكلفن، الشمعة، المول.' },
-        { en: 'University level: each base unit has a precise definition, e.g. the metre is the distance light travels in vacuum in 1/299 792 458 s; the second is 9 192 631 770 periods of Cs‑133 radiation (BK p.14).', ar: 'في المستوى الجامعي: لكل وحدة تعريف دقيق، فالمتر مرتبط بسرعة الضوء والثانية بذرة السيزيوم.' }
+        { en: 'University level: each base unit has a precise definition, e.g. the metre is the distance light travels in vacuum in {{1 // 299 792 458}} s; the second is 9 192 631 770 periods of Cs‑133 radiation (BK p.14).', ar: 'في المستوى الجامعي: لكل وحدة تعريف دقيق، فالمتر مرتبط بسرعة الضوء والثانية بذرة السيزيوم.' }
       ],
       terms: [['Fundamental quantity', 'كمية أساسية', 'Not defined from other quantities'], ['Derived quantity', 'كمية مشتقة', 'Built from fundamental quantities'], ['Prefix', 'بادئة', 'Power of ten written before a unit (k, m, μ…)'], ['Amount of substance', 'كمية المادة', 'Measured in mole (mol)'], ['Luminous intensity', 'شدة الإضاءة', 'Measured in candela (cd)']],
-      formulas: [{ f: 'n = 10⁻⁹, μ = 10⁻⁶, m = 10⁻³, c = 10⁻², d = 10⁻¹, da = 10¹, k = 10³, M = 10⁶, G = 10⁹', name: 'SI prefixes (Table 1.1)', sym: [['μ', 'micro', '10⁻⁶'], ['M', 'mega', '10⁶']], cond: 'm (milli) ≠ M (mega): case matters.' }],
+      formulas: [{ f: 'n = 10⁻⁹, μ = 10⁻⁶, m = 10⁻³, c = 10⁻², d = 10⁻¹, da = 10¹, k = 10³, M = 10⁶, G = 10⁹', name: 'SI prefixes (Table 1.1)', sym: [['n', 'nano', '10⁻⁹', 'نانو'], ['μ', 'micro', '10⁻⁶', 'مايكرو'], ['m', 'milli', '10⁻³', 'ملّي'], ['k', 'kilo', '10³', 'كيلو'], ['M', 'mega', '10⁶', 'ميغا'], ['G', 'giga', '10⁹', 'جيجا']], cond: 'm (milli) ≠ M (mega): case matters.' }],
       life: { en: 'A phone charger label "5 V, 2 A" uses two SI units; a 128 GB phone uses the giga prefix.', ar: 'ملصق شاحن الجوال 5V و2A يستخدم وحدات دولية، وسعة 128GB تستخدم البادئة جيجا.' },
       worked: { src: 'S01 slide "Converting units" · BK p.15', q: 'Convert 5 μm to metres.', steps: ['Write the conversion equation: 1 μm = 10⁻⁶ m', 'Multiply: 5 μm = 5 × 10⁻⁶ m'], ans: '5 × 10⁻⁶ m' },
       tryit: { src: 'BK p.21 Exercise 9', q: 'The proton mass is 1.6 × 10⁻²⁷ kg. Express it in grams.', ans: 1.6e-24, tol: 0.02, unit: 'g', hint: '1 kg = 10³ g, so multiply by 10³.', sol: '1.6 × 10⁻²⁷ × 10³ = 1.6 × 10⁻²⁴ g' },
       checks: [
-        { q: 'Which is a derived quantity?', o: ['Mass', 'Time', 'Density', 'Electric current'], a: 2, why: 'Density = mass/volume, built from fundamental quantities.' },
+        { q: 'Which is a derived quantity?', o: ['Mass', 'Time', 'Density', 'Electric current'], a: 2, why: 'Density = {{mass // volume}}, built from fundamental quantities.' },
         { q: 'The SI unit of temperature is…', o: ['°C', 'K', '°F', 'cal'], a: 1, why: 'Kelvin (K) is the SI base unit.' }
       ],
       mistakes: [['Writing M for milli', 'm = milli (10⁻³), M = mega (10⁶).'], ['Treating gram as the SI base unit', 'The SI base unit of mass is the kilogram.']],
@@ -225,12 +276,12 @@ COURSE.push({
         { en: 'Powers apply to the prefix too: 1 cm³ = (10⁻² m)³ = 10⁻⁶ m³.', ar: 'الأس يُطبَّق على البادئة أيضًا: السنتيمتر المكعب = 10⁻⁶ m³.' }
       ],
       terms: [['Conversion factor', 'معامل التحويل', 'Number linking two units, e.g. 60 s/min'], ['Compound unit', 'وحدة مركبة', 'Unit made of several units, e.g. m/s']],
-      formulas: [{ f: '1 km/h = {{10³ m // 3600 s}} = {{1 // 3.6}} m/s', name: 'Speed conversion', sym: [['km/h', 'kilometre per hour', '—']], cond: 'Divide km/h by 3.6 to get m/s.' }, { f: '1 g/cm³ = {{10⁻³ kg // (10⁻²)³ m³}} = 10³ kg/m³', name: 'Density conversion', sym: [['ρ', 'density', 'kg/m³']], cond: '—' }],
+      formulas: [{ f: '1 km/h = {{10³ m // 3600 s}} = {{1 // 3.6}} m/s', name: 'Speed conversion', sym: [['km/h', 'kilometre per hour', '—', 'كيلومتر لكل ساعة'], ['m/s', 'metre per second (SI)', '—', 'متر لكل ثانية']], cond: 'Divide km/h by 3.6 to get m/s.' }, { f: '1 g/cm³ = {{10⁻³ kg // (10⁻²)³ m³}} = 10³ kg/m³', name: 'Density conversion', sym: [['ρ', 'density', 'kg/m³', 'الكثافة'], ['g/cm³', 'gram per cubic centimetre', '—', 'غرام لكل سنتيمتر مكعب']], cond: '—' }],
       life: { en: 'A road sign of 90 km/h means 25 m/s: in one second the car moves 25 m (S01 Ex 1.1).', ar: 'لوحة 90 km/h تعني أن السيارة تقطع 25 مترًا كل ثانية.' },
-      worked: { src: 'S01 Ex 1.2 · BK p.16', q: 'Mercury density is 13.6 g/cm³. Express it in SI.', steps: ['ρ = 13.6 g/cm³', 'Replace g → 10⁻³ kg and cm³ → (10⁻²)³ m³', 'ρ = 13.6 × 10⁻³ / 10⁻⁶ = 1.36 × 10⁴ kg/m³'], ans: '1.36 × 10⁴ kg/m³' },
-      tryit: { src: 'BK p.20 Exercise 8', q: 'An iron cube has mass 856 g and side 5.32 cm. Find its density in SI units.', ans: 5685, tol: 0.02, unit: 'kg/m³', hint: 'V = (5.32 cm)³ = 150.6 cm³; then convert g/cm³ to kg/m³.', sol: 'ρ = 856 / 150.6 = 5.685 g/cm³ = 5.685 × 10³ kg/m³' },
+      worked: { src: 'S01 Ex 1.2 · BK p.16', q: 'Mercury density is 13.6 g/cm³. Express it in SI.', steps: ['ρ = 13.6 g/cm³', 'Replace g → 10⁻³ kg and cm³ → (10⁻²)³ m³', 'ρ = {{13.6 × 10⁻³ // 10⁻⁶}} = 1.36 × 10⁴ kg/m³'], ans: '1.36 × 10⁴ kg/m³' },
+      tryit: { src: 'BK p.20 Exercise 8', q: 'An iron cube has mass 856 g and side 5.32 cm. Find its density in SI units.', ans: 5685, tol: 0.02, unit: 'kg/m³', hint: 'V = (5.32 cm)³ = 150.6 cm³; then convert g/cm³ to kg/m³.', sol: 'ρ = {{856 // 150.6}} = 5.685 g/cm³ = 5.685 × 10³ kg/m³' },
       checks: [
-        { q: '72 km/h equals…', o: ['20 m/s', '7.2 m/s', '259 m/s', '2 m/s'], a: 0, why: '72 / 3.6 = 20 m/s.' },
+        { q: '72 km/h equals…', o: ['20 m/s', '7.2 m/s', '259 m/s', '2 m/s'], a: 0, why: '{{72 // 3.6}} = 20 m/s.' },
         { q: '1 cm² equals…', o: ['10⁻² m²', '10⁻⁴ m²', '10⁻⁶ m²', '10² m²'], a: 1, why: '(10⁻² m)² = 10⁻⁴ m².' }
       ],
       mistakes: [['Converting cm³ with 10⁻² only', 'Cube the factor: (10⁻²)³ = 10⁻⁶.'], ['Multiplying km/h by 3.6 to get m/s', 'Divide by 3.6; multiply to go from m/s to km/h.']],
@@ -253,10 +304,10 @@ COURSE.push({
         { en: 'Limitation: numbers like 2π have no dimensions, so dimensional analysis cannot find them (BK p.19: "In practice, the constant C was equal to 2π").', ar: 'القيد: الثوابت العددية مثل 2π لا أبعاد لها فلا يمكن إيجادها بالأبعاد.' }
       ],
       terms: [['Dimension', 'بُعد', 'Expression of a quantity in M, L, T'], ['Dimensionally homogeneous', 'متجانس بُعديًا', 'Both sides have equal dimensions'], ['Dimensionless', 'عديم الأبعاد', 'Pure number, e.g. strain, angle, 2π']],
-      formulas: [{ f: '[F] = [m][a] = M·LT⁻² = MLT⁻²', name: 'Example of dimension algebra', sym: [['[ ]', 'dimension of', '—']], cond: 'Add/subtract only terms with identical dimensions.' }],
+      formulas: [{ f: '[F] = [m][a] = M·LT⁻² = MLT⁻²', name: 'Example of dimension algebra', sym: [['[ ]', 'dimension of', '—', 'بُعد الكمية'], ['M, L, T', 'mass, length, time', '—', 'الكتلة، الطول، الزمن']], cond: 'Add/subtract only terms with identical dimensions.' }],
       life: { en: 'Engineers check spreadsheets by units: if a "speed" column ends up in m·s, a formula is wrong.', ar: 'المهندس يكتشف خطأ معادلته عندما تخرج وحدة السرعة m·s بدل m/s.' },
-      worked: { src: 'S01 Ex 1.3 · BK p.18', q: 'Verify T = 2π√(L/g).', steps: ['Left side: [T]', 'Right side: √( L / (LT⁻²) ) = √(T²) = [T]', 'Both sides are [T] → dimensionally homogeneous.'], ans: 'Correct dimensionally' },
-      tryit: { src: 'BK p.20 Exercise 4', q: 'Verify F = mv²/r. What is the dimension of the right side? (type the power of T)', ans: -2, tol: 0, unit: 'power of T', hint: '[m][v]²/[r] = M (LT⁻¹)² / L', sol: 'M L² T⁻² / L = MLT⁻² = [F] ✓ → power of T is −2' },
+      worked: { src: 'S01 Ex 1.3 · BK p.18', q: 'Verify T = 2π√(L/g).', steps: ['Left side: [T]', 'Right side: √( {{L // LT⁻²}} ) = √(T²) = [T]', 'Both sides are [T] → dimensionally homogeneous.'], ans: 'Correct dimensionally' },
+      tryit: { src: 'BK p.20 Exercise 4', q: 'Verify F = mv²/r. What is the dimension of the right side? (type the power of T)', ans: -2, tol: 0, unit: 'power of T', hint: '{{[m][v]² // [r]}} = {{M (LT⁻¹)² // L}}', sol: '{{M L² T⁻² // L}} = MLT⁻² = [F] ✓ → power of T is −2' },
       checks: [
         { q: 'Dimension of power P = W/t:', o: ['ML²T⁻²', 'ML²T⁻³', 'MLT⁻²', 'ML⁻³'], a: 1, why: 'ML²T⁻² ÷ T = ML²T⁻³.' },
         { q: 'Dimensional analysis can determine…', o: ['the constant 2π', 'whether an equation is homogeneous', 'the sign of a result', 'numerical constants'], a: 1, why: 'It cannot find pure numbers.' }
@@ -266,7 +317,7 @@ COURSE.push({
       quiz: [
         { q: 'Dimension of work W = F·d:', o: ['MLT⁻²', 'ML²T⁻²', 'ML²T⁻³', 'M L⁻¹T⁻²'], a: 1, why: 'MLT⁻² × L.' },
         { q: 'In T = c·L^α·m^β·g^γ (BK Ex 1.4) the exponent γ equals…', num: -0.5, tol: 0, unit: '', sol: '−2γ = 1 → γ = −½; α = ½; β = 0.' },
-        { q: 'The dimension of pressure P = F/A is ML^xT⁻². x = ?', num: -1, tol: 0, unit: '', sol: 'MLT⁻² / L² = ML⁻¹T⁻² (Appendix BK p.177).' }
+        { q: 'The dimension of pressure P = F/A is ML^xT⁻². x = ?', num: -1, tol: 0, unit: '', sol: '{{MLT⁻² // L²}} = ML⁻¹T⁻² (Appendix BK p.177).' }
       ]
     }
   ]
@@ -286,7 +337,7 @@ COURSE.push({
         { en: 'Properties: A = B (same magnitude and direction); A + B = B + A; (A + B) + C = A + (B + C); A + (−A) = 0; A − B = A + (−B); B = nA (n < 0 reverses direction).', ar: 'الخواص: التساوي، الإبدال، التجميع، المعكوس، الطرح، الضرب في عدد.' }
       ],
       terms: [['Scalar', 'كمية قياسية', 'Magnitude only'], ['Vector', 'متجه', 'Magnitude + direction'], ['Commutative', 'إبدالي', 'Order does not matter'], ['Associative', 'تجميعي', 'Grouping does not matter'], ['Inverse vector', 'المتجه المعكوس', 'Same magnitude, opposite direction']],
-      formulas: [{ f: 'C = A − B = A + (−B)', name: 'Vector subtraction', sym: [['−B', 'inverse of B', 'same unit']], cond: '—' }],
+      formulas: [{ f: 'C = A − B = A + (−B)', name: 'Vector subtraction', sym: [['A, B', 'vectors', 'same unit', 'متجهان'], ['−B', 'inverse of B', 'same unit', 'معكوس المتجه B'], ['C', 'difference A − B', 'same unit', 'الفرق']], cond: '—' }],
       life: { en: 'A GPS shows "2 km north‑east" (vector) while the trip meter shows "3.4 km" (scalar distance).', ar: 'الخرائط تعطي إزاحة باتجاه، وعداد السيارة يعطي مسافة.' },
       worked: { src: 'BK p.25', q: 'A man walks 30 m east to the mosque and returns. Distance and net displacement?', steps: ['Distance = 30 + 30 = 60 m (scalar)', 'Displacement = +30 m + (−30 m) = 0'], ans: 'd = 60 m, Δx = 0' },
       tryit: { src: '🧩 additional design', q: 'If A = 5 units east, what is the magnitude of −2A?', ans: 10, tol: 0, unit: 'units', hint: 'Multiplying by n scales the magnitude by |n|.', sol: '|−2| × 5 = 10 units, pointing west.' },
@@ -308,16 +359,16 @@ COURSE.push({
       why: { en: 'Two forces of 4 N each do not make 8 N unless they act in the same direction.', ar: 'قوتان كل منهما 4 نيوتن لا تعطيان 8 نيوتن إلا إذا كانتا في الاتجاه نفسه.' },
       explain: [
         { en: 'Head‑to‑tail: draw B starting at the head of A; the resultant C goes from the tail of A to the head of B.', ar: 'ارسم ذيل المتجه الثاني عند رأس الأول؛ المحصلة من ذيل الأول إلى رأس الثاني.' },
-        { en: 'Right angle: C = √(A² + B²), θ = tan⁻¹(B/A).', ar: 'إذا كانا متعامدين نستخدم فيثاغورس والظل.' },
-        { en: 'Any angle: C = √(A² + B² − 2AB cos θ) where θ is the angle <b>inside the triangle</b> (opposite C); direction by sine rule sin β / B = sin θ / C.', ar: 'لأي زاوية: قانون جيب التمام، حيث θ هي الزاوية داخل المثلث المقابلة للمحصلة.' }
+        { en: 'Right angle: C = √(A² + B²), θ = tan⁻¹( {{B // A}} ).', ar: 'إذا كانا متعامدين نستخدم فيثاغورس والظل.' },
+        { en: 'Any angle: C = √(A² + B² − 2AB cos θ) where θ is the angle <b>inside the triangle</b> (opposite C); direction by sine rule {{sin β // B}} = {{sin θ // C}}.', ar: 'لأي زاوية: قانون جيب التمام، حيث θ هي الزاوية داخل المثلث المقابلة للمحصلة.' }
       ],
       terms: [['Resultant', 'المحصلة', 'Single vector equal to the sum'], ['Head‑to‑tail', 'رأس لذيل', 'Graphical addition method'], ['Cosine rule', 'قانون جيب التمام', 'C² = A² + B² − 2AB cos θ']],
       formulas: [
-        { f: 'C = √(A² + B²) ,  θ = tan⁻¹( {{B // A}} )', name: 'Perpendicular vectors', sym: [['C', 'resultant magnitude', 'same as A'], ['θ', 'angle of C from A', '°']], cond: 'Only when A ⟂ B.' },
-        { f: 'C = √(A² + B² − 2AB cos θ)', name: 'Cosine rule', sym: [['θ', 'angle between A and B inside the triangle', '°']], cond: 'θ is the triangle angle (Ex 2.2 uses 60°, i.e. 180° − 120°).' }
+        { f: 'C = √(A² + B²) ,  θ = tan⁻¹( {{B // A}} )', name: 'Perpendicular vectors', sym: [['A, B', 'perpendicular vectors', 'same unit', 'متجهان متعامدان'], ['C', 'resultant magnitude', 'same as A', 'مقدار المحصلة'], ['θ', 'angle of C from A', '°', 'زاوية المحصلة مع A']], cond: 'Only when A ⟂ B.' },
+        { f: 'C = √(A² + B² − 2AB cos θ)', name: 'Cosine rule', sym: [['A, B', 'the two magnitudes', 'same unit', 'مقدارا المتجهين'], ['C', 'resultant magnitude', 'same as A', 'مقدار المحصلة'], ['θ', 'angle between A and B inside the triangle', '°', 'الزاوية داخل المثلث']], cond: 'θ is the triangle angle (Ex 2.2 uses 60°, i.e. 180° − 120°).' }
       ],
       life: { en: 'A boat heading north at 4 m/s in a 3 m/s east current moves at 5 m/s relative to the shore.', ar: 'قارب يتجه شمالًا 4 م/ث في تيار شرقي 3 م/ث سرعته المحصلة 5 م/ث.' },
-      worked: { src: 'S02 Ex 2.2 · BK p.27', q: 'A = 6, B = 9 with 120° between them (tail to tail). Find C.', steps: ['Triangle angle = 180° − 120° = 60°', 'C = √(6² + 9² − 2·6·9·cos 60°) = √63 = 7.9', 'sin β = (9/7.9) sin 60° → β = 80.6°'], ans: 'C = 7.9, β = 80.6°' },
+      worked: { src: 'S02 Ex 2.2 · BK p.27', q: 'A = 6, B = 9 with 120° between them (tail to tail). Find C.', steps: ['Triangle angle = 180° − 120° = 60°', 'C = √(6² + 9² − 2·6·9·cos 60°) = √63 = 7.9', 'sin β = {{9 // 7.9}} sin 60° → β = 80.6°'], ans: 'C = 7.9, β = 80.6°' },
       tryit: { src: 'BK p.36 Exercise 1', q: 'A = 10 units along +x, B = 7 units at 30° from +x. Find |A + B|.', ans: 16.44, tol: 0.02, unit: 'units', hint: 'Use components: Rx = 10 + 7cos30, Ry = 7sin30.', sol: 'Rx = 16.06, Ry = 3.5 → |R| = 16.44 at 12.3°' },
       checks: [
         { q: 'A = 4 east, B = 4 north. |A + B| ≈ ?', o: ['8', '5.7', '4', '0'], a: 1, why: '√32 = 5.66 (S02 Ex 2.1).' },
@@ -326,7 +377,7 @@ COURSE.push({
       mistakes: [['Using the 120° between the tails in the cosine rule', 'Use the triangle angle (180° − 120° = 60°) with the minus sign, or use 120° with + sign.'], ['Adding magnitudes directly', 'Only valid when vectors are parallel.']],
       summary: ['Perpendicular → Pythagoras + tan⁻¹', 'Any angle → cosine rule + sine rule', '|A − B| ≤ |A + B| ≤ A + B'],
       quiz: [
-        { q: 'A = 3, B = 4, perpendicular. Angle of C from A (°):', num: 53.13, tol: 0.01, unit: '°', sol: 'tan⁻¹(4/3) = 53.1°' },
+        { q: 'A = 3, B = 4, perpendicular. Angle of C from A (°):', num: 53.13, tol: 0.01, unit: '°', sol: 'tan⁻¹( {{4 // 3}} ) = 53.1°' },
         { q: 'A = 5, B = 5 with a triangle angle of 60°. C = ?', num: 5, tol: 0.01, unit: '', sol: '√(25 + 25 − 50·0.5) = 5' }
       ]
     },
@@ -341,7 +392,7 @@ COURSE.push({
         { en: 'Sum: A + B = (Aₓ + Bₓ)î + (A_y + B_y)ĵ + (A_z + B_z)k̂; magnitude √(Rₓ² + R_y² + R_z²).', ar: 'نجمع المركبات المتناظرة ثم نحسب المقدار.' }
       ],
       terms: [['Component', 'مركبة', 'Projection on an axis'], ['Unit vector', 'متجه وحدة', 'Magnitude 1, shows direction'], ['Right‑hand system', 'نظام اليد اليمنى', 'Orientation of x, y, z']],
-      formulas: [{ f: 'Aₓ = A cos θ ,  A_y = A sin θ', name: 'Components', sym: [['θ', 'angle from +x axis', '°']], cond: 'θ measured counter‑clockwise from +x.' }, { f: 'A + B = (Aₓ+Bₓ)î + (A_y+B_y)ĵ + (A_z+B_z)k̂', name: 'Component addition', sym: [['î ĵ k̂', 'unit vectors', '—']], cond: '—' }],
+      formulas: [{ f: 'Aₓ = A cos θ ,  A_y = A sin θ', name: 'Components', sym: [['A', 'magnitude', '—', 'مقدار المتجه'], ['Aₓ, A_y', 'x‑ and y‑components', 'same as A', 'المركبتان السينية والصادية'], ['θ', 'angle from +x axis', '°', 'الزاوية من محور x الموجب']], cond: 'θ measured counter‑clockwise from +x.' }, { f: 'A + B = (Aₓ+Bₓ)î + (A_y+B_y)ĵ + (A_z+B_z)k̂', name: 'Component addition', sym: [['î ĵ k̂', 'unit vectors along x, y, z', '—', 'متجهات الوحدة'], ['Aₓ, A_y, A_z', 'components of A', 'same as A', 'مركبات المتجه']], cond: '—' }],
       life: { en: 'A plane flying 200 km/h at 30° north of east gains 100 km/h northward each hour (A sin 30°).', ar: 'طائرة تطير 200 كم/س بزاوية 30° شمال الشرق تتقدم شمالًا 100 كم كل ساعة.' },
       worked: { src: 'S02 Ex 2.3 · BK p.30', q: 'A = 3 cm at 60° with +x. Find components.', steps: ['Aₓ = 3 cos 60° = 1.5 î', 'A_y = 3 sin 60° = 2.6 ĵ'], ans: 'A = 1.5î + 2.6ĵ cm' },
       tryit: { src: 'BK p.36 Exercise 6c', q: '|A| = 10 m, θ = 235°. Find Aₓ.', ans: -5.736, tol: 0.02, unit: 'm', hint: 'cos 235° is negative (third quadrant).', sol: 'Aₓ = 10 cos 235° = −5.74 m; A_y = 10 sin 235° = −8.19 m' },
@@ -364,17 +415,17 @@ COURSE.push({
       why: { en: 'Work is a dot product (W = F·Δr, Chapter 5); torque and magnetic force are cross products.', ar: 'الشغل ضرب قياسي (الفصل 5)، والعزم ضرب اتجاهي.' },
       explain: [
         { en: '<b>Scalar product</b>: A·B = AB cos θ = AₓBₓ + A_yB_y + A_zB_z → a scalar; commutative. î·î = 1, î·ĵ = 0.', ar: 'الضرب القياسي ناتجه عدد، وهو إبدالي.' },
-        { en: 'Angle: cos θ = A·B / (AB). If A·B = 0 the vectors are orthogonal.', ar: 'إذا كان الضرب القياسي صفرًا فالمتجهان متعامدان.' },
+        { en: 'Angle: cos θ = {{A·B // AB}}. If A·B = 0 the vectors are orthogonal.', ar: 'إذا كان الضرب القياسي صفرًا فالمتجهان متعامدان.' },
         { en: '<b>Vector product</b>: A×B = AB sin θ n̂, perpendicular to both (right‑hand rule); A×B = −B×A. î×ĵ = k̂, ĵ×k̂ = î, k̂×î = ĵ, î×î = 0.', ar: 'الضرب الاتجاهي ناتجه متجه عمودي على الاثنين، وليس إبداليًا.' },
         { en: 'Determinant form: A×B = î(A_yB_z − A_zB_y) − ĵ(AₓB_z − A_zBₓ) + k̂(AₓB_y − A_yBₓ).', ar: 'صيغة المحدد، انتبه لإشارة السالب أمام ĵ.' }
       ],
       terms: [['Dot product', 'الضرب القياسي (النقطي)', 'Gives a scalar'], ['Cross product', 'الضرب الاتجاهي', 'Gives a vector'], ['Orthogonal', 'متعامد', 'θ = 90°'], ['Right‑hand rule', 'قاعدة اليد اليمنى', 'Direction of A×B']],
       formulas: [
-        { f: 'A·B = AB cos θ = AₓBₓ + A_yB_y + A_zB_z', name: 'Scalar product', sym: [['θ', 'angle between A and B', '°']], cond: 'Result is a scalar.' },
-        { f: '|A×B| = AB sin θ', name: 'Vector product magnitude', sym: [['n̂', 'unit vector ⟂ to A and B', '—']], cond: 'A×B = −B×A' }
+        { f: 'A·B = AB cos θ = AₓBₓ + A_yB_y + A_zB_z', name: 'Scalar product', sym: [['A·B', 'scalar product (a number)', 'product of units', 'الضرب القياسي'], ['θ', 'angle between A and B', '°', 'الزاوية بين المتجهين']], cond: 'Result is a scalar.' },
+        { f: '|A×B| = AB sin θ', name: 'Vector product magnitude', sym: [['|A×B|', 'size of the vector product', 'product of units', 'مقدار الضرب الاتجاهي'], ['θ', 'angle between A and B', '°', 'الزاوية بين المتجهين'], ['n̂', 'unit vector ⟂ to A and B', '—', 'متجه وحدة عمودي على A و B']], cond: 'A×B = −B×A' }
       ],
       life: { en: 'Pushing a trolley with a handle at an angle: only F cos θ moves it forward (dot product idea).', ar: 'عند دفع عربة بزاوية، الجزء المفيد من القوة هو F cos θ.' },
-      worked: { src: 'S02 Ex 2.7 · BK p.32–33 (see gap G‑05)', q: 'Angle between A = 2î + 2ĵ − k̂ and B = 6î + 3ĵ + 2k̂.', steps: ['A·B = 12 + 6 − 2 = 16', 'A = √9 = 3, B = √49 = 7', 'θ = cos⁻¹(16/21) = cos⁻¹(0.762)', 'θ = 40.4° (the source prints 40.1°; 40.4° is the computed value)'], ans: 'θ ≈ 40.4°', note: 'Source value 40.1° differs from the calculation: logged as G‑05 for instructor review.' },
+      worked: { src: 'S02 Ex 2.7 · BK p.32–33 (see gap G‑05)', q: 'Angle between A = 2î + 2ĵ − k̂ and B = 6î + 3ĵ + 2k̂.', steps: ['A·B = 12 + 6 − 2 = 16', 'A = √9 = 3, B = √49 = 7', 'θ = cos⁻¹( {{16 // 21}} ) = cos⁻¹(0.762)', 'θ = 40.4° (the source prints 40.1°; 40.4° is the computed value)'], ans: 'θ ≈ 40.4°', note: 'Source value 40.1° differs from the calculation: logged as G‑05 for instructor review.' },
       tryit: { src: 'BK p.37 Exercise 10', q: 'A = 3î − 4ĵ + 2k̂, B = −2î + 3ĵ + 3k̂. Find the x‑component of A×B.', ans: -18, tol: 0, unit: '', hint: 'x: A_yB_z − A_zB_y = (−4)(3) − (2)(3).', sol: 'A×B = −18î − 13ĵ + k̂' },
       checks: [
         { q: 'A·B for A = 100, B = 20, θ = 60°:', o: ['2000', '1000', '1732', '0'], a: 1, why: 'S02 Ex 2.5: 100·20·cos60 = 1000.' },
@@ -406,7 +457,7 @@ COURSE.push({
         { en: '|Δx| ≤ d always; they are equal only for motion in one direction without turning back.', ar: 'مقدار الإزاحة أقل من أو يساوي المسافة دائمًا.' }
       ],
       terms: [['Displacement', 'الإزاحة', 'Δx = x₂ − x₁ (vector)'], ['Distance', 'المسافة', 'Path length (scalar)'], ['Position', 'الموقع', 'x relative to an origin']],
-      formulas: [{ f: 'Δx = x₂ − x₁', name: 'Displacement (3.1)', sym: [['x₁, x₂', 'initial, final position', 'm']], cond: 'Sign shows direction.' }],
+      formulas: [{ f: 'Δx = x₂ − x₁', name: 'Displacement (3.1)', sym: [['Δx', 'displacement', 'm', 'الإزاحة'], ['x₁, x₂', 'initial, final position', 'm', 'الموقع الابتدائي والنهائي']], cond: 'Sign shows direction.' }],
       life: { en: 'A 400 m running track: after one lap the distance is 400 m but the displacement is 0.', ar: 'في مضمار 400 م، بعد لفة كاملة المسافة 400 م والإزاحة صفر.' },
       worked: { src: 'S03 Ex 3.1 (slide version, see G‑06)', q: 'Runner O → A (500 m) → B (200 m) → C (300 m), positions on a line. Distance and displacement?', steps: ['Distance = OA + AB + BC = 500 + 300 + 100 = 900 m', 'Displacement = x_C − x_O = 300 − 0 = 300 m'], ans: 'd = 900 m, Δx = 300 m', note: 'The textbook version (BK p.41–42) uses 1320 m east, 940 m west, 320 m east → Δx = 700 m, d = 2580 m.' },
       tryit: { src: 'BK p.41–42 Ex 3.1 (book version)', q: 'Runners go 1320 m east, then 940 m west, then 320 m east. Find the displacement.', ans: 700, tol: 0, unit: 'm', hint: 'Take east as +.', sol: '1320 − 940 + 320 = 700 m east (distance 2580 m)' },
@@ -423,53 +474,53 @@ COURSE.push({
     },
     {
       id: 'ch3-l2', title: 'Speed, average & instantaneous velocity', ar: 'السرعة القياسية والمتوسطة واللحظية', src: 'S03 §2 · BK p.42–44',
-      goals: ['Compute average speed s = d/Δt', 'Compute average velocity Δx/Δt', 'Differentiate x(t) to get v(t)'],
+      goals: ['Compute average speed s = {{d // Δt}}', 'Compute average velocity {{Δx // Δt}}', 'Differentiate x(t) to get v(t)'],
       goalsAr: 'ستحسب السرعة القياسية المتوسطة والسرعة المتجهة المتوسطة واللحظية بالاشتقاق.',
       why: { en: 'Speedometers show instantaneous speed; trip planners use average speed.', ar: 'عداد السرعة يعرض السرعة اللحظية، وتخطيط الرحلة يستخدم المتوسطة.' },
       explain: [
-        { en: 'Average speed s = d/Δt (scalar). Average velocity v_av = Δx/Δt = (x₂ − x₁)/(t₂ − t₁) (vector).', ar: 'السرعة القياسية = المسافة ÷ الزمن، والمتجهة = الإزاحة ÷ الزمن.' },
-        { en: 'Instantaneous velocity is the limit as Δt → 0: v = dx/dt (3.3).', ar: 'السرعة اللحظية هي نهاية المتوسطة عندما يقترب الزمن من الصفر، أي المشتقة.' },
-        { en: 'Power rule: d/dt(tⁿ) = n tⁿ⁻¹, derivative of a constant = 0.', ar: 'قاعدة الاشتقاق: مشتقة tⁿ هي n tⁿ⁻¹.' }
+        { en: 'Average speed s = {{d // Δt}} (scalar). Average velocity v_av = {{Δx // Δt}} = {{x₂ − x₁ // t₂ − t₁}} (vector).', ar: 'السرعة القياسية = المسافة ÷ الزمن، والمتجهة = الإزاحة ÷ الزمن.' },
+        { en: 'Instantaneous velocity is the limit as Δt → 0: v = {{dx // dt}} (3.3).', ar: 'السرعة اللحظية هي نهاية المتوسطة عندما يقترب الزمن من الصفر، أي المشتقة.' },
+        { en: 'Power rule: {{d // dt}}(tⁿ) = n tⁿ⁻¹, derivative of a constant = 0.', ar: 'قاعدة الاشتقاق: مشتقة tⁿ هي n tⁿ⁻¹.' }
       ],
-      terms: [['Average speed', 'السرعة القياسية المتوسطة', 'd/Δt'], ['Average velocity', 'السرعة المتجهة المتوسطة', 'Δx/Δt'], ['Instantaneous velocity', 'السرعة اللحظية', 'dx/dt']],
-      formulas: [{ f: 'v_av = {{Δx // Δt}} ,  v = {{dx // dt}}', name: 'Velocity (3.2, 3.3)', sym: [['v', 'velocity', 'm/s'], ['t', 'time', 's']], cond: '—' }],
+      terms: [['Average speed', 'السرعة القياسية المتوسطة', '{{d // Δt}}'], ['Average velocity', 'السرعة المتجهة المتوسطة', '{{Δx // Δt}}'], ['Instantaneous velocity', 'السرعة اللحظية', '{{dx // dt}}']],
+      formulas: [{ f: 'v_av = {{Δx // Δt}} ,  v = {{dx // dt}}', name: 'Velocity (3.2, 3.3)', sym: [['v_av', 'average velocity', 'm/s', 'السرعة المتوسطة'], ['v', 'instantaneous velocity', 'm/s', 'السرعة اللحظية'], ['Δx', 'displacement', 'm', 'الإزاحة'], ['t', 'time', 's', 'الزمن']], cond: '—' }],
       life: { en: 'Bisha → Makkah 450 km in 9 h: average 50 km/h even if the speedometer showed 120 at times.', ar: 'رحلة بيشة–مكة 450 كم في 9 ساعات متوسطها 50 كم/س.' },
-      worked: { src: 'S03 Ex 3.2 · BK p.43–44', q: 'x(t) = 6t² − t + 1. Find v at t = 3 s and v_av between 0 and 3 s.', steps: ['x(0) = 1 m, x(3) = 52 m → Δx = 51 m', 'v = dx/dt = 12t − 1 → v(3) = 35 m/s', 'v_av = 51/3 = 17 m/s'], ans: 'v(3) = 35 m/s, v_av = 17 m/s' },
-      tryit: { src: 'BK p.53 Exercise 7', q: 'x(t) = 3t − 4t² + t³. Find the average velocity between t = 2 s and t = 4 s.', ans: 7, tol: 0.01, unit: 'm/s', hint: 'x(2) = −2 m, x(4) = 12 m.', sol: 'v_av = (12 − (−2))/2 = 7 m/s; v(3) = 3 − 24 + 27 = 6 m/s' },
+      worked: { src: 'S03 Ex 3.2 · BK p.43–44', q: 'x(t) = 6t² − t + 1. Find v at t = 3 s and v_av between 0 and 3 s.', steps: ['x(0) = 1 m, x(3) = 52 m → Δx = 51 m', 'v = {{dx // dt}} = 12t − 1 → v(3) = 35 m/s', 'v_av = {{51 // 3}} = 17 m/s'], ans: 'v(3) = 35 m/s, v_av = 17 m/s' },
+      tryit: { src: 'BK p.53 Exercise 7', q: 'x(t) = 3t − 4t² + t³. Find the average velocity between t = 2 s and t = 4 s.', ans: 7, tol: 0.01, unit: 'm/s', hint: 'x(2) = −2 m, x(4) = 12 m.', sol: 'v_av = {{12 − (−2) // 2}} = 7 m/s; v(3) = 3 − 24 + 27 = 6 m/s' },
       checks: [
         { q: 'x = 2t³ + 2t + 1. v at t = 5 s (S03)?', o: ['152 m/s', '252 m/s', '62 m/s', '50 m/s'], a: 0, why: 'v = 6t² + 2 = 152.' },
-        { q: 'The slope of an x–t graph is…', o: ['acceleration', 'velocity', 'distance', 'time'], a: 1, why: 'v = dx/dt.' }
+        { q: 'The slope of an x–t graph is…', o: ['acceleration', 'velocity', 'distance', 'time'], a: 1, why: 'v = {{dx // dt}}.' }
       ],
       mistakes: [['Dividing distance by time for average velocity', 'Use displacement.'], ['Substituting t before differentiating', 'Differentiate first, then substitute.']],
-      summary: ['s = d/Δt', 'v_av = Δx/Δt', 'v = dx/dt'],
+      summary: ['s = {{d // Δt}}', 'v_av = {{Δx // Δt}}', 'v = {{dx // dt}}'],
       quiz: [
-        { q: 'Player: path 17.5 m, Δx = 10 m, 5 s. Average speed?', num: 3.5, tol: 0, unit: 'm/s', sol: '17.5/5 = 3.5 m/s (S03)' },
-        { q: 'Same player: average velocity?', num: 2, tol: 0, unit: 'm/s', sol: '10/5 = 2 m/s' },
-        { q: 'Car 450 km from 7 am to 4 pm (BK Ex.2). Average velocity in km/h?', num: 50, tol: 0.01, unit: 'km/h', sol: '450/9 = 50 km/h (assuming 450 km is the straight‑line separation)' }
+        { q: 'Player: path 17.5 m, Δx = 10 m, 5 s. Average speed?', num: 3.5, tol: 0, unit: 'm/s', sol: '{{17.5 // 5}} = 3.5 m/s (S03)' },
+        { q: 'Same player: average velocity?', num: 2, tol: 0, unit: 'm/s', sol: '{{10 // 5}} = 2 m/s' },
+        { q: 'Car 450 km from 7 am to 4 pm (BK Ex.2). Average velocity in km/h?', num: 50, tol: 0.01, unit: 'km/h', sol: '{{450 // 9}} = 50 km/h (assuming 450 km is the straight‑line separation)' }
       ]
     },
     {
       id: 'ch3-l3', title: 'Acceleration', ar: 'التسارع', src: 'S03 §3 · BK p.45–46',
-      goals: ['Compute a_av = Δv/Δt', 'Differentiate v(t) to get a(t)', 'Interpret the sign of acceleration'],
+      goals: ['Compute a_av = {{Δv // Δt}}', 'Differentiate v(t) to get a(t)', 'Interpret the sign of acceleration'],
       goalsAr: 'ستحسب التسارع المتوسط واللحظي وتفهم معنى إشارته.',
       why: { en: 'Acceleration links motion to forces (Newton\'s 2nd law, Chapter 4).', ar: 'التسارع هو الجسر بين الحركة والقوة في الفصل الرابع.' },
       explain: [
-        { en: 'Average acceleration: "the rate of velocity change in time", a_av = Δv/Δt = (v₂ − v₁)/(t₂ − t₁) (3.4).', ar: 'التسارع المتوسط = التغير في السرعة ÷ الزمن.' },
-        { en: '⚠ The slide S03 words it as "average velocity divided by the time interval"; the equation (Δv/Δt) and the book are the reference (gap G‑04).', ar: 'تنبيه: صياغة الشريحة غير دقيقة، المعتمد هو Δv/Δt.' },
-        { en: 'Instantaneous acceleration a = dv/dt = d²x/dt² (3.5).', ar: 'التسارع اللحظي هو مشتقة السرعة.' },
+        { en: 'Average acceleration: "the rate of velocity change in time", a_av = {{Δv // Δt}} = {{v₂ − v₁ // t₂ − t₁}} (3.4).', ar: 'التسارع المتوسط = التغير في السرعة ÷ الزمن.' },
+        { en: '⚠ The slide S03 words it as "average velocity divided by the time interval"; the equation ({{Δv // Δt}}) and the book are the reference (gap G‑04).', ar: 'تنبيه: صياغة الشريحة غير دقيقة، المعتمد هو {{Δv // Δt}}.' },
+        { en: 'Instantaneous acceleration a = {{dv // dt}} = {{d²x // dt²}} (3.5).', ar: 'التسارع اللحظي هو مشتقة السرعة.' },
         { en: 'Negative a does not necessarily mean slowing down: if a and v are both negative, the object speeds up (BK p.45).', ar: 'التسارع السالب لا يعني دائمًا التباطؤ؛ إذا كانت السرعة سالبة أيضًا فالجسم يتسارع.' }
       ],
       terms: [['Acceleration', 'التسارع', 'Rate of change of velocity'], ['Deceleration', 'التباطؤ', 'Speed decreasing (a opposite to v)']],
-      formulas: [{ f: 'a_av = {{Δv // Δt}} ,  a = {{dv // dt}}', name: 'Acceleration (3.4, 3.5)', sym: [['a', 'acceleration', 'm/s²']], cond: '—' }],
+      formulas: [{ f: 'a_av = {{Δv // Δt}} ,  a = {{dv // dt}}', name: 'Acceleration (3.4, 3.5)', sym: [['a_av', 'average acceleration', 'm/s²', 'التسارع المتوسط'], ['a', 'instantaneous acceleration', 'm/s²', 'التسارع اللحظي'], ['Δv', 'change of velocity', 'm/s', 'تغير السرعة'], ['t', 'time', 's', 'الزمن']], cond: '—' }],
       life: { en: 'A car going 0 → 100 km/h in 10 s has an average acceleration of 2.78 m/s².', ar: 'سيارة من 0 إلى 100 كم/س في 10 ثوانٍ تسارعها 2.78 م/ث².' },
       worked: { src: 'S03 Ex 3.3 · BK p.45–46', q: 'x(t) = 2t³ − 3t² + 2t. Find a at t = 3 s.', steps: ['v = 6t² − 6t + 2', 'a = 12t − 6', 'a(3) = 36 − 6 = 30 m/s²'], ans: '30 m/s²' },
-      tryit: { src: 'BK p.52 Exercise 3a', q: 'A train at 30 m/s slows to a stop in 44 s. Find its acceleration.', ans: -0.682, tol: 0.02, unit: 'm/s²', hint: 'a = (0 − 30)/44', sol: 'a = −0.68 m/s² (deceleration)' },
+      tryit: { src: 'BK p.52 Exercise 3a', q: 'A train at 30 m/s slows to a stop in 44 s. Find its acceleration.', ans: -0.682, tol: 0.02, unit: 'm/s²', hint: 'a = {{0 − 30 // 44}}', sol: 'a = −0.68 m/s² (deceleration)' },
       checks: [
-        { q: 'v from 3 m/s to 5 m/s in 5 s. a_av?', o: ['0.4 m/s²', '1.6 m/s²', '8 m/s²', '2 m/s²'], a: 0, why: 'S03: (5 − 3)/5.' },
+        { q: 'v from 3 m/s to 5 m/s in 5 s. a_av?', o: ['0.4 m/s²', '1.6 m/s²', '8 m/s²', '2 m/s²'], a: 0, why: 'S03: a = {{5 − 3 // 5}}.' },
         { q: 'v = −5 m/s and a = −2 m/s². The object is…', o: ['slowing down', 'speeding up', 'at rest', 'moving at constant speed'], a: 1, why: 'Same signs ⇒ speeding up.' }
       ],
-      mistakes: [['Negative acceleration = slowing down', 'Compare signs of a and v.'], ['Using the slide wording "average velocity / time"', 'Use Δv/Δt.']],
-      summary: ['a_av = Δv/Δt', 'a = dv/dt', 'Same signs of a and v ⇒ speeding up'],
+      mistakes: [['Negative acceleration = slowing down', 'Compare signs of a and v.'], ['Using the slide wording "average velocity / time"', 'Use {{Δv // Δt}}.']],
+      summary: ['a_av = {{Δv // Δt}}', 'a = {{dv // dt}}', 'Same signs of a and v ⇒ speeding up'],
       quiz: [
         { q: 'x = 2t³ + t² + 1. a at t = 5 s (S03)?', num: 62, tol: 0, unit: 'm/s²', sol: 'v = 6t² + 2t, a = 12t + 2 = 62' },
         { q: 'Classify: a motorcycle approaching a red light (BK Ex.10f).', o: ['Positive (speeding up)', 'Negative (deceleration)', 'Zero'], a: 1, why: 'It slows down.' }
@@ -484,28 +535,28 @@ COURSE.push({
         { en: 'If a is constant: (3.6) v_f = at + v_i · (3.7) x_f = ½at² + v_i t + x_i · (3.8) v_f² = v_i² + 2aΔx.', ar: 'المعادلات الثلاث صالحة فقط عندما يكون التسارع ثابتًا.' },
         { en: 'Pick the equation that does not contain the quantity you neither know nor need (no t → use 3.8).', ar: 'اختر المعادلة التي لا تحتوي الكمية المجهولة غير المطلوبة.' },
         { en: 'Free fall: a = g = 9.8 m/s² toward Earth\'s centre, independent of mass (air resistance neglected). Choose + direction first: Ex 3.5 takes down +, Ex 3.6 takes up +.', ar: 'السقوط الحر: التسارع g = 9.8 م/ث² نحو الأرض. حدد الاتجاه الموجب أولًا.' },
-        { en: 'Thrown up: y_max = v_i²/2g, t_max = v_i/g, flight time back to the same level = 2 t_max.', ar: 'أقصى ارتفاع v²/2g وزمن الصعود v/g وزمن التحليق ضعفه.' }
+        { en: 'Thrown up: y_max = {{v_i² // 2g}}, t_max = {{v_i // g}}, flight time back to the same level = 2 t_max.', ar: 'أقصى ارتفاع v²/2g وزمن الصعود v/g وزمن التحليق ضعفه.' }
       ],
       terms: [['Constant acceleration', 'تسارع ثابت', 'a does not change'], ['Free fall', 'السقوط الحر', 'Motion under gravity only'], ['Maximum height', 'أقصى ارتفاع', 'Where v = 0'], ['Flight time', 'زمن التحليق', 'Time to return']],
       formulas: [
-        { f: 'v_f = v_i + at', name: '(3.6)', sym: [['v_i, v_f', 'initial/final velocity', 'm/s'], ['t', 'time', 's']], cond: 'a constant' },
-        { f: 'x_f = x_i + v_i t + ½at²', name: '(3.7)', sym: [['x', 'position', 'm']], cond: 'a constant' },
-        { f: 'v_f² = v_i² + 2aΔx', name: '(3.8)', sym: [['Δx', 'displacement', 'm']], cond: 'a constant; no time' }
+        { f: 'v_f = v_i + at', name: '(3.6)', sym: [['v_i, v_f', 'initial/final velocity', 'm/s', 'السرعة الابتدائية والنهائية'], ['a', 'acceleration', 'm/s²', 'التسارع'], ['t', 'time', 's', 'الزمن']], cond: 'a constant' },
+        { f: 'x_f = x_i + v_i t + ½at²', name: '(3.7)', sym: [['x_i, x_f', 'initial/final position', 'm', 'الموقع الابتدائي والنهائي'], ['v_i', 'initial velocity', 'm/s', 'السرعة الابتدائية'], ['a', 'acceleration', 'm/s²', 'التسارع'], ['t', 'time', 's', 'الزمن']], cond: 'a constant' },
+        { f: 'v_f² = v_i² + 2aΔx', name: '(3.8)', sym: [['v_i, v_f', 'initial/final velocity', 'm/s', 'السرعة الابتدائية والنهائية'], ['a', 'acceleration', 'm/s²', 'التسارع'], ['Δx', 'displacement', 'm', 'الإزاحة']], cond: 'a constant; no time' }
       ],
       life: { en: 'Dropping a phone from 1.2 m: it hits the floor after √(2·1.2/9.8) ≈ 0.49 s; that is why you can rarely catch it.', ar: 'الجوال الساقط من 1.2 م يصل الأرض بعد نصف ثانية تقريبًا.' },
       worked: { src: 'S03 Ex 3.4 · BK p.48', q: 'Car from rest, a = 2.5 m/s². (a) time to travel 50 m (b) velocity then.', steps: ['50 = ½(2.5)t² → t² = 40 → t = 6.32 s', 'v_f² = 0 + 2(2.5)(50) = 250 → v = 15.81 m/s'], ans: 't = 6.32 s, v = 15.81 m/s' },
       tryit: { src: 'BK p.52 Exercise 6', q: 'A stone is thrown up at 29.4 m/s from the top of a 34.3 m minaret. When does it hit the ground?', ans: 7, tol: 0.02, unit: 's', hint: 'Up +: −34.3 = 29.4t − 4.9t² → t² − 6t − 7 = 0.', sol: 't = 7 s (t_max = 3 s; impact speed 39.2 m/s)' },
       checks: [
-        { q: 'Which equation has no time?', o: ['v_f = v_i + at', 'x = v_i t + ½at²', 'v_f² = v_i² + 2aΔx', 'v = dx/dt'], a: 2, why: '(3.8).' },
-        { q: 'Thrown up at 60 m/s: maximum height (BK p.51)?', o: ['183.7 m', '367 m', '60 m', '6.1 m'], a: 0, why: '60²/(2·9.8).' }
+        { q: 'Which equation has no time?', o: ['v_f = v_i + at', 'x = v_i t + ½at²', 'v_f² = v_i² + 2aΔx', 'v = {{dx // dt}}'], a: 2, why: '(3.8).' },
+        { q: 'Thrown up at 60 m/s: maximum height (BK p.51)?', o: ['183.7 m', '367 m', '60 m', '6.1 m'], a: 0, why: 'y_max = {{60² // 2 × 9.8}}.' }
       ],
       mistakes: [['Mixing sign conventions inside one problem', 'Fix + once and keep it.'], ['Using these equations when a changes with time', 'Then use derivatives (Lesson 3).'], ['Setting a = 0 at the top of the flight', 'v = 0 at the top, but a = g still.']],
-      summary: ['3 equations, constant a only', 'Free fall: |a| = 9.8 m/s²', 'y_max = v²/2g, t_max = v/g'],
+      summary: ['3 equations, constant a only', 'Free fall: |a| = 9.8 m/s²', 'y_max = {{v² // 2g}}, t_max = {{v // g}}'],
       quiz: [
         { q: 'Thrown down at 60 m/s, hits ground after 5 s. Height (S03 Ex 3.5)?', num: 422.5, tol: 0.01, unit: 'm', sol: '60·5 + ½·9.8·25 = 422.5 m' },
         { q: 'Same object: impact speed?', num: 109, tol: 0.01, unit: 'm/s', sol: '60 + 9.8·5 = 109 m/s' },
-        { q: 'Arrow reaches 122.5 m. Total flight time (BK Ex.5)?', num: 10, tol: 0.02, unit: 's', sol: 'v_i = √(2·9.8·122.5) = 49 m/s → t = 2·49/9.8 = 10 s' },
-        { q: 'Plane needs 360 km/h on a 1200 m runway from rest (BK Ex.9). a = ?', num: 4.17, tol: 0.02, unit: 'm/s²', sol: '100² /(2·1200) = 4.17 m/s²' },
+        { q: 'Arrow reaches 122.5 m. Total flight time (BK Ex.5)?', num: 10, tol: 0.02, unit: 's', sol: 'v_i = √(2·9.8·122.5) = 49 m/s → t = {{2 × 49 // 9.8}} = 10 s' },
+        { q: 'Plane needs 360 km/h on a 1200 m runway from rest (BK Ex.9). a = ?', num: 4.17, tol: 0.02, unit: 'm/s²', sol: 'a = {{100² // 2 × 1200}} = 4.17 m/s²' },
         { q: 'Bus at 45 km/h brakes, hits a car 40 m ahead after 4 s (BK Ex.8). Deceleration magnitude?', num: 1.25, tol: 0.02, unit: 'm/s²', sol: '40 = 12.5·4 + ½a·16 → a = −1.25 m/s²; speed at impact 7.5 m/s' }
       ]
     }
@@ -528,7 +579,7 @@ COURSE.push({
         { en: 'Equilibrium method: draw forces, resolve into x and y, set each sum to zero, solve.', ar: 'طريقة الاتزان: ارسم القوى، حللها، اجعل مجموع كل محور صفرًا.' }
       ],
       terms: [['Net force', 'القوة المحصلة', 'Vector sum ΣF'], ['Inertia', 'القصور الذاتي', 'Resistance to change of motion'], ['Equilibrium', 'الاتزان', 'ΣF = 0'], ['Field force', 'قوة مجال', 'Acts without contact']],
-      formulas: [{ f: 'ΣF = 0  ⇔  ΣFₓ = 0 and ΣF_y = 0', name: 'First law / equilibrium (4.1)', sym: [['ΣF', 'net force', 'N']], cond: 'Body at rest or at constant velocity.' }],
+      formulas: [{ f: 'ΣF = 0  ⇔  ΣFₓ = 0 and ΣF_y = 0', name: 'First law / equilibrium (4.1)', sym: [['ΣF', 'net force', 'N', 'القوة المحصلة'], ['ΣFₓ, ΣF_y', 'components of the net force', 'N', 'مركبتا القوة المحصلة']], cond: 'Body at rest or at constant velocity.' }],
       life: { en: 'Passengers lurch forward when a bus brakes: their bodies keep moving (inertia).', ar: 'يندفع الركاب للأمام عند فرملة الحافلة بسبب القصور الذاتي.' },
       worked: { src: 'S04 Ex 4.2 · BK p.60', q: 'Static body: F₁ = 10 N at φ = 60° (up‑left), F₃ at θ = 30° (up‑right), F₂ down. Find F₃ and F₂.', steps: ['ΣFₓ: F₃ cos 30° − 10 cos 60° = 0 → F₃ = 5.8 N', 'ΣF_y: 10 sin 60° + 5.8 sin 30° − F₂ = 0 → F₂ = 11.6 N'], ans: 'F₃ = 5.8 N, F₂ = 11.6 N' },
       tryit: { src: 'BK p.66 Exercise 3', q: 'A 10 kg block hangs from two strings at 60° and 30° to the horizontal. Find the tension in the 60° string.', ans: 84.9, tol: 0.02, unit: 'N', hint: 'T₁cos60 = T₂cos30 and T₁sin60 + T₂sin30 = 98 N.', sol: 'T₁ = 84.9 N (60° string), T₂ = 49 N. 🧩 Assumes angles measured from the horizontal ceiling; check the figure.' },
@@ -555,19 +606,19 @@ COURSE.push({
         { en: 'Use components: ΣFₓ = maₓ, ΣF_y = ma_y. a points in the direction of the net force.', ar: 'نطبق القانون على كل محور على حدة.' }
       ],
       terms: [['Mass', 'الكتلة', 'Amount of inertia (kg)'], ['Weight', 'الوزن', 'Gravitational force mg (N)'], ['Newton (N)', 'نيوتن', 'kg·m/s²'], ['Tension', 'الشد', 'Force in a string']],
-      formulas: [{ f: 'ΣF = m a', name: 'Second law (4.2)', sym: [['ΣF', 'net force', 'N'], ['m', 'mass', 'kg'], ['a', 'acceleration', 'm/s²']], cond: 'Inertial frame; ΣF is the vector sum.' }, { f: 'F_w = m g', name: 'Weight', sym: [['g', '9.8 m/s²', 'm/s²']], cond: 'Near Earth\'s surface' }],
+      formulas: [{ f: 'ΣF = m a', name: 'Second law (4.2)', sym: [['ΣF', 'net force', 'N', 'القوة المحصلة'], ['m', 'mass', 'kg', 'الكتلة'], ['a', 'acceleration', 'm/s²', 'التسارع']], cond: 'Inertial frame; ΣF is the vector sum.' }, { f: 'F_w = m g', name: 'Weight', sym: [['F_w', 'weight', 'N', 'الوزن'], ['m', 'mass', 'kg', 'الكتلة'], ['g', '9.8 m/s²', 'm/s²', 'تسارع الجاذبية']], cond: 'Near Earth\'s surface' }],
       life: { en: 'In an elevator accelerating upward a scale shows more than your weight: n = m(g + a).', ar: 'في مصعد يتسارع للأعلى يقرأ الميزان أكثر من وزنك.' },
-      worked: { src: 'S04 slide example', q: 'F = 20 N at 30° acts on m = 5 kg. Find aₓ, a_y and a.', steps: ['Fₓ = 20 cos 30° = 17.3 N, F_y = 20 sin 30° = 10 N', 'aₓ = 17.3/5 = 3.46 m/s², a_y = 10/5 = 2 m/s²', 'a = 20/5 = 4 m/s² at 30° (same direction as F)'], ans: 'a = 4 m/s² at 30°' },
-      tryit: { src: 'BK p.66 Exercise 4', q: 'Masses 10 kg and 5 kg hang over a frictionless pulley. Find the acceleration.', ans: 3.27, tol: 0.02, unit: 'm/s²', hint: 'a = (m₁ − m₂)g/(m₁ + m₂).', sol: 'a = 5·9.8/15 = 3.27 m/s²; T = 2m₁m₂g/(m₁+m₂) = 65.3 N' },
+      worked: { src: 'S04 slide example', q: 'F = 20 N at 30° acts on m = 5 kg. Find aₓ, a_y and a.', steps: ['Fₓ = 20 cos 30° = 17.3 N, F_y = 20 sin 30° = 10 N', 'aₓ = {{17.3 // 5}} = 3.46 m/s², a_y = {{10 // 5}} = 2 m/s²', 'a = {{20 // 5}} = 4 m/s² at 30° (same direction as F)'], ans: 'a = 4 m/s² at 30°' },
+      tryit: { src: 'BK p.66 Exercise 4', q: 'Masses 10 kg and 5 kg hang over a frictionless pulley. Find the acceleration.', ans: 3.27, tol: 0.02, unit: 'm/s²', hint: 'a = {{(m₁ − m₂) g // m₁ + m₂}}.', sol: 'a = {{5 × 9.8 // 15}} = 3.27 m/s²; T = {{2 m₁ m₂ g // m₁ + m₂}} = 65.3 N' },
       checks: [
-        { q: 'Same force, mass tripled. Acceleration becomes (BK Quiz 2)…', o: ['a', 'a/3', '3a'], a: 1, why: 'a ∝ 1/m.' },
-        { q: 'A body weighs 24.4 N on Earth. Mass? (S04 Ex 4.4)', o: ['2.5 kg', '24.4 kg', '239 kg', '0.4 kg'], a: 0, why: '24.4/9.8.' }
+        { q: 'Same force, mass tripled. Acceleration becomes (BK Quiz 2)…', o: ['a', 'a/3', '3a'], a: 1, why: 'a ∝ {{1 // m}}.' },
+        { q: 'A body weighs 24.4 N on Earth. Mass? (S04 Ex 4.4)', o: ['2.5 kg', '24.4 kg', '239 kg', '0.4 kg'], a: 0, why: '{{24.4 // 9.8}}.' }
       ],
       mistakes: [['Using a single force instead of ΣF', 'Sum all forces first.'], ['Writing weight in kg', 'Weight is a force in N.']],
       summary: ['ΣF = ma (vector)', 'Weight = mg', 'Work per axis'],
       quiz: [
         { q: '80 kg person in an elevator accelerating up at 3 m/s². Scale reading? (BK Ex.5)', num: 1024, tol: 0.01, unit: 'N', sol: 'n = 80(9.8 + 3) = 1024 N (down: 544 N)' },
-        { q: '1200 kg car, 0 → 100 km/h in 10 s. Force? (BK Ex.8)', num: 3333, tol: 0.02, unit: 'N', sol: 'a = 27.78/10 = 2.778 → F = 3333 N' },
+        { q: '1200 kg car, 0 → 100 km/h in 10 s. Force? (BK Ex.8)', num: 3333, tol: 0.02, unit: 'N', sol: 'a = {{27.78 // 10}} = 2.778 → F = 3333 N' },
         { q: 'Ice block slides down a frictionless 20° incline. a = ? (BK Ex.2a)', num: 3.35, tol: 0.02, unit: 'm/s²', sol: 'a = g sin 20° = 3.35 m/s² down the slope' },
         { q: 'Child 30 kg pulled by 9 N (60° above x) and 12 N (30° below x). |a| = ? (BK Ex 4.3)', num: 0.5, tol: 0.03, unit: 'm/s²', sol: 'ΣFₓ = 14.89 N, ΣF_y = 1.79 N → aₓ = 0.496, a_y = 0.06 → a ≈ 0.50 m/s² at 6.9° (book prints a_y = 0.1, 11.3°: gap G‑26)' }
       ]
@@ -583,10 +634,10 @@ COURSE.push({
         { en: 'A book on a table: Earth pulls the book down (mg); the table pushes the book up (normal force n). For the book at rest n = mg (first law); the reaction to n is the book pushing the table.', ar: 'الكتاب على الطاولة: القوة العمودية تساوي الوزن هنا بسبب الاتزان.' }
       ],
       terms: [['Action–reaction pair', 'زوج الفعل ورد الفعل', 'Equal, opposite, on different bodies'], ['Normal force', 'القوة العمودية', 'Contact force ⟂ to surface']],
-      formulas: [{ f: 'F₁₂ = −F₂₁', name: 'Third law (4.3)', sym: [['F₁₂', 'force by 1 on 2', 'N']], cond: 'Always, for any interaction.' }],
+      formulas: [{ f: 'F₁₂ = −F₂₁', name: 'Third law (4.3)', sym: [['F₁₂', 'force by body 1 on body 2', 'N', 'قوة الجسم 1 على الجسم 2'], ['F₂₁', 'force by body 2 on body 1', 'N', 'قوة الجسم 2 على الجسم 1']], cond: 'Always, for any interaction.' }],
       life: { en: 'When you jump off a small boat, the boat moves backward.', ar: 'عندما تقفز من قارب صغير يتحرك القارب للخلف.' },
       worked: { src: 'S04 Ex 4.5 · BK p.65', q: 'An object of weight 200 N rests on a table. Reaction force n?', steps: ['Object at rest: ΣF_y = 0', 'n − W = 0 → n = W = 200 N'], ans: 'n = 200 N' },
-      tryit: { src: 'BK p.67 Exercise 7', q: 'A compressed spring pushes a 2 kg and a 1 kg ball apart on a frictionless table. If the 2 kg ball gets a = 3 m/s², what is the 1 kg ball\'s acceleration?', ans: 6, tol: 0.01, unit: 'm/s²', hint: 'Equal and opposite forces: F = 2 × 3 = 6 N on each.', sol: 'a = 6/1 = 6 m/s²: the lighter ball moves away faster. 🧩 numbers added to the book\'s conceptual question.' },
+      tryit: { src: 'BK p.67 Exercise 7', q: 'A compressed spring pushes a 2 kg and a 1 kg ball apart on a frictionless table. If the 2 kg ball gets a = 3 m/s², what is the 1 kg ball\'s acceleration?', ans: 6, tol: 0.01, unit: 'm/s²', hint: 'Equal and opposite forces: F = 2 × 3 = 6 N on each.', sol: 'a = {{6 // 1}} = 6 m/s²: the lighter ball moves away faster. 🧩 numbers added to the book\'s conceptual question.' },
       checks: [
         { q: 'Floor exerts a normal force on… (chair on rug, book on chair, BK Ex.10)', o: ['all three', 'only the book', 'only the rug', 'the chair'], a: 2, why: 'The floor touches only the rug.' },
         { q: 'Action and reaction cancel because they are opposite.', o: ['True', 'False'], a: 1, why: 'They act on different bodies.' }
@@ -615,13 +666,13 @@ COURSE.push({
         { en: 'θ = 90° ⇒ W = 0; θ > 90° ⇒ W < 0 (energy taken from the system).', ar: 'إذا كانت القوة عمودية على الإزاحة فالشغل صفر، وإذا كانت الزاوية منفرجة فالشغل سالب.' }
       ],
       terms: [['Work', 'الشغل', 'W = F·Δr'], ['Joule', 'الجول', 'N·m'], ['Displacement', 'الإزاحة', 'Δr']],
-      formulas: [{ f: 'W = F·Δr = F Δr cos θ', name: 'Work (5.1)', sym: [['F', 'force', 'N'], ['Δr', 'displacement', 'm'], ['θ', 'angle between F and Δr', '°']], cond: 'Constant force.' }],
+      formulas: [{ f: 'W = F·Δr = F Δr cos θ', name: 'Work (5.1)', sym: [['W', 'work', 'J', 'الشغل'], ['F', 'force', 'N', 'القوة'], ['Δr', 'displacement', 'm', 'الإزاحة'], ['θ', 'angle between F and Δr', '°', 'الزاوية بين القوة والإزاحة']], cond: 'Constant force.' }],
       life: { en: 'Pulling a suitcase by its handle at 60°: only half of your pull does work moving it forward.', ar: 'عند سحب حقيبة بزاوية 60° نصف قوتك فقط تبذل شغلًا للأمام.' },
       worked: { src: 'S05 Ex 5.4 · BK p.74', q: 'Two 200 N forces act; F₁ at 60° to the motion, F₂ perpendicular; Δr = 2 m. Total work?', steps: ['F₂ ⟂ motion → W₂ = 0', 'W₁ = 200 × 2 × cos 60° = 200 J'], ans: 'W = 200 J' },
       tryit: { src: 'BK p.82 Exercise 3', q: 'F = 15î + 25ĵ N moves an object from (2,7) to (5,9) m. Work?', ans: 95, tol: 0.01, unit: 'J', hint: 'Δr = 3î + 2ĵ', sol: 'W = 15·3 + 25·2 = 95 J' },
       checks: [
         { q: '2 N along +x, Δr = 2 m along +x. W = ? (S05 Ex 5.1)', o: ['4 J', '0', '1 J', '−4 J'], a: 0, why: '2·2·cos 0°.' },
-        { q: 'A man raises a 100 N bucket doing 1000 J. Depth? (BK Ex 5.2)', o: ['10 m', '100 m', '1 m', '0.1 m'], a: 0, why: 'Δr = W/F.' }
+        { q: 'A man raises a 100 N bucket doing 1000 J. Depth? (BK Ex 5.2)', o: ['10 m', '100 m', '1 m', '0.1 m'], a: 0, why: 'Δr = {{W // F}}.' }
       ],
       mistakes: [['Using sin θ for work', 'Work uses cos θ.'], ['Writing (5î + 4ĵ) × 4î for work', 'It is a dot product (·), see G‑19.']],
       summary: ['W = FΔr cos θ', 'Scalar, in J', '⟂ force does no work'],
@@ -642,7 +693,7 @@ COURSE.push({
         { en: 'Negative work (brakes) reduces KE.', ar: 'الشغل السالب يقلل الطاقة الحركية.' }
       ],
       terms: [['Kinetic energy', 'الطاقة الحركية', '½mv²'], ['Work–energy theorem', 'مبرهنة الشغل–الطاقة', 'W_net = ΔKE']],
-      formulas: [{ f: 'KE = ½ m v² ,  W = KE_f − KE_i', name: '(5.2)', sym: [['m', 'mass', 'kg'], ['v', 'speed', 'm/s']], cond: 'W is the net work.' }],
+      formulas: [{ f: 'KE = ½ m v² ,  W = KE_f − KE_i', name: '(5.2)', sym: [['KE', 'kinetic energy', 'J', 'الطاقة الحركية'], ['m', 'mass', 'kg', 'الكتلة'], ['v', 'speed', 'm/s', 'السرعة'], ['W', 'net work', 'J', 'الشغل الكلي']], cond: 'W is the net work.' }],
       life: { en: 'Doubling speed from 60 to 120 km/h quadruples KE, so braking distance is about four times longer.', ar: 'مضاعفة السرعة تضاعف الطاقة الحركية أربع مرات.' },
       worked: { src: 'S05 Ex 5.6 · BK p.76', q: '1200 kg car at 20 m/s stops in 30 m. Work by brakes?', steps: ['KE_f = 0', 'W = 0 − ½·1200·20² = −240 000 J'], ans: 'W = −2.4 × 10⁵ J' },
       tryit: { src: 'S05 Ex 5.5 · BK p.75–76 (see G‑07)', q: 'F = 5î + 4ĵ N moves a 5 kg body 4 m along x. KE_i = 5 J. Find KE_f.', ans: 25, tol: 0.01, unit: 'J', hint: 'W = 5·4 = 20 J = KE_f − KE_i', sol: 'KE_f = 20 + 5 = 25 J (the book prints 15 J; slides give 25 J)' },
@@ -668,7 +719,7 @@ COURSE.push({
         { en: 'Work and energy theory: "The work done of any system is equal to the sum of the change in the kinetic and potential energy": W = ΔKE + ΔPE (5.4).', ar: 'الشغل = التغير في الطاقة الحركية + التغير في طاقة الوضع.' }
       ],
       terms: [['Potential energy', 'طاقة الوضع', 'Energy of position'], ['Reference level', 'مستوى الإسناد', 'Where PE = 0'], ['Conservation of energy', 'حفظ الطاقة', 'Energy is not created or destroyed']],
-      formulas: [{ f: 'ΔPE = m g Δh', name: '(5.3)', sym: [['Δh', 'height change', 'm']], cond: 'Near Earth\'s surface.' }, { f: 'W = ΔKE + ΔPE', name: '(5.4)', sym: [['W', 'work by applied force', 'J']], cond: '—' }],
+      formulas: [{ f: 'ΔPE = m g Δh', name: '(5.3)', sym: [['ΔPE', 'change of potential energy', 'J', 'تغير طاقة الوضع'], ['m', 'mass', 'kg', 'الكتلة'], ['g', '9.8 m/s²', 'm/s²', 'تسارع الجاذبية'], ['Δh', 'height change', 'm', 'تغير الارتفاع']], cond: 'Near Earth\'s surface.' }, { f: 'W = ΔKE + ΔPE', name: '(5.4)', sym: [['W', 'work by the applied force', 'J', 'شغل القوة المؤثرة'], ['ΔKE', 'change of kinetic energy', 'J', 'تغير الطاقة الحركية'], ['ΔPE', 'change of potential energy', 'J', 'تغير طاقة الوضع']], cond: '—' }],
       life: { en: 'Hydro‑electric dams turn water\'s PE into electrical energy.', ar: 'السدود تحول طاقة وضع الماء إلى كهرباء.' },
       worked: { src: 'S05 Ex 5.8 · BK p.79', q: 'F = 10î + 20ĵ N moves a 2 kg particle (from rest) from 2î + ĵ to 4î + 3ĵ m (y vertical). Find W, ΔPE, v_f.', steps: ['Δr = 2î + 2ĵ → W = 20 + 40 = 60 J', 'ΔPE = 2·9.8·(3 − 1) = 39.2 J', '60 = ½·2·v_f² + 39.2 → v_f = 4.56 m/s'], ans: 'v_f = 4.56 m/s' },
       tryit: { src: 'BK p.82 Exercise 8', q: 'A 500 kg elevator rises from 3 m to 12 m. ΔPE?', ans: 44100, tol: 0.01, unit: 'J', hint: 'Δh = 9 m', sol: '500·9.8·9 = 44 100 J' },
@@ -686,22 +737,22 @@ COURSE.push({
     },
     {
       id: 'ch5-l4', title: 'Power', ar: 'القدرة', src: 'S05 §5 · BK p.80–81',
-      goals: ['Compute P = W/t', 'Use the watt'],
+      goals: ['Compute P = {{W // t}}', 'Use the watt'],
       goalsAr: 'ستحسب القدرة كمعدل لبذل الشغل.',
       why: { en: 'Two cranes may do the same work; the more powerful one does it faster.', ar: 'رافعتان تبذلان الشغل نفسه، والأقوى تنجزه أسرع.' },
       explain: [
-        { en: '"Power is defined as the rate of work done": P = dW/dt (5.5); average P = W/t.', ar: 'القدرة معدل بذل الشغل.' },
+        { en: '"Power is defined as the rate of work done": P = {{dW // dt}} (5.5); average P = {{W // t}}.', ar: 'القدرة معدل بذل الشغل.' },
         { en: 'Unit: watt W = J/s = kg·m²/s³. Do not confuse W (watt) with W (work).', ar: 'وحدتها الواط، لا تخلط بين رمز الواط ورمز الشغل.' }
       ],
       terms: [['Power', 'القدرة', 'Rate of work'], ['Watt', 'الواط', 'J/s']],
-      formulas: [{ f: 'P = {{dW // dt}}  (average: P = {{W // t}})', name: '(5.5)', sym: [['P', 'power', 'W'], ['t', 'time', 's']], cond: '—' }],
+      formulas: [{ f: 'P = {{dW // dt}}  (average: P = {{W // t}})', name: '(5.5)', sym: [['P', 'power', 'W', 'القدرة'], ['W', 'work', 'J', 'الشغل'], ['t', 'time', 's', 'الزمن']], cond: '—' }],
       life: { en: 'Climbing stairs fast feels harder: same work, more power.', ar: 'صعود الدرج بسرعة متعب أكثر: نفس الشغل بقدرة أكبر.' },
-      worked: { src: 'S05 Ex 5.10 · BK p.81', q: '2 kg raised 3 m in 5 s. Work and power?', steps: ['W = mgh = 2·9.8·3 = 58.8 J', 'P = 58.8/5 = 11.76 W'], ans: 'P = 11.76 W' },
-      tryit: { src: '🧩 additional design', q: 'A 60 kg student climbs 4 m of stairs in 8 s. Average power?', ans: 294, tol: 0.01, unit: 'W', hint: 'W = mgh', sol: '60·9.8·4/8 = 294 W' },
+      worked: { src: 'S05 Ex 5.10 · BK p.81', q: '2 kg raised 3 m in 5 s. Work and power?', steps: ['W = mgh = 2·9.8·3 = 58.8 J', 'P = {{58.8 // 5}} = 11.76 W'], ans: 'P = 11.76 W' },
+      tryit: { src: '🧩 additional design', q: 'A 60 kg student climbs 4 m of stairs in 8 s. Average power?', ans: 294, tol: 0.01, unit: 'W', hint: 'W = mgh', sol: 'P = {{60 × 9.8 × 4 // 8}} = 294 W' },
       checks: [{ q: '1 W equals…', o: ['1 J·s', '1 J/s', '1 N/s', '1 kg·m/s'], a: 1, why: 'Rate of work.' }],
-      mistakes: [['Dividing by distance instead of time', 'P = W/t.']],
-      summary: ['P = W/t', 'Watt = J/s'],
-      quiz: [{ q: 'A 1800 J job done in 2 min. P = ?', num: 15, tol: 0, unit: 'W', sol: '1800/120 = 15 W (🧩)' }]
+      mistakes: [['Dividing by distance instead of time', 'P = {{W // t}}.']],
+      summary: ['P = {{W // t}}', 'Watt = J/s'],
+      quiz: [{ q: 'A 1800 J job done in 2 min. P = ?', num: 15, tol: 0, unit: 'W', sol: 'P = {{1800 // 120}} = 15 W (🧩)' }]
     }
   ]
 });
@@ -715,82 +766,82 @@ COURSE.push({
       goalsAr: 'ستحسب الإجهاد والانفعال ومعاملات المرونة الثلاثة.',
       why: { en: 'Cable, bridge and bone design depend on how materials stretch.', ar: 'تصميم الكابلات والجسور يعتمد على استطالة المواد.' },
       explain: [
-        { en: 'Stress = F/A (N/m²): "the force affecting on the unit of areas". Strain = ΔL/L (unitless).', ar: 'الإجهاد قوة لكل وحدة مساحة، والانفعال تغير الطول النسبي بلا وحدة.' },
-        { en: 'Young\'s modulus Y = stress/strain → F/A = Y ΔL/L (6.1). Bulk: F/A = −B ΔV/V (6.2). Shear: F/A = S x/L (6.3).', ar: 'ثلاثة معاملات: للطول وللحجم وللشكل.' },
+        { en: 'Stress = {{F // A}} (N/m²): "the force affecting on the unit of areas". Strain = {{ΔL // L}} (unitless).', ar: 'الإجهاد قوة لكل وحدة مساحة، والانفعال تغير الطول النسبي بلا وحدة.' },
+        { en: 'Young\'s modulus Y = {{stress // strain}} → {{F // A}} = Y {{ΔL // L}} (6.1). Bulk: {{F // A}} = −B {{ΔV // V}} (6.2). Shear: {{F // A}} = S {{x // L}} (6.3).', ar: 'ثلاثة معاملات: للطول وللحجم وللشكل.' },
         { en: 'Stress–strain curve (Fig 6.2): elastic limit → yield point → breaking point. The formulas hold below the elastic limit.', ar: 'القوانين صحيحة تحت حد المرونة فقط.' },
-        { en: 'Area of a wire: A = πr² with r = diameter/2.', ar: 'مساحة مقطع السلك πr² ونصف القطر = القطر/2.' }
+        { en: 'Area of a wire: A = πr² with r = {{diameter // 2}}.', ar: 'مساحة مقطع السلك πr² ونصف القطر = القطر/2.' }
       ],
       terms: [['Stress', 'الإجهاد', 'F/A'], ['Strain', 'الانفعال', 'ΔL/L'], ['Young\'s modulus', 'معامل يونغ', 'Elasticity of length'], ['Bulk modulus', 'معامل المرونة الحجمي', 'Elasticity of volume'], ['Shear modulus', 'معامل القص', 'Elasticity of shape'], ['Elastic limit', 'حد المرونة', 'Max stress with full recovery']],
       formulas: [
-        { f: '{{F // A}} = Y {{ΔL // L}}', name: 'Young (6.1)', sym: [['Y', 'Young\'s modulus', 'N/m²'], ['ΔL', 'extension', 'm']], cond: 'Below elastic limit.' },
-        { f: '{{F // A}} = −B {{ΔV // V}}', name: 'Bulk (6.2)', sym: [['B', 'bulk modulus', 'N/m²']], cond: 'Minus: volume decreases as pressure increases.' },
-        { f: '{{F // A}} = S {{x // L}}', name: 'Shear (6.3)', sym: [['x', 'shift of top face', 'm']], cond: 'Tangential force.' }
+        { f: '{{F // A}} = Y {{ΔL // L}}', name: 'Young (6.1)', sym: [['F', 'force', 'N', 'القوة'], ['A', 'cross‑section area', 'm²', 'مساحة المقطع'], ['Y', 'Young\'s modulus', 'N/m²', 'معامل يونغ'], ['ΔL', 'extension', 'm', 'الاستطالة'], ['L', 'original length', 'm', 'الطول الأصلي']], cond: 'Below elastic limit.' },
+        { f: '{{F // A}} = −B {{ΔV // V}}', name: 'Bulk (6.2)', sym: [['F/A', 'pressure change', 'N/m²', 'تغير الضغط'], ['B', 'bulk modulus', 'N/m²', 'معامل المرونة الحجمي'], ['ΔV', 'change of volume', 'm³', 'تغير الحجم'], ['V', 'original volume', 'm³', 'الحجم الأصلي']], cond: 'Minus: volume decreases as pressure increases.' },
+        { f: '{{F // A}} = S {{x // L}}', name: 'Shear (6.3)', sym: [['F', 'tangential force', 'N', 'القوة المماسية'], ['A', 'area of the face', 'm²', 'مساحة الوجه'], ['S', 'shear modulus', 'N/m²', 'معامل القص'], ['x', 'shift of the top face', 'm', 'إزاحة الوجه العلوي'], ['L', 'height of the block', 'm', 'ارتفاع الجسم']], cond: 'Tangential force.' }
       ],
       life: { en: 'Elevator cables are chosen so the stress stays far below the elastic limit.', ar: 'كابلات المصاعد تُختار بحيث يبقى الإجهاد بعيدًا عن حد المرونة.' },
-      worked: { src: 'S06 Ex 6.1 · BK p.89', q: '2500 N on a 10 m wire of diameter 3.5 mm, extension 0.5 cm. Stress, strain, Y?', steps: ['A = π(1.75×10⁻³)² = 9.62×10⁻⁶ m²', 'Stress = 2500/9.62×10⁻⁶ = 2.6×10⁸ N/m²', 'Strain = 0.005/10 = 5×10⁻⁴', 'Y = 2.6×10⁸ / 5×10⁻⁴ = 5.2×10¹¹ N/m²'], ans: 'Y = 5.2 × 10¹¹ N/m²' },
-      tryit: { src: 'BK p.100 Exercise 1', q: '1000 N on a wire 100 m long, 0.003 m diameter, extends 0.5 m. Y = ?', ans: 2.83e10, tol: 0.02, unit: 'N/m²', hint: 'r = 0.0015 m', sol: 'Stress = 1000/7.07×10⁻⁶ = 1.415×10⁸; strain = 0.005; Y = 2.83×10¹⁰ N/m²' },
+      worked: { src: 'S06 Ex 6.1 · BK p.89', q: '2500 N on a 10 m wire of diameter 3.5 mm, extension 0.5 cm. Stress, strain, Y?', steps: ['A = π(1.75×10⁻³)² = 9.62×10⁻⁶ m²', 'Stress = {{F // A}} = {{2500 // 9.62×10⁻⁶}} = 2.6×10⁸ N/m²', 'Strain = {{ΔL // L}} = {{0.005 // 10}} = 5×10⁻⁴', 'Y = {{stress // strain}} = {{2.6×10⁸ // 5×10⁻⁴}} = 5.2×10¹¹ N/m²'], ans: 'Y = 5.2 × 10¹¹ N/m²' },
+      tryit: { src: 'BK p.100 Exercise 1', q: '1000 N on a wire 100 m long, 0.003 m diameter, extends 0.5 m. Y = ?', ans: 2.83e10, tol: 0.02, unit: 'N/m²', hint: 'r = 0.0015 m', sol: 'Stress = {{1000 // 7.07×10⁻⁶}} = 1.415×10⁸; strain = 0.005; Y = 2.83×10¹⁰ N/m²' },
       checks: [
         { q: 'The unit of strain is…', o: ['N/m²', 'm', 'none', 'N'], a: 2, why: 'Ratio of lengths.' },
-        { q: '10 cm cube, 10⁶ N tangential force, 0.03 cm shift. S = ? (S06 Ex 6.3)', o: ['3.3×10¹⁰ N/m²', '3.3×10⁶', '1×10⁸', '3×10⁻⁴'], a: 0, why: 'S = FL/(Ax). (Slide prints 106 N: G‑20)' }
+        { q: '10 cm cube, 10⁶ N tangential force, 0.03 cm shift. S = ? (S06 Ex 6.3)', o: ['3.3×10¹⁰ N/m²', '3.3×10⁶', '1×10⁸', '3×10⁻⁴'], a: 0, why: 'S = {{F L // A x}}. (Slide prints 106 N: G‑20)' }
       ],
       mistakes: [['Using the diameter in πr²', 'Halve it first.'], ['Giving strain a unit', 'Strain is dimensionless.']],
-      summary: ['Stress = F/A, strain = ΔL/L', 'Y, B, S moduli in N/m²', 'Valid below elastic limit'],
+      summary: ['Stress = {{F // A}}, strain = {{ΔL // L}}', 'Y, B, S moduli in N/m²', 'Valid below elastic limit'],
       quiz: [
-        { q: 'Copper cube Ex 6.2: B = FV/(AΔV) with the slide\'s numbers = ?', num: 1.5e7, tol: 0.02, unit: 'N/m²', sol: '1.5×10³·125×10⁻⁶ /(25×10⁻⁴·5×10⁻⁶) = 1.5×10⁷ (units issue: G‑10)' },
+        { q: 'Copper cube Ex 6.2: B = FV/(AΔV) with the slide\'s numbers = ?', num: 1.5e7, tol: 0.02, unit: 'N/m²', sol: 'B = {{1.5×10³ × 125×10⁻⁶ // 25×10⁻⁴ × 5×10⁻⁶}} = 1.5×10⁷ (units issue: G‑10)' },
         { q: 'Stress 2×10⁸ N/m², strain 1×10⁻³. Y = ?', num: 2e11, tol: 0.01, unit: 'N/m²', sol: '🧩 2×10¹¹ N/m²' }
       ]
     },
     {
       id: 'ch6-l2', title: 'Density & pressure in liquids', ar: 'الكثافة والضغط في السوائل', src: 'S06 §2–3 · BK p.91–93',
-      goals: ['Compute ρ = m/V', 'Compute P = F/A and P = P₀ + ρgh'],
+      goals: ['Compute ρ = {{m // V}}', 'Compute P = {{F // A}} and P = P₀ + ρgh'],
       goalsAr: 'ستحسب الكثافة والضغط والضغط عند عمق في سائل.',
       why: { en: 'Divers and dam engineers need pressure at depth.', ar: 'الغواصون ومهندسو السدود يحتاجون حساب الضغط على عمق.' },
       explain: [
-        { en: 'Density "is defined as mass per unit volume": ρ = m/V (kg/m³) (6.4). Density mostly decreases as temperature increases.', ar: 'الكثافة = الكتلة ÷ الحجم.' },
-        { en: 'Pressure is the perpendicular force per unit area: P = F/A, unit pascal Pa = N/m² (6.5).', ar: 'الضغط = القوة العمودية ÷ المساحة.' },
+        { en: 'Density "is defined as mass per unit volume": ρ = {{m // V}} (kg/m³) (6.4). Density mostly decreases as temperature increases.', ar: 'الكثافة = الكتلة ÷ الحجم.' },
+        { en: 'Pressure is the perpendicular force per unit area: P = {{F // A}}, unit pascal Pa = N/m² (6.5).', ar: 'الضغط = القوة العمودية ÷ المساحة.' },
         { en: 'Liquid column: F = mg = ρAhg ⇒ P = ρgh (6.6). With the atmosphere on top: P = P₀ + ρgh.', ar: 'ضغط عمود السائل ρgh، ويضاف الضغط الجوي إذا كان السطح مكشوفًا.' },
         { en: 'Pressure depends on depth, not on the shape of the container (BK p.93).', ar: 'الضغط يعتمد على العمق لا على شكل الإناء.' }
       ],
       terms: [['Density', 'الكثافة', 'm/V'], ['Pressure', 'الضغط', 'F/A'], ['Pascal', 'باسكال', 'N/m²'], ['Atmospheric pressure', 'الضغط الجوي', '≈ 1×10⁵ Pa']],
-      formulas: [{ f: 'ρ = {{m // V}}', name: '(6.4)', sym: [['ρ', 'density', 'kg/m³']], cond: '—' }, { f: 'P = {{F // A}} ,  P = P₀ + ρgh', name: '(6.5–6.6)', sym: [['h', 'depth', 'm'], ['P₀', 'atmospheric pressure', 'Pa']], cond: 'Fluid at rest.' }],
+      formulas: [{ f: 'ρ = {{m // V}}', name: '(6.4)', sym: [['ρ', 'density', 'kg/m³', 'الكثافة'], ['m', 'mass', 'kg', 'الكتلة'], ['V', 'volume', 'm³', 'الحجم']], cond: '—' }, { f: 'P = {{F // A}} ,  P = P₀ + ρgh', name: '(6.5–6.6)', sym: [['P', 'pressure', 'Pa', 'الضغط'], ['F', 'force', 'N', 'القوة'], ['A', 'area', 'm²', 'المساحة'], ['P₀', 'atmospheric pressure', 'Pa', 'الضغط الجوي'], ['ρ', 'liquid density', 'kg/m³', 'كثافة السائل'], ['h', 'depth', 'm', 'العمق']], cond: 'Fluid at rest.' }],
       life: { en: 'Every 10 m of sea water adds about 1 atmosphere of pressure on a diver.', ar: 'كل 10 أمتار من ماء البحر تضيف ضغطًا جويًا تقريبًا.' },
       worked: { src: 'S06 Ex 6.5 · BK p.93', q: 'Submarine at 30 m, hatch area 2 m², ρ = 1025 kg/m³. Force on hatch?', steps: ['P = P₀ + ρgh = 10⁵ + 1025·9.8·30 = 401 350 Pa', 'F = PA = 802 700 N'], ans: 'F = 8.03 × 10⁵ N' },
-      tryit: { src: 'BK p.100 Exercise 5', q: 'A 65 kg student stands on one foot of area 250 cm². Pressure on the ground?', ans: 25480, tol: 0.01, unit: 'Pa', hint: 'A = 0.025 m², F = mg', sol: '637/0.025 = 25 480 Pa (both feet: 12 740 Pa)' },
+      tryit: { src: 'BK p.100 Exercise 5', q: 'A 65 kg student stands on one foot of area 250 cm². Pressure on the ground?', ans: 25480, tol: 0.01, unit: 'Pa', hint: 'A = 0.025 m², F = mg', sol: 'P = {{637 // 0.025}} = 25 480 Pa (both feet: 12 740 Pa)' },
       checks: [
-        { q: '100 g of glycerol occupies 79.3 cm³. ρ? (S06 Ex 6.4)', o: ['1261 kg/m³', '1.261 kg/m³', '793 kg/m³', '12.6 kg/m³'], a: 0, why: '0.1/79.3×10⁻⁶.' },
+        { q: '100 g of glycerol occupies 79.3 cm³. ρ? (S06 Ex 6.4)', o: ['1261 kg/m³', '1.261 kg/m³', '793 kg/m³', '12.6 kg/m³'], a: 0, why: 'ρ = {{0.1 // 79.3×10⁻⁶}}.' },
         { q: 'Doubling the depth doubles…', o: ['total pressure', 'gauge pressure ρgh', 'density', 'P₀'], a: 1, why: 'ρgh ∝ h.' }
       ],
       mistakes: [['Forgetting P₀ when asked for total pressure', 'Read whether "total" or "due to the liquid".'], ['Using cm for h', 'Convert to m.']],
-      summary: ['ρ = m/V', 'P = F/A', 'P = P₀ + ρgh'],
+      summary: ['ρ = {{m // V}}', 'P = {{F // A}}', 'P = P₀ + ρgh'],
       quiz: [
-        { q: 'Liquid 10 kg in 0.5 m³ (BK Ex.2). ρ = ?', num: 20, tol: 0, unit: 'kg/m³', sol: '10/0.5' },
+        { q: 'Liquid 10 kg in 0.5 m³ (BK Ex.2). ρ = ?', num: 20, tol: 0, unit: 'kg/m³', sol: '{{10 // 0.5}}' },
         { q: 'Oil ρ = 900, 1 m deep (BK Ex.7a). Pressure due to oil?', num: 8820, tol: 0.01, unit: 'Pa', sol: '900·9.8·1 = 8820 Pa; total = 1.03×10⁵ + 8820 = 1.118×10⁵ Pa' },
-        { q: 'Block 2×3×4 m, 5000 kg (BK Ex.4). Largest pressure on ground?', num: 8167, tol: 0.01, unit: 'Pa', sol: '49 000 N / 6 m² = 8167 Pa (smallest: /12 = 4083 Pa)' }
+        { q: 'Block 2×3×4 m, 5000 kg (BK Ex.4). Largest pressure on ground?', num: 8167, tol: 0.01, unit: 'Pa', sol: 'P = {{49 000 N // 6 m²}} = 8167 Pa (smallest: {{49 000 N // 12 m²}} = 4083 Pa)' }
       ]
     },
     {
       id: 'ch6-l3', title: 'Pascal\'s law, barometer & manometer', ar: 'قاعدة باسكال والبارومتر والمانومتر', src: 'S06 §3 · BK p.93–95',
-      goals: ['Use f/a = F/A', 'Find atmospheric pressure with a barometer', 'Find gas pressure with a manometer'],
+      goals: ['Use {{f // a}} = {{F // A}}', 'Find atmospheric pressure with a barometer', 'Find gas pressure with a manometer'],
       goalsAr: 'ستطبق قاعدة باسكال وتحسب الضغط بالبارومتر والمانومتر.',
       why: { en: 'Car brakes and hydraulic lifts multiply force using Pascal\'s law.', ar: 'فرامل السيارة والرافعة الهيدروليكية تضاعف القوة بقاعدة باسكال.' },
       explain: [
-        { en: 'Pascal\'s law: "A change in pressure at any point in an enclosed fluid at rest is transmitted undiminished to all points in the fluid." Hydraulic press: f/a = F/A.', ar: 'الضغط ينتقل كاملًا في المائع المحصور.' },
-        { en: 'Areas scale with r² (or d²): F/f = (R/r)².', ar: 'النسبة بين القوتين تساوي مربع نسبة نصفي القطرين.' },
+        { en: 'Pascal\'s law: "A change in pressure at any point in an enclosed fluid at rest is transmitted undiminished to all points in the fluid." Hydraulic press: {{f // a}} = {{F // A}}.', ar: 'الضغط ينتقل كاملًا في المائع المحصور.' },
+        { en: 'Areas scale with r² (or d²): {{F // f}} = ( {{R // r}} )².', ar: 'النسبة بين القوتين تساوي مربع نسبة نصفي القطرين.' },
         { en: 'Barometer: P₀ = ρgh (mercury column 0.76 m). Manometer: P = P₀ + ρgh.', ar: 'البارومتر يقيس الضغط الجوي، والمانومتر يقيس ضغط غاز محصور.' }
       ],
       terms: [['Pascal\'s law', 'قاعدة باسكال', 'Pressure transmitted undiminished'], ['Hydraulic press', 'المكبس الهيدروليكي', 'Force multiplier'], ['Barometer', 'البارومتر', 'Measures P₀'], ['Manometer', 'المانومتر', 'Measures gas pressure']],
-      formulas: [{ f: '{{f // a}} = {{F // A}}', name: 'Hydraulic press', sym: [['a, A', 'small/large piston area', 'm²']], cond: 'Same level, fluid at rest.' }, { f: 'P₀ = ρgh ,  P = P₀ + ρgh', name: 'Barometer / manometer', sym: [['h', 'column height difference', 'm']], cond: '—' }],
+      formulas: [{ f: '{{f // a}} = {{F // A}}', name: 'Hydraulic press', sym: [['f, F', 'small/large piston force', 'N', 'قوة المكبس الصغير والكبير'], ['a, A', 'small/large piston area', 'm²', 'مساحة المكبس الصغير والكبير']], cond: 'Same level, fluid at rest.' }, { f: 'P₀ = ρgh ,  P = P₀ + ρgh', name: 'Barometer / manometer', sym: [['P₀', 'atmospheric pressure', 'Pa', 'الضغط الجوي'], ['ρ', 'liquid density', 'kg/m³', 'كثافة السائل'], ['h', 'column height difference', 'm', 'فرق ارتفاع عمود السائل']], cond: '—' }],
       life: { en: 'A garage lift raises a 1500 kg car with a small pump because the large piston has many times the area.', ar: 'رافعة الورشة ترفع سيارة بمضخة صغيرة لأن مساحة المكبس الكبير أكبر بكثير.' },
-      worked: { src: 'BK Ex 6.6 p.94', q: 'Piston radii 2 cm and 20 cm. Large piston force 2000 N. Small piston force?', steps: ['f = F·a/A = 2000·(π·0.02²)/(π·0.2²)', 'f = 2000/100 = 20 N'], ans: 'f = 20 N' },
-      tryit: { src: 'BK p.101 Exercise 9', q: 'Pistons of diameters 60 and 180 (same units). Small force 10 N. Large force?', ans: 90, tol: 0.01, unit: 'N', hint: '(180/60)² = 9', sol: 'F = 10 × 9 = 90 N' },
+      worked: { src: 'BK Ex 6.6 p.94', q: 'Piston radii 2 cm and 20 cm. Large piston force 2000 N. Small piston force?', steps: ['f = {{F a // A}} = {{2000 × π × 0.02² // π × 0.2²}}', 'f = {{2000 // 100}} = 20 N'], ans: 'f = 20 N' },
+      tryit: { src: 'BK p.101 Exercise 9', q: 'Pistons of diameters 60 and 180 (same units). Small force 10 N. Large force?', ans: 90, tol: 0.01, unit: 'N', hint: '( {{180 // 60}} )² = 9', sol: 'F = 10 × 9 = 90 N' },
       checks: [
-        { q: 'Water barometer height for P₀ = 10⁵ Pa (S06 Ex 6.7)?', o: ['10.2 m', '0.76 m', '1.02 m', '102 m'], a: 0, why: '10⁵/(1000·9.8).' },
+        { q: 'Water barometer height for P₀ = 10⁵ Pa (S06 Ex 6.7)?', o: ['10.2 m', '0.76 m', '1.02 m', '102 m'], a: 0, why: 'h = {{10⁵ // 1000 × 9.8}}.' },
         { q: 'Manometer: mercury 40 cm above (S06 Ex 6.8). Gas pressure?', o: ['153 312 Pa', '53 312 Pa', '100 000 Pa', '46 688 Pa'], a: 0, why: 'P₀ + ρgh.' }
       ],
       mistakes: [['Using the radius ratio without squaring', 'Area ratio = (radius ratio)².']],
-      summary: ['f/a = F/A', 'Barometer P₀ = ρgh', 'Manometer P = P₀ + ρgh'],
+      summary: ['{{f // a}} = {{F // A}}', 'Barometer P₀ = ρgh', 'Manometer P = P₀ + ρgh'],
       quiz: [
-        { q: 'Half diameters 20 and 40 cm (BK Ex.8). F₂ : F₁ = ?', num: 4, tol: 0, unit: '', sol: '(40/20)² = 4' },
+        { q: 'Half diameters 20 and 40 cm (BK Ex.8). F₂ : F₁ = ?', num: 4, tol: 0, unit: '', sol: '( {{40 // 20}} )² = 4' },
         { q: 'Mercury barometer: h = 0.76 m, ρ = 13 600. P₀ = ?', num: 101293, tol: 0.01, unit: 'Pa', sol: '13600·9.8·0.76 = 1.013×10⁵ Pa (🧩)' }
       ]
     },
@@ -806,19 +857,19 @@ COURSE.push({
         { en: 'Horizontal tube: P₁ − P₂ = ½ρ(v₂² − v₁²) → faster flow, lower pressure. Static fluid: P₁ − P₂ = (h₂ − h₁)ρg.', ar: 'في الأنبوب الأفقي: السرعة الأكبر تعني ضغطًا أقل.' }
       ],
       terms: [['Flow rate', 'معدل التدفق', 'R = Av'], ['Continuity equation', 'معادلة الاستمرارية', 'A₁v₁ = A₂v₂'], ['Streamline', 'خط الانسياب', 'Path of fluid particles'], ['Viscosity', 'اللزوجة', 'Internal friction']],
-      formulas: [{ f: 'A₁v₁ = A₂v₂', name: 'Continuity (6.7)', sym: [['A', 'cross‑section', 'm²'], ['v', 'speed', 'm/s']], cond: 'Incompressible fluid.' }, { f: 'P₁ + h₁ρg + ½ρv₁² = P₂ + h₂ρg + ½ρv₂²', name: 'Bernoulli (6.8)', sym: [['P', 'pressure', 'Pa'], ['h', 'height', 'm']], cond: 'Ideal fluid, along one streamline.' }],
+      formulas: [{ f: 'A₁v₁ = A₂v₂', name: 'Continuity (6.7)', sym: [['A', 'cross‑section area', 'm²', 'مساحة المقطع'], ['v', 'flow speed', 'm/s', 'سرعة السائل']], cond: 'Incompressible fluid.' }, { f: 'P₁ + h₁ρg + ½ρv₁² = P₂ + h₂ρg + ½ρv₂²', name: 'Bernoulli (6.8)', sym: [['P', 'pressure', 'Pa', 'الضغط'], ['h', 'height', 'm', 'الارتفاع'], ['ρ', 'density', 'kg/m³', 'الكثافة'], ['v', 'flow speed', 'm/s', 'سرعة السائل']], cond: 'Ideal fluid, along one streamline.' }],
       life: { en: 'Putting your thumb on a hose reduces A, so v increases and the water shoots farther.', ar: 'تضييق فوهة الخرطوم بالإبهام يزيد سرعة الماء.' },
       worked: { src: 'S06 Ex 6.10 · BK p.99', q: 'Horizontal tube: P₁ = 1332.8 Pa at v₁ = 0.5 m/s. P₂ where v₂ = 0.8 m/s?', steps: ['P₂ = P₁ − ½ρ(v₂² − v₁²)', '= 1332.8 − ½·10³·(0.64 − 0.25) = 1332.8 − 195', 'P₂ = 1137.8 Pa'], ans: '1137.8 N/m²' },
-      tryit: { src: 'BK p.101 Exercise 11', q: 'A 0.25 m diameter gas pipe delivers 1.55 m³/s. Gas speed?', ans: 31.58, tol: 0.02, unit: 'm/s', hint: 'v = R/A, A = π(0.125)²', sol: 'v = 1.55/0.0491 = 31.6 m/s' },
+      tryit: { src: 'BK p.101 Exercise 11', q: 'A 0.25 m diameter gas pipe delivers 1.55 m³/s. Gas speed?', ans: 31.58, tol: 0.02, unit: 'm/s', hint: 'v = {{R // A}}, A = π(0.125)²', sol: 'v = {{1.55 // 0.0491}} = 31.6 m/s' },
       checks: [
-        { q: 'Tube radius 0.2 m → 0.1 m, v₁ = 1 m/s (BK Ex 6.9). v₂?', o: ['4 m/s', '2 m/s', '0.25 m/s', '1 m/s'], a: 0, why: '(0.2/0.1)² = 4.' },
+        { q: 'Tube radius 0.2 m → 0.1 m, v₁ = 1 m/s (BK Ex 6.9). v₂?', o: ['4 m/s', '2 m/s', '0.25 m/s', '1 m/s'], a: 0, why: '( {{0.2 // 0.1}} )² = 4.' },
         { q: 'In a horizontal pipe, where v is larger, P is…', o: ['larger', 'smaller', 'same'], a: 1, why: 'Bernoulli.' }
       ],
       mistakes: [['Using the radius ratio without squaring', 'A ∝ r².'], ['Applying Bernoulli to viscous flow', 'Only ideal fluids.']],
       summary: ['R = Av', 'A₁v₁ = A₂v₂', 'P + ρgh + ½ρv² = const'],
       quiz: [
         { q: 'Hole 16 m below the water surface of an open tank (BK Ex.10a). Exit speed?', num: 17.71, tol: 0.02, unit: 'm/s', sol: 'v = √(2gh) = √313.6 = 17.7 m/s (🧩 Torricelli from Bernoulli)' },
-        { q: 'Same hole, flow 2.5×10⁻³ m³/min (BK Ex.10b). Hole diameter in mm?', num: 1.73, tol: 0.03, unit: 'mm', sol: 'R = 4.17×10⁻⁵ m³/s, A = R/v = 2.35×10⁻⁶ m² → d = 1.73 mm' }
+        { q: 'Same hole, flow 2.5×10⁻³ m³/min (BK Ex.10b). Hole diameter in mm?', num: 1.73, tol: 0.03, unit: 'mm', sol: 'R = 4.17×10⁻⁵ m³/s, A = {{R // v}} = 2.35×10⁻⁶ m² → d = 1.73 mm' }
       ]
     }
   ]
@@ -836,20 +887,20 @@ COURSE.push({
       explain: [
         { en: 'Thermometers use a property that changes with temperature: liquid volume, gas volume (constant P), gas pressure (constant V), solid dimensions, electrical resistance, emitted wavelength.', ar: 'الترمومتر يعتمد على خاصية فيزيائية تتغير بالحرارة.' },
         { en: 'Fixed points: Celsius 0–100, Fahrenheit 32–212 (180 divisions), Kelvin 273.15–373.15.', ar: 'نقاط التجمد والغليان في المقاييس الثلاثة.' },
-        { en: 'T_C/100 = (T_K − 273)/100 = (T_F − 32)/180 → T_C = 5/9 (T_F − 32), T_K = T_C + 273 (7.1, 7.2).', ar: 'العلاقة العامة بين المقاييس.' },
+        { en: '{{T_C // 100}} = {{T_K − 273 // 100}} = {{T_F − 32 // 180}} → T_C = {{5 // 9}} (T_F − 32), T_K = T_C + 273 (7.1, 7.2).', ar: 'العلاقة العامة بين المقاييس.' },
         { en: 'Absolute zero −273.15 °C = 0 K (gas pressure → 0, Fig 7.2). Write K, not °K (G‑17).', ar: 'الصفر المطلق −273.15 °C.' }
       ],
       terms: [['Temperature', 'درجة الحرارة', 'Measure of hotness'], ['Thermometer', 'مقياس الحرارة', 'Uses a thermometric property'], ['Absolute zero', 'الصفر المطلق', '0 K']],
-      formulas: [{ f: 'T_C = {{5 // 9}} (T_F − 32) ,  T_K = T_C + 273', name: '(7.1–7.2)', sym: [['T_C, T_F, T_K', 'temperatures', '°C, °F, K']], cond: 'ΔT in °C equals ΔT in K.' }],
+      formulas: [{ f: 'T_C = {{5 // 9}} (T_F − 32) ,  T_K = T_C + 273', name: '(7.1–7.2)', sym: [['T_C', 'Celsius temperature', '°C', 'درجة الحرارة السيليزية'], ['T_F', 'Fahrenheit temperature', '°F', 'درجة الحرارة الفهرنهايتية'], ['T_K', 'absolute temperature', 'K', 'درجة الحرارة المطلقة']], cond: 'ΔT in °C equals ΔT in K.' }],
       life: { en: 'A fever of 104 °F is 40 °C.', ar: 'حمى 104 فهرنهايت تساوي 40 مئوية.' },
-      worked: { src: 'S07 Ex 7.1 · BK p.107', q: 'Room temperature 100 °F in °C and K?', steps: ['T_C = 5/9 (100 − 32) = 37.8 °C', 'T_K = 37.8 + 273 = 310.8 K'], ans: '37.8 °C, 310.8 K' },
-      tryit: { src: 'BK p.120 Exercise 1', q: 'Oxygen freezes at −362 °F. Value in °C?', ans: -218.9, tol: 0.01, unit: '°C', hint: '5/9 × (−362 − 32)', sol: '5/9 × (−394) = −218.9 °C' },
+      worked: { src: 'S07 Ex 7.1 · BK p.107', q: 'Room temperature 100 °F in °C and K?', steps: ['T_C = {{5 // 9}} (100 − 32) = 37.8 °C', 'T_K = 37.8 + 273 = 310.8 K'], ans: '37.8 °C, 310.8 K' },
+      tryit: { src: 'BK p.120 Exercise 1', q: 'Oxygen freezes at −362 °F. Value in °C?', ans: -218.9, tol: 0.01, unit: '°C', hint: '{{5 // 9}} × (−362 − 32)', sol: '{{5 // 9}} × (−394) = −218.9 °C' },
       checks: [
-        { q: 'At what Celsius reading is the Fahrenheit reading twice it? (BK Ex 7.2)', o: ['160 °C', '−40 °C', '80 °C', '320 °C'], a: 0, why: 'x/100 = (2x − 32)/180 → x = 160.' },
-        { q: '−10 °C in °F (BK Ex.2)?', o: ['14 °F', '−14 °F', '50 °F', '−23 °F'], a: 0, why: '9/5(−10) + 32.' }
+        { q: 'At what Celsius reading is the Fahrenheit reading twice it? (BK Ex 7.2)', o: ['160 °C', '−40 °C', '80 °C', '320 °C'], a: 0, why: '{{x // 100}} = {{2x − 32 // 180}} → x = 160.' },
+        { q: '−10 °C in °F (BK Ex.2)?', o: ['14 °F', '−14 °F', '50 °F', '−23 °F'], a: 0, why: '{{9 // 5}}(−10) + 32.' }
       ],
-      mistakes: [['Adding 32 before multiplying by 9/5', 'T_F = 9/5 T_C + 32.'], ['Writing °K', 'Use K.']],
-      summary: ['°C 0–100, °F 32–212, K 273–373', 'T_C = 5/9(T_F − 32)', 'T_K = T_C + 273'],
+      mistakes: [['Adding 32 before multiplying by 9/5', 'T_F = {{9 // 5}} T_C + 32.'], ['Writing °K', 'Use K.']],
+      summary: ['°C 0–100, °F 32–212, K 273–373', 'T_C = {{5 // 9}}(T_F − 32)', 'T_K = T_C + 273'],
       quiz: [
         { q: '−40 °C in °F?', num: -40, tol: 0, unit: '°F', sol: '🧩 the two scales meet at −40.' },
         { q: '300 K in °C?', num: 27, tol: 0, unit: '°C', sol: '300 − 273 = 27 °C' }
@@ -868,12 +919,12 @@ COURSE.push({
         { en: 'A hole in a plate expands as if it were made of the plate material (Ex 7.4).', ar: 'الثقب في صفيحة يتمدد كأنه من مادة الصفيحة.' }
       ],
       terms: [['Linear expansion coefficient α', 'معامل التمدد الطولي', '°C⁻¹'], ['Surface coefficient γ', 'معامل التمدد السطحي', '2α'], ['Volume coefficient β', 'معامل التمدد الحجمي', '3α'], ['Anomaly of water', 'شذوذ الماء', 'Max density at 4 °C']],
-      formulas: [{ f: 'Δℓ = α ℓ ΔT ,  ΔS = γ S ΔT ,  ΔV = β V ΔT', name: '(7.3–7.5)', sym: [['α', 'linear coefficient', '°C⁻¹ or K⁻¹'], ['ΔT', 'temperature change', '°C or K']], cond: 'γ = 2α, β = 3α (small αΔT).' }],
+      formulas: [{ f: 'Δℓ = α ℓ ΔT ,  ΔS = γ S ΔT ,  ΔV = β V ΔT', name: '(7.3–7.5)', sym: [['Δℓ, ΔS, ΔV', 'change of length, area, volume', 'm, m², m³', 'تغير الطول والمساحة والحجم'], ['α', 'linear coefficient', '°C⁻¹ or K⁻¹', 'معامل التمدد الطولي'], ['γ, β', 'area / volume coefficient', '°C⁻¹', 'معاملا التمدد السطحي والحجمي'], ['ΔT', 'temperature change', '°C or K', 'تغير درجة الحرارة']], cond: 'γ = 2α, β = 3α (small αΔT).' }],
       life: { en: 'Power lines sag more in summer because they are longer.', ar: 'أسلاك الكهرباء تتدلى صيفًا لأنها أطول.' },
       worked: { src: 'S07 example · BK Ex 7.3 p.112', q: 'Copper bar 10 m at 0 °C heated to 500 °C, α = 1.8×10⁻⁵ °C⁻¹. Expansion?', steps: ['Δℓ = 1.8×10⁻⁵ × 10 × 500', 'Δℓ = 0.09 m → ℓ₂ = 10.09 m', 'β = 3α = 5.4×10⁻⁵ °C⁻¹'], ans: 'Δℓ = 0.09 m' },
       tryit: { src: 'S07 example · BK Ex 7.5 p.113', q: 'A 0.55 m³ metal box at 20 °C is heated to 100 °C, α = 1.7×10⁻⁵. ΔV = ?', ans: 0.002244, tol: 0.02, unit: 'm³', hint: 'β = 3α', sol: 'ΔV = 3·1.7×10⁻⁵·0.55·80 = 2.24×10⁻³ m³' },
       checks: [
-        { q: 'A square plate 100 cm side grows by 1 cm, α = 1.25×10⁻⁵ (BK Ex 7.4). ΔT?', o: ['800 °C', '80 °C', '8000 °C', '400 °C'], a: 0, why: 'ΔT = 1/(100·1.25×10⁻⁵).' },
+        { q: 'A square plate 100 cm side grows by 1 cm, α = 1.25×10⁻⁵ (BK Ex 7.4). ΔT?', o: ['800 °C', '80 °C', '8000 °C', '400 °C'], a: 0, why: 'ΔT = {{1 // 100 × 1.25×10⁻⁵}}.' },
         { q: 'Water has maximum density at…', o: ['0 °C', '4 °C', '100 °C', '−4 °C'], a: 1, why: 'Anomaly of water.' }
       ],
       mistakes: [['Using β = α for volumes', 'β = 3α.'], ['Thinking a hole shrinks on heating', 'It expands.']],
@@ -896,9 +947,9 @@ COURSE.push({
       ],
       terms: [['Specific heat c', 'الحرارة النوعية', 'J/kg·K or cal/g·°C'], ['Heat capacity C', 'السعة الحرارية', 'J/K'], ['Latent heat L', 'الحرارة الكامنة', 'J/kg'], ['Calorimeter', 'المسعر', 'Insulated container']],
       formulas: [
-        { f: 'Q = c m ΔT', name: '(7.6)', sym: [['c', 'specific heat', 'J/kg·K'], ['m', 'mass', 'kg']], cond: 'No phase change.' },
-        { f: 'Q = m L', name: '(7.8)', sym: [['L', 'latent heat', 'J/kg']], cond: 'Constant temperature during phase change.' },
-        { f: 'Σ Q_lost = Σ Q_gained', name: 'Heat balance', sym: [['Q', 'heat', 'J or cal']], cond: 'Insulated system.' }
+        { f: 'Q = c m ΔT', name: '(7.6)', sym: [['Q', 'heat', 'J', 'كمية الحرارة'], ['c', 'specific heat', 'J/kg·K', 'الحرارة النوعية'], ['m', 'mass', 'kg', 'الكتلة'], ['ΔT', 'temperature change', 'K or °C', 'تغير درجة الحرارة']], cond: 'No phase change.' },
+        { f: 'Q = m L', name: '(7.8)', sym: [['Q', 'heat', 'J', 'كمية الحرارة'], ['m', 'mass', 'kg', 'الكتلة'], ['L', 'latent heat', 'J/kg', 'الحرارة الكامنة']], cond: 'Constant temperature during phase change.' },
+        { f: 'Σ Q_lost = Σ Q_gained', name: 'Heat balance', sym: [['Q', 'heat', 'J or cal', 'كمية الحرارة'], ['T_f', 'final temperature', '°C', 'درجة الحرارة النهائية']], cond: 'Insulated system.' }
       ],
       life: { en: 'Sand on the beach gets hot quickly while the sea stays cool: water has a much larger c.', ar: 'الرمل يسخن بسرعة والبحر يبقى باردًا لأن الحرارة النوعية للماء أكبر.' },
       worked: { src: 'BK Ex 7.8 p.116', q: '75 g copper (c = 0.092) at 312 °C into 220 g water at 12 °C in glass (C = 45 cal/K). Final T?', steps: ['Heat lost = 75·0.092·(312 − T)', 'Heat gained = 220·1·(T − 12) + 45(T − 12)', '2152.8 − 6.9T = 265T − 3180 → 5332.8 = 271.9T', 'T = 19.6 °C'], ans: 'T = 19.6 °C' },
@@ -918,25 +969,25 @@ COURSE.push({
     },
     {
       id: 'ch7-l4', title: 'Heat transfer: conduction, convection, radiation', ar: 'انتقال الحرارة: التوصيل والحمل والإشعاع', src: 'S07 §4 · BK p.116–118',
-      goals: ['Use H = k_c A (T₁ − T₂)/x', 'Describe convection', 'Use Stefan–Boltzmann Q = σAT⁴'],
+      goals: ['Use H = {{k_c A (T₁ − T₂) // x}}', 'Describe convection', 'Use Stefan–Boltzmann Q = σAT⁴'],
       goalsAr: 'ستتعرف طرق انتقال الحرارة الثلاث وتحسب التوصيل والإشعاع.',
       why: { en: 'Insulation, cooking pots and the Sun warming Earth are the three modes in action.', ar: 'العزل وأواني الطبخ وتسخين الشمس للأرض أمثلة على الطرق الثلاث.' },
       explain: [
-        { en: 'Conduction: heat Q through a slab is ∝ A, (T₁ − T₂), t and ∝ 1/x. Rate H = Q/t = k_c A (T₁ − T₂)/x (7.9).', ar: 'التوصيل يعتمد على المساحة وفرق الحرارة والسمك.' },
+        { en: 'Conduction: heat Q through a slab is ∝ A, (T₁ − T₂), t and ∝ {{1 // x}}. Rate H = {{Q // t}} = {{k_c A (T₁ − T₂) // x}} (7.9).', ar: 'التوصيل يعتمد على المساحة وفرق الحرارة والسمك.' },
         { en: 'Convection: movement of the fluid itself; hot water rises because its density decreases (Fig 7.8).', ar: 'الحمل: انتقال المادة الساخنة نفسها.' },
         { en: 'Radiation: electromagnetic waves, no medium needed. Stefan–Boltzmann: Q = σAT⁴, σ = 5.67×10⁻⁸ W/m²K⁴, T in kelvin; Q here is energy per second of a black body (G‑16).', ar: 'الإشعاع لا يحتاج وسطًا، ويتناسب مع T⁴ بالكلفن.' }
       ],
       terms: [['Thermal conductivity k_c', 'معامل التوصيل الحراري', 'W/m·K'], ['Temperature gradient', 'الميل الحراري', '(T₁ − T₂)/x'], ['Convection', 'الحمل', 'Fluid motion'], ['Radiation', 'الإشعاع', 'EM waves'], ['Black body', 'الجسم الأسود', 'Ideal emitter']],
-      formulas: [{ f: 'H = {{k_c A (T₁ − T₂) // x}}', name: 'Conduction (7.9)', sym: [['H', 'heat rate', 'W or cal/s'], ['x', 'thickness', 'm']], cond: 'Steady state.' }, { f: 'Q = σ A T⁴', name: 'Stefan–Boltzmann (7.10)', sym: [['σ', '5.67×10⁻⁸', 'W/m²K⁴'], ['T', 'absolute temperature', 'K']], cond: 'Ideal black body; per second.' }],
+      formulas: [{ f: 'H = {{k_c A (T₁ − T₂) // x}}', name: 'Conduction (7.9)', sym: [['H', 'heat rate', 'W or cal/s', 'معدل انتقال الحرارة'], ['k_c', 'thermal conductivity', 'W/m·K', 'معامل التوصيل الحراري'], ['A', 'area', 'm²', 'المساحة'], ['T₁ − T₂', 'temperature difference', 'K or °C', 'فرق درجتي الحرارة'], ['x', 'thickness', 'm', 'السمك']], cond: 'Steady state.' }, { f: 'Q = σ A T⁴', name: 'Stefan–Boltzmann (7.10)', sym: [['Q', 'energy radiated per second', 'W', 'الطاقة المشعة في الثانية'], ['σ', '5.67×10⁻⁸', 'W/m²K⁴', 'ثابت ستيفان-بولتزمان'], ['A', 'surface area', 'm²', 'مساحة السطح'], ['T', 'absolute temperature', 'K', 'درجة الحرارة المطلقة']], cond: 'Ideal black body; per second.' }],
       life: { en: 'Double‑glazed windows trap air (poor conductor) to cut heat loss.', ar: 'النوافذ المزدوجة تحبس الهواء الرديء التوصيل.' },
-      worked: { src: '🧩 built on (7.9), data of BK Ex.5', q: 'Copper bar 1 m, A = 2 cm², ends at 100 °C and 0 °C, k = 0.2 cal/s·cm·°C. Heat in 10 min?', steps: ['H = 0.2 × 2 × 100/100 = 0.4 cal/s', 'Q = 0.4 × 600 = 240 cal'], ans: '240 cal ≈ 1004 J' },
+      worked: { src: '🧩 built on (7.9), data of BK Ex.5', q: 'Copper bar 1 m, A = 2 cm², ends at 100 °C and 0 °C, k = 0.2 cal/s·cm·°C. Heat in 10 min?', steps: ['H = {{0.2 × 2 × 100 // 100}} = 0.4 cal/s', 'Q = 0.4 × 600 = 240 cal'], ans: '240 cal ≈ 1004 J' },
       tryit: { src: '🧩 additional design', q: 'A black body of area 1 m² at 300 K. Radiated power?', ans: 459.3, tol: 0.01, unit: 'W', hint: 'σ T⁴ with T = 300 K', sol: '5.67×10⁻⁸ × 300⁴ = 459 W' },
       checks: [
         { q: 'Which needs no medium?', o: ['Conduction', 'Convection', 'Radiation'], a: 2, why: 'EM waves travel in vacuum.' },
-        { q: 'Doubling slab thickness makes H…', o: ['double', 'half', 'same', '4×'], a: 1, why: 'H ∝ 1/x.' }
+        { q: 'Doubling slab thickness makes H…', o: ['double', 'half', 'same', '4×'], a: 1, why: 'H ∝ {{1 // x}}.' }
       ],
       mistakes: [['Using °C in σT⁴', 'Convert to K.']],
-      summary: ['Conduction H = kA ΔT/x', 'Convection: fluid moves', 'Radiation σAT⁴ (K)'],
+      summary: ['Conduction H = {{k A ΔT // x}}', 'Convection: fluid moves', 'Radiation σAT⁴ (K)'],
       quiz: [{ q: 'If T (in K) doubles, radiated power becomes ×…', num: 16, tol: 0, unit: '', sol: '2⁴ = 16' }]
     }
   ]
@@ -1158,7 +1209,7 @@ COURSE.push({
         { en: 'Two mirrors at angle Φ: total deviation = 360° − 2Φ; at 90° the ray returns (retro‑reflection) (BK p.164–165).', ar: 'مرآتان بزاوية Φ: الانحراف 360 − 2Φ.' }
       ],
       terms: [['Normal', 'العمود المقام', 'Line ⟂ to surface'], ['Angle of incidence', 'زاوية السقوط', 'θ₁'], ['Diffuse reflection', 'الانعكاس المنتشر', 'From rough surfaces'], ['Photon', 'الفوتون', 'Light quantum']],
-      formulas: [{ f: 'θ₁ = θ₂', name: 'Law of reflection (10.1)', sym: [['θ', 'angle from the normal', '°']], cond: '—' }],
+      formulas: [{ f: 'θ₁ = θ₂', name: 'Law of reflection (10.1)', sym: [['θ₁', 'angle of incidence, from the normal', '°', 'زاوية السقوط مع العمود'], ['θ₂', 'angle of reflection, from the normal', '°', 'زاوية الانعكاس مع العمود']], cond: '—' }],
       life: { en: 'Bicycle reflectors use corner mirrors to send light back to the car.', ar: 'عاكسات الدراجة ترد الضوء إلى السيارة.' },
       worked: { src: 'S10 Ex 10.1 · BK p.164', q: 'Two mirrors at 90°. Total deviation?', steps: ['First reflection deviates 180° − 2θ', 'Second: 180° − 2(90° − θ)', 'Total = 360° − 180° = 180°'], ans: '180°' },
       tryit: { src: 'BK p.174 Exercise 9', q: 'Mirrors at 120°. Total deviation?', ans: 120, tol: 0, unit: '°', hint: '360 − 2Φ', sol: '360 − 240 = 120°' },
@@ -1169,31 +1220,31 @@ COURSE.push({
     },
     {
       id: 'ch10-l2', title: 'Refraction & Snell\'s law', ar: 'الانكسار وقانون سنل', src: 'S10 §3 · BK p.165–170',
-      goals: ['Use n = c/v and n₁ sin θ₁ = n₂ sin θ₂', 'Find wavelength in a medium λₙ = λ/n'],
+      goals: ['Use n = {{c // v}} and n₁ sin θ₁ = n₂ sin θ₂', 'Find wavelength in a medium λₙ = {{λ // n}}'],
       goalsAr: 'ستطبق قانون سنل وتحسب سرعة الضوء وطوله الموجي في الوسط.',
       why: { en: 'Glasses, cameras and the apparent depth of pools come from refraction.', ar: 'النظارات والكاميرات وظاهرة العمق الظاهري سببها الانكسار.' },
       explain: [
-        { en: 'Refraction laws: incident, reflected, refracted rays and the normal lie in one plane; sin θ₁/sin θ₂ = v₁/v₂ (10.2).', ar: 'نسبة الجيبين = نسبة السرعتين.' },
-        { en: 'Refractive index n = c/v (> 1). Snell: n₁ sin θ₁ = n₂ sin θ₂ (10.3). Vacuum n = 1.', ar: 'معامل الانكسار وقانون سنل.' },
-        { en: 'Frequency does not change between media; therefore n = λ/λₙ and n₁λ₁ = n₂λ₂.', ar: 'التردد لا يتغير، فيتغير الطول الموجي.' },
+        { en: 'Refraction laws: incident, reflected, refracted rays and the normal lie in one plane; {{sin θ₁ // sin θ₂}} = {{v₁ // v₂}} (10.2).', ar: 'نسبة الجيبين = نسبة السرعتين.' },
+        { en: 'Refractive index n = {{c // v}} (> 1). Snell: n₁ sin θ₁ = n₂ sin θ₂ (10.3). Vacuum n = 1.', ar: 'معامل الانكسار وقانون سنل.' },
+        { en: 'Frequency does not change between media; therefore n = {{λ // λₙ}} and n₁λ₁ = n₂λ₂.', ar: 'التردد لا يتغير، فيتغير الطول الموجي.' },
         { en: 'Into a denser medium the ray bends toward the normal; the path is reversible (Fig 10.6).', ar: 'عند الدخول لوسط أكبر معاملًا ينكسر مقتربًا من العمود.' }
       ],
-      terms: [['Refraction', 'الانكسار', 'Change of direction at a boundary'], ['Refractive index', 'معامل الانكسار', 'n = c/v'], ['Snell\'s law', 'قانون سنل', 'n₁ sin θ₁ = n₂ sin θ₂']],
-      formulas: [{ f: 'n = {{c // v}} = {{λ // λₙ}}', name: 'Refractive index', sym: [['c', '3×10⁸ m/s', 'm/s'], ['λₙ', 'wavelength in medium', 'm']], cond: 'f constant.' }, { f: 'n₁ sin θ₁ = n₂ sin θ₂', name: 'Snell (10.3)', sym: [['θ', 'angle from normal', '°']], cond: '—' }],
+      terms: [['Refraction', 'الانكسار', 'Change of direction at a boundary'], ['Refractive index', 'معامل الانكسار', 'n = {{c // v}}'], ['Snell\'s law', 'قانون سنل', 'n₁ sin θ₁ = n₂ sin θ₂']],
+      formulas: [{ f: 'n = {{c // v}} = {{λ // λₙ}}', name: 'Refractive index', sym: [['n', 'refractive index', '—', 'معامل الانكسار'], ['c', '3×10⁸ m/s', 'm/s', 'سرعة الضوء في الفراغ'], ['v', 'speed in the medium', 'm/s', 'سرعة الضوء في الوسط'], ['λ, λₙ', 'wavelength in vacuum / in the medium', 'm', 'الطول الموجي في الفراغ وفي الوسط']], cond: 'f constant.' }, { f: 'n₁ sin θ₁ = n₂ sin θ₂', name: 'Snell (10.3)', sym: [['n₁, n₂', 'refractive indices', '—', 'معاملا الانكسار'], ['θ₁, θ₂', 'angles from the normal', '°', 'الزاويتان مع العمود']], cond: '—' }],
       life: { en: 'A straw looks bent in a glass of water.', ar: 'الماصة تبدو مكسورة في كوب الماء.' },
-      worked: { src: 'S10 Ex 10.3 · BK p.168–169', q: '589 nm, air → glass (n = 1.52) at 30°. θ₂, v, λₙ?', steps: ['θ₂ = sin⁻¹(sin30°/1.52) = 19.2°', 'v = 3×10⁸/1.52 = 1.97×10⁸ m/s', 'λₙ = 589/1.52 = 388 nm'], ans: '19.2°, 1.97×10⁸ m/s, 388 nm' },
-      tryit: { src: 'BK p.174 Exercise 8', q: 'Air → medium n = 1.458 at θ₁ = 45°. θ₂?', ans: 29.0, tol: 0.01, unit: '°', hint: 'sin θ₂ = sin45°/1.458', sol: 'sin θ₂ = 0.485 → θ₂ = 29.0°' },
+      worked: { src: 'S10 Ex 10.3 · BK p.168–169', q: '589 nm, air → glass (n = 1.52) at 30°. θ₂, v, λₙ?', steps: ['θ₂ = sin⁻¹( {{sin 30° // 1.52}} ) = 19.2°', 'v = {{c // n}} = {{3×10⁸ // 1.52}} = 1.97×10⁸ m/s', 'λₙ = {{λ // n}} = {{589 // 1.52}} = 388 nm'], ans: '19.2°, 1.97×10⁸ m/s, 388 nm' },
+      tryit: { src: 'BK p.174 Exercise 8', q: 'Air → medium n = 1.458 at θ₁ = 45°. θ₂?', ans: 29.0, tol: 0.01, unit: '°', hint: 'sin θ₂ = {{sin 45° // 1.458}}', sol: 'sin θ₂ = 0.485 → θ₂ = 29.0°' },
       checks: [
         { q: 'Air → water (1.33) at 30° (Ex 10.2). θ₂?', o: ['22°', '42°', '30°', '48.8°'], a: 0, why: 'sin⁻¹(0.376).' },
         { q: 'When light enters glass, what stays constant? (BK Ex.2)', o: ['speed', 'wavelength', 'frequency'], a: 2, why: 'f is set by the source.' }
       ],
       mistakes: [['Thinking frequency changes', 'Speed and wavelength change; f does not.']],
-      summary: ['n = c/v', 'n₁ sin θ₁ = n₂ sin θ₂', 'λₙ = λ/n'],
+      summary: ['n = {{c // v}}', 'n₁ sin θ₁ = n₂ sin θ₂', 'λₙ = {{λ // n}}'],
       quiz: [
-        { q: 'λ = 495 nm in air, 434 nm in liquid (BK Ex.1). n?', num: 1.141, tol: 0.01, unit: '', sol: '495/434 = 1.14' },
-        { q: 'Glass n = 1.66 (BK Ex.6). Speed of light ×10⁸ m/s?', num: 1.807, tol: 0.01, unit: '×10⁸ m/s', sol: '3/1.66 = 1.81' },
-        { q: 'He‑Ne 632.8 nm (BK Ex.4). Frequency ×10¹⁴ Hz?', num: 4.74, tol: 0.01, unit: '×10¹⁴ Hz', sol: 'f = c/λ = 4.74×10¹⁴ Hz' },
-        { q: 'Same laser in glass n = 1.5 (BK Ex.5). λₙ?', num: 421.9, tol: 0.01, unit: 'nm', sol: '632.8/1.5' }
+        { q: 'λ = 495 nm in air, 434 nm in liquid (BK Ex.1). n?', num: 1.141, tol: 0.01, unit: '', sol: '{{495 // 434}} = 1.14' },
+        { q: 'Glass n = 1.66 (BK Ex.6). Speed of light ×10⁸ m/s?', num: 1.807, tol: 0.01, unit: '×10⁸ m/s', sol: '{{3 // 1.66}} = 1.81' },
+        { q: 'He‑Ne 632.8 nm (BK Ex.4). Frequency ×10¹⁴ Hz?', num: 4.74, tol: 0.01, unit: '×10¹⁴ Hz', sol: 'f = {{c // λ}} = 4.74×10¹⁴ Hz' },
+        { q: 'Same laser in glass n = 1.5 (BK Ex.5). λₙ?', num: 421.9, tol: 0.01, unit: 'nm', sol: '{{632.8 // 1.5}}' }
       ]
     },
     {
@@ -1203,17 +1254,17 @@ COURSE.push({
       why: { en: 'Fibre‑optic internet relies on total internal reflection.', ar: 'الإنترنت بالألياف البصرية يعتمد على الانعكاس الكلي الداخلي.' },
       explain: [
         { en: 'Dispersion: n depends on λ; red has a smaller n than violet, so each colour refracts at a different angle (prism, rainbow).', ar: 'التشتت: معامل الانكسار يقل بزيادة الطول الموجي.' },
-        { en: 'From larger n to smaller n the ray bends away from the normal. At θ₂ = 90° the incident angle is the critical angle: sin θ_c = n₂/n₁ (10.4).', ar: 'الزاوية الحرجة عند انكسار الشعاع موازيًا للسطح.' },
+        { en: 'From larger n to smaller n the ray bends away from the normal. At θ₂ = 90° the incident angle is the critical angle: sin θ_c = {{n₂ // n₁}} (10.4).', ar: 'الزاوية الحرجة عند انكسار الشعاع موازيًا للسطح.' },
         { en: 'If θ₁ > θ_c, all light is reflected back: total internal reflection (only when n₁ > n₂).', ar: 'إذا زادت زاوية السقوط عن الحرجة يحدث انعكاس كلي.' }
       ],
-      terms: [['Dispersion', 'التشتت (التحلل)', 'n depends on λ'], ['Critical angle', 'الزاوية الحرجة', 'sin θ_c = n₂/n₁'], ['Total internal reflection', 'الانعكاس الكلي الداخلي', 'θ₁ > θ_c']],
-      formulas: [{ f: 'sin θ_c = {{n₂ // n₁}}', name: '(10.4)', sym: [['n₁', 'denser medium', '—'], ['n₂', 'less dense', '—']], cond: 'n₁ > n₂ only.' }],
+      terms: [['Dispersion', 'التشتت (التحلل)', 'n depends on λ'], ['Critical angle', 'الزاوية الحرجة', 'sin θ_c = {{n₂ // n₁}}'], ['Total internal reflection', 'الانعكاس الكلي الداخلي', 'θ₁ > θ_c']],
+      formulas: [{ f: 'sin θ_c = {{n₂ // n₁}}', name: '(10.4)', sym: [['θ_c', 'critical angle', '°', 'الزاوية الحرجة'], ['n₁', 'denser medium', '—', 'الوسط الأكثف'], ['n₂', 'less dense medium', '—', 'الوسط الأقل كثافة']], cond: 'n₁ > n₂ only.' }],
       life: { en: 'Diamonds sparkle because their small critical angle (≈ 24°) traps light inside.', ar: 'يلمع الألماس لأن زاويته الحرجة صغيرة.' },
-      worked: { src: 'S10 Ex 10.5 · BK p.172', q: 'Glass (n = 1.5) → air. θ_c?', steps: ['sin θ_c = 1/1.5 = 0.667', 'θ_c = 42°'], ans: '42°' },
-      tryit: { src: 'BK p.174 Exercise 10', q: 'Water (n = 1.33) → air. θ_c?', ans: 48.75, tol: 0.01, unit: '°', hint: 'sin⁻¹(1/1.33)', sol: 'θ_c = 48.8°' },
+      worked: { src: 'S10 Ex 10.5 · BK p.172', q: 'Glass (n = 1.5) → air. θ_c?', steps: ['sin θ_c = {{1 // 1.5}} = 0.667', 'θ_c = 42°'], ans: '42°' },
+      tryit: { src: 'BK p.174 Exercise 10', q: 'Water (n = 1.33) → air. θ_c?', ans: 48.75, tol: 0.01, unit: '°', hint: 'sin⁻¹( {{1 // 1.33}} )', sol: 'θ_c = 48.8°' },
       checks: [{ q: 'TIR can happen when light goes…', o: ['air → glass', 'glass → air', 'both'], a: 1, why: 'Needs n₁ > n₂.' }],
       mistakes: [['Swapping n₁ and n₂ in sin θ_c', 'Smaller over larger.']],
-      summary: ['Red bends least', 'sin θ_c = n₂/n₁', 'TIR when θ > θ_c'],
+      summary: ['Red bends least', 'sin θ_c = {{n₂ // n₁}}', 'TIR when θ > θ_c'],
       quiz: [{ q: 'Which colour has the largest refractive index in glass?', o: ['Red', 'Green', 'Violet'], a: 2, why: 'Shorter λ → larger n.' }]
     }
   ]
@@ -1746,6 +1797,250 @@ window.WORDS = {
         ['sin θ_c = {{n₂ // n₁}}', 'n₁ sin θ_c = n₂', 'n₁ = {{n₂ // sin θ_c}}'], 'Multiply both sides by n₁, then divide by sin θ_c.', 'اضرب الطرفين في n₁، ثم اقسم على sin θ_c.')
     ]
   };
+})();
+
+/* Unit 0: the maths and reading skills the course assumes (gap G‑03: "content assumes algebra, trigonometry, basic derivatives").
+   All of this is additional design (🧩). Each skill: Arabic‑first explanation, one worked example, a generator of fresh
+   questions (same item format as the lessons: {q, o, a, why} or {q, num, tol, unit, sol}), and the lessons that use it. */
+(function () {
+  const R = (a, b, d = 0) => +(a + Math.random() * (b - a)).toFixed(d);
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const sig = (x, n = 3) => +x.toPrecision(n);
+  const sup = n => String(n).replace(/-/g, '⁻').replace(/\d/g, d => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d]);
+  const sci = x => { if (x === 0) return '0'; const e = Math.floor(Math.log10(Math.abs(x))); const m = sig(x / 10 ** e); return `${m} × 10${sup(e)}`; };
+  const deg = r => r * 180 / Math.PI, rad = d => d * Math.PI / 180;
+  // multiple choice from a right answer and distractors (duplicates removed)
+  const mcq = (q, right, wrong, why) => { const o = shuffle([right, ...[...new Set(wrong.filter(w => w !== right))].slice(0, 3)]); return { q, o, a: o.indexOf(right), why }; };
+
+  window.FOUND = [
+    {
+      id: 'f1', title: 'Powers of ten & scientific notation', ar: 'القوى العشرية والصيغة العلمية',
+      uses: [['ch1-l1', 'prefixes such as μ = 10⁻⁶'], ['ch8-l1', 'charges like e = 1.6 × 10⁻¹⁹ C'], ['ch9-l1', 'tiny drift speeds and huge n']],
+      explain: [
+        ['الصيغة العلمية تكتب الرقم على شكل a × 10ⁿ حيث a بين 1 و 10. مثال: 4500 = 4.5 × 10³ ، و 0.00032 = 3.2 × 10⁻⁴.', 'Scientific notation writes a number as a × 10ⁿ with 1 ≤ a < 10: 4500 = 4.5 × 10³, 0.00032 = 3.2 × 10⁻⁴.'],
+        ['الأس الموجب يعني رقمًا كبيرًا (الفاصلة تتحرك يمينًا)، والأس السالب يعني رقمًا صغيرًا أقل من 1 (الفاصلة تتحرك يسارًا). عدد الخانات التي تحركت بها الفاصلة هو الأس.', 'A positive power means a big number, a negative power a number below 1. The number of places the decimal point moves is the power.'],
+        ['عند الضرب: اضرب الأرقام واجمع الأسس. عند القسمة: اقسم الأرقام واطرح الأسس. مثال: (2 × 10³)(3 × 10⁴) = 6 × 10⁷.', 'Multiplying: multiply the numbers, add the powers. Dividing: divide the numbers, subtract the powers.'],
+        ['في الآلة الحاسبة: اكتب 1.6 ثم زر EXP (أو ×10ˣ) ثم −19. لا تكتب × 10 ^ يدويًا لأنها تسبب أخطاء في الأقواس.', 'On the calculator type 1.6, then EXP (or ×10ˣ), then −19. Do not type × 10 ^ by hand.']
+      ],
+      example: { q: 'Write 0.000052 in scientific notation.', steps: ['Move the decimal point to get a number between 1 and 10: 5.2', 'It moved 5 places to the right, so the power is −5', '0.000052 = 5.2 × 10⁻⁵'], ans: '5.2 × 10⁻⁵' },
+      gen: () => pick([
+        () => { const m = R(1.1, 9.9, 1), e = pick([-9, -7, -6, -5, -4, -3, 3, 4, 5, 6, 8]); const x = m * 10 ** e; const s = e < 0 ? x.toFixed(-e + 1) : String(Math.round(x)); return { q: `Write ${s} as ${m} × 10ⁿ. What is n?`, num: e, tol: 0, unit: '', sol: `The decimal point moves ${Math.abs(e)} places ${e < 0 ? 'right, so n is negative' : 'left, so n is positive'}: n = ${e}.` }; },
+        () => { const a = R(1.5, 4.5, 1), b = R(1.5, 4.5, 1), m = R(-9, 9), n = R(-9, 9); const x = a * b * 10 ** (m + n); return { q: `(${a} × 10${sup(m)}) × (${b} × 10${sup(n)}) = ?`, num: x, tol: 0.01, unit: '', sol: `Multiply ${a} × ${b} = ${sig(a * b)}, add the powers ${m} + (${n}) = ${m + n}: ${sci(x)}` }; },
+        () => { const a = R(4, 9.8, 1), b = R(1.2, 3.9, 1), m = R(-8, 8), n = R(-8, 8); const x = a / b * 10 ** (m - n); return { q: `{{${a} × 10${sup(m)} // ${b} × 10${sup(n)}}} = ?`, num: x, tol: 0.01, unit: '', sol: `Divide ${a} ÷ ${b} = ${sig(a / b)}, subtract the powers ${m} − (${n}) = ${m - n}: ${sci(x)}` }; }
+      ])()
+    },
+    {
+      id: 'f2', title: 'Exponent rules & converting squared units', ar: 'قوانين الأسس وتحويل الوحدات المربعة والمكعبة',
+      uses: [['ch1-l2', '1 cm³ = (10⁻²)³ m³ = 10⁻⁶ m³'], ['ch6-l1', 'wire areas in mm²'], ['ch9-l1', 'cm² → m² (the slides get this wrong, G‑12)']],
+      explain: [
+        ['قوانين الأسس الأربعة: 10ᵐ × 10ⁿ = 10ᵐ⁺ⁿ ، و 10ᵐ ÷ 10ⁿ = 10ᵐ⁻ⁿ ، و (10ᵐ)ⁿ = 10ᵐˣⁿ ، و 10⁻ⁿ = 1 ÷ 10ⁿ.', 'The four rules: 10ᵐ × 10ⁿ = 10ᵐ⁺ⁿ, 10ᵐ ÷ 10ⁿ = 10ᵐ⁻ⁿ, (10ᵐ)ⁿ = 10ᵐⁿ, 10⁻ⁿ = 1/10ⁿ.'],
+        ['الوحدة المربعة يُربَّع معامل تحويلها: 1 cm = 10⁻² m إذن 1 cm² = (10⁻²)² m² = 10⁻⁴ m². والمكعبة يُكعَّب: 1 cm³ = 10⁻⁶ m³.', 'A squared unit squares its factor: 1 cm² = (10⁻²)² m² = 10⁻⁴ m². A cubed unit cubes it: 1 cm³ = 10⁻⁶ m³.'],
+        ['أشهر خطأ: تحويل cm² بـ 10⁻² فقط. هذا الخطأ موجود حتى في شرائح المقرر (مثال 9.2، الفجوة G‑12).', 'The classic mistake is converting cm² with 10⁻² only; it even appears in the course slides (Ex 9.2, gap G‑12).']
+      ],
+      example: { q: 'Convert 2.5 mm² to m².', steps: ['1 mm = 10⁻³ m', '1 mm² = (10⁻³)² m² = 10⁻⁶ m²', '2.5 mm² = 2.5 × 10⁻⁶ m²'], ans: '2.5 × 10⁻⁶ m²' },
+      gen: () => pick([
+        () => { const a = R(-6, 6), b = R(-6, 6), c = R(-6, 6); return { q: `{{10${sup(a)} × 10${sup(b)} // 10${sup(c)}}} = 10ⁿ. What is n?`, num: a + b - c, tol: 0, unit: '', sol: `Add the top powers, subtract the bottom: ${a} + (${b}) − (${c}) = ${a + b - c}` }; },
+        () => { const a = pick([-3, -2, 2, 3, 6]), b = pick([2, 3]); return { q: `(10${sup(a)})${sup(b)} = 10ⁿ. What is n?`, num: a * b, tol: 0, unit: '', sol: `Multiply the powers: ${a} × ${b} = ${a * b}` }; },
+        () => { const [u, e] = pick([['cm', -2], ['mm', -3], ['km', 3]]), p = pick([2, 3]); return { q: `1 ${u}${sup(p)} = 10ⁿ m${sup(p)}. What is n?`, num: e * p, tol: 0, unit: '', sol: `1 ${u} = 10${sup(e)} m, so 1 ${u}${sup(p)} = (10${sup(e)})${sup(p)} m${sup(p)} = 10${sup(e * p)} m${sup(p)}` }; },
+        () => { const v = R(1.5, 9.5, 1); return { q: `Convert ${v} cm² to m².`, num: v * 1e-4, tol: 0.01, unit: 'm²', sol: `1 cm² = 10⁻⁴ m² → ${v} × 10⁻⁴ m²` }; }
+      ])()
+    },
+    {
+      id: 'f3', title: 'Rearranging an equation', ar: 'ترتيب المعادلة وعزل المجهول',
+      uses: [['ch9-l2', 'R = V/I from V = RI'], ['ch4-l2', 'm = ΣF/a'], ['ch8-l1', 'r from Coulomb\'s law']],
+      link: '#rearrange',
+      explain: [
+        ['المعادلة ميزان: أي عملية تعملها على طرف لازم تعملها على الطرف الثاني. الهدف أن يبقى الرمز المطلوب وحده.', 'An equation is a balance: do the same to both sides until the symbol you want stands alone.'],
+        ['إذا كان المجهول مضروبًا في شيء فاقسم عليه، وإذا كان مقسومًا على شيء فاضرب فيه، وإذا كان في المقام فاضرب فيه أولًا ليصعد.', 'Multiplied → divide; divided → multiply; in the denominator → multiply first so it moves up.'],
+        ['رتّب القانون بالرموز أولًا ثم عوّض بالأرقام في النهاية؛ هذا يقلل الأخطاء ويوضح الحل للمصحح.', 'Rearrange with symbols first and substitute numbers last.']
+      ],
+      example: { q: 'From P = {{V² // R}}, find R.', steps: ['Multiply both sides by R: P R = V²', 'Divide both sides by P: R = {{V² // P}}'], ans: 'R = {{V² // P}}' },
+      gen: () => {
+        const L = shuffle(['a', 'b', 'c', 'x', 'y', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'w']);
+        const [x, y, z] = L;
+        return pick([
+          () => mcq(`If ${x} = ${y} ${z}, then ${y} = ?`, `{{${x} // ${z}}}`, [`${x} ${z}`, `{{${z} // ${x}}}`, `${x} − ${z}`], `${y} is multiplied by ${z}: divide both sides by ${z}.`),
+          () => mcq(`If ${x} = {{${y} // ${z}}}, then ${z} = ?`, `{{${y} // ${x}}}`, [`${x} ${y}`, `{{${x} // ${y}}}`, `${y} − ${x}`], `${z} is in the denominator: multiply both sides by ${z} (${x} ${z} = ${y}), then divide by ${x}.`),
+          () => mcq(`If ${x} = {{${y} // ${z}}}, then ${y} = ?`, `${x} ${z}`, [`{{${x} // ${z}}}`, `{{${z} // ${x}}}`, `${x} + ${z}`], `${y} is divided by ${z}: multiply both sides by ${z}.`),
+          () => mcq(`If ${x} = ${y} + ${z}, then ${z} = ?`, `${x} − ${y}`, [`${x} + ${y}`, `${y} − ${x}`, `{{${x} // ${y}}}`], `Subtract ${y} from both sides.`),
+          () => mcq(`If ${x} = ${y} ${z}², then ${z} = ?`, `√( {{${x} // ${y}}} )`, [`{{${x} // ${y}}}`, `( {{${x} // ${y}}} )²`, `√(${x} ${y})`], `Divide by ${y}, then take the square root.`),
+          () => mcq(`If ${x} = {{${y} ${z} // ${L[3]}}}, then ${L[3]} = ?`, `{{${y} ${z} // ${x}}}`, [`{{${x} ${z} // ${y}}}`, `${x} ${y} ${z}`, `{{${x} // ${y} ${z}}}`], `Multiply both sides by ${L[3]}, then divide by ${x}.`)
+        ])();
+      }
+    },
+    {
+      id: 'f4', title: 'Proportion: direct, inverse, inverse‑square', ar: 'التناسب الطردي والعكسي والتربيعي',
+      uses: [['ch4-l2', 'a ∝ ΣF and a ∝ 1/m'], ['ch8-l1', 'F ∝ 1/r²'], ['ch9-l2', 'R ∝ ℓ and R ∝ 1/A']],
+      explain: [
+        ['طردي y ∝ x: إذا تضاعف x تضاعف y. عكسي y ∝ 1/x: إذا تضاعف x صار y النصف.', 'Direct y ∝ x: double x → double y. Inverse y ∝ 1/x: double x → half y.'],
+        ['تربيعي y ∝ x²: إذا تضاعف x صار y أربعة أضعاف. تربيعي عكسي y ∝ 1/x²: إذا تضاعف x صار y الربع.', 'Square y ∝ x²: double x → 4 × y. Inverse square y ∝ 1/x²: double x → y/4.'],
+        ['القاعدة: ارفع معامل التغيير لأسّ الرمز في القانون. في F = kq₁q₂/r² أسّ r هو −2، فإذا صار r ثلاثة أضعاف تصبح F مضروبة في 3⁻² = 1/9.', 'Raise the change factor to the power of the symbol in the law: in F = kq₁q₂/r² the power of r is −2, so r × 3 gives F × 3⁻² = F/9.']
+      ],
+      example: { q: 'In KE = ½ m v², the speed is doubled. What happens to KE?', steps: ['The power of v is 2', '2² = 4', 'KE becomes 4 times bigger'], ans: 'KE × 4' },
+      gen: () => {
+        const laws = [['F = {{k q₁ q₂ // r²}}', 'F', 'r', -2], ['F = {{k q₁ q₂ // r²}}', 'F', 'q₁', 1], ['KE = ½ m v²', 'KE', 'v', 2], ['KE = ½ m v²', 'KE', 'm', 1], ['a = {{ΣF // m}}', 'a', 'm', -1], ['R = {{ρ ℓ // A}}', 'R', 'ℓ', 1], ['R = {{ρ ℓ // A}}', 'R', 'A', -1], ['C = {{ε₀ A // d}}', 'C', 'd', -1], ['P = {{V² // R}}', 'P', 'V', 2], ['E = {{k q // r²}}', 'E', 'r', -2], ['V = {{k q // r}}', 'V', 'r', -1], ['y_max = {{v_i² // 2g}}', 'y_max', 'v_i', 2], ['U = ½ C V²', 'U', 'V', 2]];
+        const [law, out, sym, p] = pick(laws), k = pick([2, 3, 4]);
+        const say = e => e === 0 ? 'unchanged' : e > 0 ? `${out} × ${k ** e}` : `{{${out} // ${k ** -e}}}`;
+        return mcq(`In ${law}, ${sym} is multiplied by ${k}. ${out} becomes…`, say(p), [say(-p), say(p > 0 ? 1 : -1), say(p > 0 ? -1 : 1), say(2 * p > 2 ? 1 : 2)], `The power of ${sym} is ${p}: ${k}${sup(p)} → ${say(p)}.`);
+      }
+    },
+    {
+      id: 'f5', title: 'Areas & volumes: radius vs diameter', ar: 'المساحة والحجم: نصف القطر والقطر',
+      uses: [['ch6-l1', 'area of a wire A = πr²'], ['ch9-l2', 'R = ρℓ/A (gap G‑11 mixes diameter and radius)'], ['ch6-l4', 'pipe sections']],
+      explain: [
+        ['مساحة الدائرة A = πr² حيث r نصف القطر. إذا أُعطيت القطر d فنصف القطر r = d ÷ 2 قبل التربيع.', 'Circle area A = πr². If the diameter d is given, use r = d/2 before squaring.'],
+        ['المربع: الضلع². المستطيل: الطول × العرض. المكعب: الضلع³. الأسطوانة: πr²h. الكرة: (4/3)πr³.', 'Square: side². Rectangle: length × width. Cube: side³. Cylinder: πr²h. Sphere: (4/3)πr³.'],
+        ['حوّل الأطوال إلى متر أولًا ثم احسب المساحة؛ هكذا تتجنب خطأ 10⁻² بدل 10⁻⁴.', 'Convert lengths to metres first, then compute the area.']
+      ],
+      example: { q: 'A wire has diameter 0.4 mm. Find its cross‑section area in m².', steps: ['r = d/2 = 0.2 mm = 0.2 × 10⁻³ m', 'A = πr² = π(0.2 × 10⁻³)²', 'A = 1.26 × 10⁻⁷ m²'], ans: '1.26 × 10⁻⁷ m²' },
+      gen: () => pick([
+        () => { const d = R(0.2, 3, 1); const A = Math.PI * (d / 2 * 1e-3) ** 2; return { q: `A wire has diameter ${d} mm. Cross‑section area in m²?`, num: A, tol: 0.01, unit: 'm²', sol: `r = ${d}/2 = ${sig(d / 2)} mm = ${sig(d / 2)} × 10⁻³ m → A = π r² = ${sci(A)} m²` }; },
+        () => { const r = R(1, 12), A = Math.PI * (r / 100) ** 2; return { q: `A pipe has radius ${r} cm. Cross‑section area in m²?`, num: A, tol: 0.01, unit: 'm²', sol: `r = ${r / 100} m → A = π r² = ${sci(A)} m²` }; },
+        () => { const a = R(2, 40), b = R(2, 40), A = a * b * 1e-4; return { q: `A plate measures ${a} cm × ${b} cm. Area in m²?`, num: A, tol: 0.01, unit: 'm²', sol: `${a / 100} m × ${b / 100} m = ${sci(A)} m²` }; },
+        () => { const s = R(2, 15), V = (s / 100) ** 3; return { q: `A cube has side ${s} cm. Volume in m³?`, num: V, tol: 0.01, unit: 'm³', sol: `(${s / 100} m)³ = ${sci(V)} m³` }; }
+      ])()
+    },
+    {
+      id: 'f6', title: 'Right triangles: sin, cos, tan', ar: 'المثلث القائم: الجيب وجيب التمام والظل',
+      uses: [['ch2-l3', 'vector components A cos θ, A sin θ'], ['ch4-l2', 'a force pulling at an angle'], ['ch5-l1', 'W = F Δr cos θ'], ['ch10-l2', 'Snell\'s law uses sin']],
+      explain: [
+        ['في المثلث القائم: sin θ = المقابل ÷ الوتر ، cos θ = المجاور ÷ الوتر ، tan θ = المقابل ÷ المجاور. (SOH‑CAH‑TOA)', 'In a right triangle: sin θ = opposite/hypotenuse, cos θ = adjacent/hypotenuse, tan θ = opposite/adjacent (SOH‑CAH‑TOA).'],
+        ['لإيجاد الزاوية نستخدم الدوال العكسية: θ = tan⁻¹(المقابل ÷ المجاور). وتأكد أن الآلة الحاسبة على وضع الدرجات DEG.', 'To find the angle use the inverse functions, e.g. θ = tan⁻¹(opposite/adjacent). Keep the calculator in DEG mode.'],
+        ['فيثاغورس: الوتر² = الضلع الأول² + الضلع الثاني². قيم تحفظها: sin 30° = 0.5 ، cos 60° = 0.5 ، tan 45° = 1.', 'Pythagoras: hypotenuse² = a² + b². Worth knowing: sin 30° = 0.5, cos 60° = 0.5, tan 45° = 1.']
+      ],
+      example: { q: 'A 20 N force pulls at 30° above the horizontal. Find its horizontal part.', steps: ['The horizontal part is next to the angle: adjacent → cos', 'Fₓ = F cos θ = 20 cos 30°', 'Fₓ = 20 × 0.866 = 17.3 N'], ans: '17.3 N' },
+      gen: () => pick([
+        () => { const h = R(5, 50), t = pick([20, 25, 30, 37, 40, 53, 60, 70]); return { q: `Hypotenuse ${h}, angle ${t}°. Side next to the angle (adjacent)?`, num: h * Math.cos(rad(t)), tol: 0.01, unit: '', sol: `adjacent = hypotenuse × cos θ = ${h} cos ${t}° = ${sig(h * Math.cos(rad(t)))}` }; },
+        () => { const h = R(5, 50), t = pick([20, 25, 30, 37, 40, 53, 60, 70]); return { q: `Hypotenuse ${h}, angle ${t}°. Side opposite the angle?`, num: h * Math.sin(rad(t)), tol: 0.01, unit: '', sol: `opposite = hypotenuse × sin θ = ${h} sin ${t}° = ${sig(h * Math.sin(rad(t)))}` }; },
+        () => { const a = R(2, 20), b = R(2, 20); return { q: `Opposite side ${b}, adjacent side ${a}. Angle θ in degrees?`, num: deg(Math.atan(b / a)), tol: 0.01, unit: '°', sol: `θ = tan⁻¹( {{${b} // ${a}}} ) = ${sig(deg(Math.atan(b / a)))}°` }; },
+        () => { const a = R(2, 20), b = R(2, 20); return { q: `The two short sides are ${a} and ${b}. Hypotenuse?`, num: Math.hypot(a, b), tol: 0.01, unit: '', sol: `√(${a}² + ${b}²) = ${sig(Math.hypot(a, b))}` }; }
+      ])()
+    },
+    {
+      id: 'f7', title: 'Sine rule & cosine rule', ar: 'قانون الجيب وقانون جيب التمام',
+      uses: [['ch2-l2', 'adding two vectors at any angle']],
+      explain: [
+        ['لأي مثلث (ليس بالضرورة قائمًا): قانون جيب التمام c² = a² + b² − 2ab cos C ، حيث C الزاوية المقابلة للضلع c والمحصورة بين a و b.', 'For any triangle: cosine rule c² = a² + b² − 2ab cos C, where C is the angle between a and b, opposite c.'],
+        ['قانون الجيب: {{a // sin A}} = {{b // sin B}} = {{c // sin C}} ، ونستخدمه لإيجاد زاوية بعد معرفة الأضلاع.', 'Sine rule: {{a // sin A}} = {{b // sin B}} = {{c // sin C}}; use it to find an angle once the sides are known.'],
+        ['إذا كانت C = 90° فإن cos 90° = 0 ويصبح قانون جيب التمام هو فيثاغورس.', 'If C = 90°, cos 90° = 0 and the cosine rule becomes Pythagoras.']
+      ],
+      example: { q: 'Two sides 6 and 9 with 60° between them. Third side?', steps: ['c² = 6² + 9² − 2·6·9·cos 60°', 'c² = 36 + 81 − 54 = 63', 'c = 7.94'], ans: '7.94' },
+      gen: () => pick([
+        () => { const a = R(3, 15), b = R(3, 15), C = pick([40, 50, 60, 70, 100, 110, 120]); const c = Math.sqrt(a * a + b * b - 2 * a * b * Math.cos(rad(C))); return { q: `Sides ${a} and ${b} with ${C}° between them. Third side?`, num: c, tol: 0.01, unit: '', sol: `c = √(${a}² + ${b}² − 2·${a}·${b}·cos ${C}°) = ${sig(c)}` }; },
+        () => { const A = pick([30, 40, 50]), B = pick([60, 70, 80]), a = R(4, 12); const b = a * Math.sin(rad(B)) / Math.sin(rad(A)); return { q: `In a triangle, angle A = ${A}° faces side a = ${a}, and angle B = ${B}°. Side b?`, num: b, tol: 0.01, unit: '', sol: `b = {{a sin B // sin A}} = {{${a} sin ${B}° // sin ${A}°}} = ${sig(b)}` }; }
+      ])()
+    },
+    {
+      id: 'f8', title: 'Graphs: slope & intercept', ar: 'الرسم البياني: الميل والمقطع',
+      uses: [['ch3-l2', 'slope of x–t = velocity'], ['ch3-l3', 'slope of v–t = acceleration'], ['lab', 'every virtual‑lab experiment fits a straight line']],
+      explain: [
+        ['الخط المستقيم معادلته y = m x + b ، حيث m الميل و b المقطع (قيمة y عندما x = 0).', 'A straight line is y = m x + b: m is the slope, b the intercept (the value of y at x = 0).'],
+        ['الميل = {{Δy // Δx}} = {{y₂ − y₁ // x₂ − x₁}} ، أي التغير في الرأسي ÷ التغير في الأفقي، ووحدته = وحدة y ÷ وحدة x.', 'Slope = {{Δy // Δx}} = {{y₂ − y₁ // x₂ − x₁}}; its unit is the unit of y over the unit of x.'],
+        ['في الفيزياء: ميل منحنى الموقع والزمن = السرعة، وميل منحنى السرعة والزمن = التسارع، والمساحة تحت منحنى السرعة = الإزاحة.', 'In physics: slope of x–t = velocity, slope of v–t = acceleration, area under v–t = displacement.']
+      ],
+      example: { q: 'A v–t line passes through (2 s, 4 m/s) and (6 s, 16 m/s). Acceleration?', steps: ['slope = {{16 − 4 // 6 − 2}}', 'slope = {{12 // 4}} = 3', 'a = 3 m/s²'], ans: '3 m/s²' },
+      gen: () => pick([
+        () => { const x1 = R(0, 4), x2 = x1 + R(2, 6), m = R(-5, 8, 1) || 2, b = R(-10, 10); const y1 = m * x1 + b, y2 = m * x2 + b; return { q: `A straight line passes through (${x1}, ${sig(y1)}) and (${x2}, ${sig(y2)}). Slope?`, num: m, tol: 0.01, unit: '', sol: `slope = {{${sig(y2)} − ${sig(y1)} // ${x2} − ${x1}}} = ${m}` }; },
+        () => { const t1 = R(0, 3), t2 = t1 + R(2, 6), a = R(1, 5, 1), v0 = R(0, 10); return { q: `On a v–t graph the line passes through (${t1} s, ${sig(v0 + a * t1)} m/s) and (${t2} s, ${sig(v0 + a * t2)} m/s). Acceleration?`, num: a, tol: 0.01, unit: 'm/s²', sol: `a = slope = {{Δv // Δt}} = ${a} m/s²` }; },
+        () => { const m = R(2, 9), b = R(-5, 5), x = R(1, 10); return { q: `y = ${m}x ${b < 0 ? '−' : '+'} ${Math.abs(b)}. What is y when x = ${x}?`, num: m * x + b, tol: 0.001, unit: '', sol: `y = ${m} × ${x} ${b < 0 ? '−' : '+'} ${Math.abs(b)} = ${m * x + b}` }; },
+        () => { const v = R(2, 12), t = R(2, 10); return { q: `A car moves at a constant ${v} m/s for ${t} s. Area under its v–t graph (its displacement)?`, num: v * t, tol: 0.001, unit: 'm', sol: `rectangle area = ${v} × ${t} = ${v * t} m` }; }
+      ])()
+    },
+    {
+      id: 'f9', title: 'Derivatives: the power rule', ar: 'الاشتقاق بقاعدة القوة',
+      uses: [['ch3-l2', 'v = dx/dt'], ['ch3-l3', 'a = dv/dt'], ['ch5-l4', 'P = dW/dt'], ['ch9-l1', 'I = dq/dt']],
+      explain: [
+        ['قاعدة القوة: مشتقة tⁿ هي n tⁿ⁻¹ ، أي ننزل الأس ضاربًا ثم نطرح من الأس واحدًا. مشتقة الثابت = صفر، ومشتقة t = 1.', 'Power rule: the derivative of tⁿ is n tⁿ⁻¹. The derivative of a constant is 0, of t is 1.'],
+        ['المعامل يبقى مضروبًا: مشتقة 6t² = 12t ، ومشتقة 2t³ = 6t².', 'A coefficient stays: d/dt(6t²) = 12t, d/dt(2t³) = 6t².'],
+        ['السرعة = مشتقة الموقع، والتسارع = مشتقة السرعة. بعد الاشتقاق عوّض الزمن المطلوب.', 'Velocity = derivative of position, acceleration = derivative of velocity. Substitute the time after differentiating.']
+      ],
+      example: { q: 'x = 6t² − t + 1. Find v at t = 3 s.', steps: ['v = {{dx // dt}} = 12t − 1', 'v(3) = 12 × 3 − 1', 'v = 35 m/s'], ans: '35 m/s' },
+      gen: () => { const a = R(1, 4), b = R(-5, 5), c = R(-6, 6), d = R(0, 9), t = R(1, 5); const term = (k, s) => k === 0 ? '' : `${k < 0 ? ' − ' : ' + '}${Math.abs(k) === 1 && s ? '' : Math.abs(k)}${s}`;
+        const x = `${a}t³${term(b, 't²')}${term(c, 't')}${term(d, '')}`;
+        return pick([
+          () => ({ q: `x(t) = ${x} (m). Velocity at t = ${t} s?`, num: 3 * a * t * t + 2 * b * t + c, tol: 0.001, unit: 'm/s', sol: `v = {{dx // dt}} = ${3 * a}t²${term(2 * b, 't')}${term(c, '')} → v(${t}) = ${3 * a * t * t + 2 * b * t + c} m/s` }),
+          () => ({ q: `x(t) = ${x} (m). Acceleration at t = ${t} s?`, num: 6 * a * t + 2 * b, tol: 0.001, unit: 'm/s²', sol: `v = ${3 * a}t²${term(2 * b, 't')}${term(c, '')} → a = {{dv // dt}} = ${6 * a}t${term(2 * b, '')} → a(${t}) = ${6 * a * t + 2 * b} m/s²` })
+        ])(); }
+    },
+    {
+      id: 'f10', title: 'Quadratic equations', ar: 'المعادلة التربيعية',
+      uses: [['ch3-l4', 'time of flight when a body is thrown from a height'], ['ch8-l4', 'two capacitors from their series and parallel values']],
+      explain: [
+        ['المعادلة التربيعية شكلها a x² + b x + c = 0 ، وحلها بالقانون العام: x = {{−b ± √(b² − 4ac) // 2a}}.', 'A quadratic a x² + b x + c = 0 is solved by x = {{−b ± √(b² − 4ac) // 2a}}.'],
+        ['تعطي غالبًا جوابين. في الفيزياء الزمن لا يكون سالبًا، فنختار الجواب الموجب.', 'It usually gives two answers; a time cannot be negative, so keep the positive one.'],
+        ['تظهر في السقوط الحر عندما تكون هناك سرعة ابتدائية وارتفاع: ½ a t² + v_i t − Δx = 0.', 'It appears in free fall with a starting speed and a height: ½ a t² + v_i t − Δx = 0.']
+      ],
+      example: { q: 'Solve t² − 6t − 7 = 0 (time in s).', steps: ['a = 1, b = −6, c = −7', 't = {{6 ± √(36 + 28) // 2}} = {{6 ± 8 // 2}}', 't = 7 or t = −1 → t = 7 s'], ans: '7 s' },
+      gen: () => pick([
+        () => { const r1 = R(2, 12), r2 = -R(1, 9), b = -(r1 + r2), c = r1 * r2; return { q: `Solve t² ${b < 0 ? '−' : '+'} ${Math.abs(b)}t ${c < 0 ? '−' : '+'} ${Math.abs(c)} = 0. Positive root?`, num: r1, tol: 0.001, unit: 's', sol: `t = {{${-b} ± √(${b * b} ${c < 0 ? '+' : '−'} ${Math.abs(4 * c)}) // 2}} → t = ${r1} or ${r2}; keep ${r1} s` }; },
+        () => { const v = pick([4.9, 9.8, 14.7, 19.6]), T = R(2, 6); const h = +(v * T + 4.9 * T * T).toFixed(1); return { q: `A stone is thrown down at ${v} m/s from ${h} m. Time to reach the ground? (down +, g = 9.8)`, num: T, tol: 0.01, unit: 's', sol: `${h} = ${v}t + 4.9t² → 4.9t² + ${v}t − ${h} = 0 → t = {{−${v} + √(${v}² + 4·4.9·${h}) // 2·4.9}} = ${T} s` }; }
+      ])()
+    },
+    {
+      id: 'f11', title: 'Calculator, brackets & rounding', ar: 'الآلة الحاسبة والأقواس والتقريب',
+      uses: [['ch8-l1', 'k q₁q₂ ÷ r² needs brackets around the denominator'], ['ch10-l2', 'sin and sin⁻¹ in DEG mode'], ['ch1-l2', 'final answers to 3 significant figures']],
+      explain: [
+        ['ضع المقام كله بين قوسين: {{a // b × c}} تُكتب في الآلة a ÷ (b × c). بدون أقواس تقسم على b ثم تضرب في c فيخرج جواب خاطئ.', 'Put the whole denominator in brackets: {{a // b × c}} is typed a ÷ (b × c). Without brackets the calculator divides by b and then multiplies by c.'],
+        ['تأكد أن الآلة على وضع الدرجات DEG قبل حساب sin و cos و tan. علامة الخطأ: sin 30 تعطي −0.988 بدل 0.5.', 'Check DEG mode before sin, cos, tan: if sin 30 gives −0.988 the calculator is in radians.'],
+        ['لا تقرّب في منتصف الحل. قرّب الجواب النهائي فقط، عادة إلى ثلاثة أرقام معنوية: 0.0045678 ≈ 0.00457 ، و 123 456 ≈ 1.23 × 10⁵.', 'Do not round in the middle. Round only the final answer, usually to 3 significant figures.']
+      ],
+      example: { q: 'Compute {{9×10⁹ × 2×10⁻⁶ // 0.03²}}.', steps: ['Type: 9 EXP 9 × 2 EXP −6 ÷ ( 0.03 x² )', '= {{18 000 // 0.0009}}', '= 2 × 10⁷'], ans: '2 × 10⁷' },
+      gen: () => pick([
+        () => { const a = R(20, 200), b = R(2, 9), c = R(2, 9); return { q: `Compute {{${a} // ${b} × ${c}}}.`, num: a / (b * c), tol: 0.005, unit: '', sol: `${a} ÷ (${b} × ${c}) = ${sig(a / (b * c))}. Without brackets you would get ${sig(a / b * c)}.` }; },
+        () => { const x = R(1000, 99999) / pick([1, 10, 1e3, 1e5]); const r = sig(x); return { q: `Round ${x} to 3 significant figures.`, num: r, tol: 0.0004, unit: '', sol: `The first three digits that are not leading zeros: ${r}` }; },
+        () => mcq('How do you type {{6 // 2 × 3}} on a calculator?', '6 ÷ (2 × 3)', ['6 ÷ 2 × 3', '(6 ÷ 2) × 3', '6 × 2 ÷ 3'], 'The whole denominator goes in brackets; the answer is 1, not 9.'),
+        () => mcq('Your calculator gives sin 30 = −0.988. What is wrong?', 'It is in radian mode', ['Nothing, that is correct', 'The battery is low', 'You must type sin⁻¹'], 'sin 30° = 0.5. Switch to DEG mode.')
+      ])()
+    }
+  ];
+  // which foundation skills each chapter leans on (used for the "Are you ready?" check)
+  window.PREREQ = { ch1: ['f1', 'f2', 'f11'], ch2: ['f6', 'f7', 'f3'], ch3: ['f9', 'f8', 'f10', 'f3'], ch4: ['f3', 'f4', 'f6'], ch5: ['f6', 'f3', 'f4'], ch6: ['f5', 'f2', 'f3'], ch7: ['f3', 'f1', 'f11'], ch8: ['f1', 'f4', 'f11'], ch9: ['f5', 'f2', 'f4'], ch10: ['f6', 'f11', 'f3'] };
+
+  // problem language: phrases that hide numbers or tell you what to do
+  window.PHRASES = [
+    { sec: 'Hidden numbers · كلمات تخفي أرقامًا', rows: [
+      ['starts from rest / released from rest', 'يبدأ من السكون', 'v_i = 0'],
+      ['dropped', 'يُترك ليسقط', 'v_i = 0 and a = g downward'],
+      ['comes to rest / stops', 'يتوقف', 'v_f = 0'],
+      ['maximum height / highest point', 'أقصى ارتفاع', 'v = 0 at the top'],
+      ['thrown vertically upward', 'قُذف رأسيًا لأعلى', 'up is +, so a = −g'],
+      ['returns to the same level', 'يعود إلى المستوى نفسه', 'Δy = 0, flight time = 2 t_max'],
+      ['constant velocity / uniform motion', 'سرعة ثابتة', 'a = 0 and ΣF = 0'],
+      ['constant acceleration', 'تسارع ثابت', 'the equations 3.6–3.8 apply'],
+      ['at rest / in equilibrium', 'ساكن / متزن', 'ΣF = 0'],
+      ['frictionless / smooth surface', 'أملس / بدون احتكاك', 'no friction force'],
+      ['neglect air resistance / free fall', 'أهمل مقاومة الهواء / سقوط حر', 'a = g = 9.8 m/s²'],
+      ['uniform electric field', 'مجال كهربائي منتظم', 'E is the same everywhere, ΔV = Ed'],
+      ['point charge', 'شحنة نقطية', 'use {{k q // r²}} and {{k q // r}}'],
+      ['in vacuum / in air', 'في الفراغ / في الهواء', 'n = 1 and ε₀ for capacitors'],
+      ['insulated container', 'وعاء معزول', 'heat lost = heat gained'],
+      ['identical resistors / capacitors', 'مقاومات أو مكثفات متماثلة', 'all have the same value: nR, {{R // n}}'],
+      ['diameter', 'القطر', 'halve it: r = {{d // 2}}']
+    ] },
+    { sec: 'Question words · أفعال السؤال', rows: [
+      ['find / calculate / determine', 'أوجد / احسب / حدد', 'a number with its unit'],
+      ['estimate', 'قدّر', 'a rough value is enough'],
+      ['show that / prove', 'أثبت / بيّن أن', 'reach the given result step by step'],
+      ['verify / check', 'تحقق', 'test it, e.g. with dimensions'],
+      ['derive', 'اشتق', 'build the formula from laws you know'],
+      ['magnitude and direction', 'المقدار والاتجاه', 'two answers: a size and an angle'],
+      ['express in SI units', 'عبّر بوحدات النظام الدولي', 'convert to m, kg, s, A, K'],
+      ['compare / ratio', 'قارن / النسبة', 'divide one by the other']
+    ] },
+    { sec: 'Linking words · كلمات الربط', rows: [
+      ['respectively', 'على الترتيب', 'values match the names in the same order'],
+      ['per', 'لكل', 'divide: km per hour = km/h'],
+      ['rate of …', 'معدل …', '… divided by time'],
+      ['directly proportional to', 'يتناسب طرديًا مع', 'y ∝ x'],
+      ['inversely proportional to', 'يتناسب عكسيًا مع', 'y ∝ {{1 // x}}'],
+      ['net / resultant', 'المحصلة', 'the vector sum of all of them'],
+      ['initial / final', 'ابتدائي / نهائي', 'subscripts i and f'],
+      ['average / instantaneous', 'متوسط / لحظي', '{{Δx // Δt}} versus {{dx // dt}}'],
+      ['twice / doubled / halved', 'الضعف / يتضاعف / يتنصف', '× 2 or ÷ 2'],
+      ['perpendicular / parallel', 'متعامد / موازٍ', 'at 90° / at 0°']
+    ] }
+  ];
 })();
 
 /* Serway & Jewett, Physics for Scientists and Engineers, 9th ed. — links per lesson (🔗 external reference, NOT course content).
@@ -3085,7 +3380,7 @@ window.SERWAY = {
 
   // ---------- state ----------
   const KEY = 'physics-learning-lab-v1';
-  const blank = () => ({ lessons: {}, mistakes: [], cards: {}, exams: [], days: {}, plan: null, prefs: { ar: true, theme: 'light' } });
+  const blank = () => ({ lessons: {}, mistakes: [], cards: {}, exams: [], days: {}, plan: null, found: {}, placement: null, prefs: { ar: true, theme: 'light' } });
   let S;
   try { S = Object.assign(blank(), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { S = blank(); }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
@@ -3218,6 +3513,9 @@ window.SERWAY = {
     const dev = ls.find(l => { const m = mastery(l.id); return m != null && m < 80; });
     const next = ls.find(l => mastery(l.id) == null);
     if (dev && (!next || ls.indexOf(dev) < ls.indexOf(next))) return { l: dev, why: `You are close on “${dev.title}” (${mastery(dev.id)}%). One more quiz attempt should lock it in.`, whyAr: 'أنت قريب من الإتقان؛ محاولة أخرى في الاختبار تكفي.' };
+    if (!S.placement && !ls.some(l => mastery(l.id) != null)) return { href: '#placement', label: 'Take the placement test', why: 'New here? A 15‑minute placement test checks the maths and reading skills the course assumes, then tells you where to start.', whyAr: 'أول مرة؟ اختبار تحديد المستوى (ربع ساعة) يقيس المهارات التي يفترضها المقرر، ثم يخبرك من أين تبدأ.' };
+    if (next) { const gap = (PREREQ[next.ch.id] || []).map(skillById).find(k => { const m = skillScore(k.id); return m != null && m < 80; });
+      if (gap) return { href: `#skill/${gap.id}`, label: `Open: ${gap.title}`, why: `Before “${next.title}”, strengthen a skill chapter ${next.ch.n} needs: “${gap.title}” (${skillScore(gap.id)}%).`, whyAr: `قبل هذا الدرس قوِّ مهارة يحتاجها الفصل: ${gap.ar}.` }; }
     if (next) return { l: next, why: `Next topic in the course order: “${next.title}”.`, whyAr: 'الموضوع التالي حسب ترتيب المقرر.' };
     return { l: null, why: 'All lessons are at 80% or more. Use the Exam simulator to train under time pressure.', whyAr: 'أتقنت كل الدروس؛ تدرّب الآن على محاكي الاختبار.' };
   }
@@ -3248,13 +3546,14 @@ window.SERWAY = {
       <div class="card">
         <h3 style="margin-top:0">🎯 Recommended next step</h3>
         <p>${r.why}</p><div class="ar">${r.whyAr}</div>
-        ${r.l ? `<a class="btn" href="#lesson/${r.l.id}">Open: ${esc(r.l.title)}</a>` : `<a class="btn" href="#exam">Open the exam simulator</a>`}
+        ${r.href ? `<a class="btn" href="${r.href}">${esc(r.label)}</a>` : r.l ? `<a class="btn" href="#lesson/${r.l.id}">Open: ${esc(r.l.title)}</a>` : `<a class="btn" href="#exam">Open the exam simulator</a>`}
         ${S.mistakes.filter(m => !m.reviewed).length ? ` <a class="btn ghost" href="#mistakes">Review ${S.mistakes.filter(m => !m.reviewed).length} mistakes</a>` : ''}
       </div>
       <h2>Chapters</h2>
       <div class="grid g2">${COURSE.map(c => { const cm = chapterMastery(c); return `<a class="card" style="text-decoration:none;color:inherit" href="#chapter/${c.id}"><div class="chap"><div><b>Ch ${c.n}. ${esc(c.title)}</b><div class="muted" style="font-size:13px">${c.lessons.length} lessons · <bdi>${c.ar}</bdi></div></div><b>${cm.avg}%</b></div>${bar(cm.avg)}</a>`; }).join('')}</div>
       <h2>How to use this tutor <span class="pill add">🧩</span></h2>
       <div class="card"><ol class="clean">
+        <li>New to the course? Take the <a href="#placement">Placement test</a>, then study the <a href="#found">Unit 0</a> skills it marks.</li>
         <li>Open the recommended lesson and go through the 14 steps in order.</li>
         <li>Answer the quick checks and the short quiz <b>before</b> looking at solutions; your answers update your mastery.</li>
         <li>Every wrong answer goes to the <a href="#mistakes">Mistake journal</a>. Clear it weekly.</li>
@@ -3268,6 +3567,7 @@ window.SERWAY = {
     const cm = chapterMastery(c);
     return `<h1>Chapter ${c.n}: ${esc(c.title)}</h1><p class="sub"><bdi>${c.ar}</bdi> · ${srcPill(c.src)}</p>
       <div class="card"><div class="chap"><b>Chapter mastery</b><b>${cm.avg}%</b></div>${bar(cm.avg)}</div>
+      ${readyBox(c)}
       ${c.lessons.map((l, i) => { const m = mastery(l.id); const [lv, cls] = level(m); return `<a class="lessonlink" href="#lesson/${l.id}"><span><b>${c.n}.${i + 1} ${esc(l.title)}</b><br><small class="muted">${l.ar}</small></span><span class="row"><span class="${cls}">${lv}${m != null ? ' · ' + m + '%' : ''}</span></span></a>`; }).join('')}
       <div class="row noprint" style="margin-top:14px"><a class="btn ghost" href="#exam/${c.id}">Chapter exam</a><a class="btn ghost" href="#practice/${c.id}">Unlimited practice</a><a class="btn ghost" href="#formulas/${c.id}">Formula sheet</a></div>`;
   };
@@ -3452,13 +3752,23 @@ window.SERWAY = {
     }));
     return cards;
   }
-  function dueCards(chId) { const now = Date.now(); return allCards().filter(c => (!chId || c.ch === chId) && (!S.cards[c.id] || S.cards[c.id].due <= now)); }
+  // one card per rearranged form: "how do you find R in Ohm's law?" (own deck, so the regular decks stay the same size)
+  function formCards() {
+    const cards = [];
+    COURSE.forEach(c => c.lessons.forEach(l => l.formulas.forEach((f, i) => (FM(l, i) || []).forEach((x, k) => {
+      if (x.base) return;
+      cards.push({ id: `${l.id}-f${i}-v${k}`, ch: c.id, form: true, front: `<div class="muted" style="font-size:13px">Law form · Ch ${c.n} · ${esc(l.title)}</div><div class="formula">${f.f}</div><b>How do you find ${x.find}?</b><div class="muted" style="font-size:14px">${x.en}</div><div class="ar" style="text-align:center">${x.ar}</div>`,
+        back: `<div class="formula">${x.f}</div>${chain(x.steps)}<div style="font-size:14px">${x.how}</div><div class="ar" style="text-align:center">${x.howAr}</div>` });
+    }))));
+    return cards;
+  }
+  function dueCards(chId) { const now = Date.now(); return (chId === 'forms' ? formCards() : allCards()).filter(c => (!chId || chId === 'forms' || c.ch === chId) && (!S.cards[c.id] || S.cards[c.id].due <= now)); }
   views.flashcards = (chId) => {
     const opts = COURSE.map(c => `<option value="${c.id}" ${c.id === chId ? 'selected' : ''}>Ch ${c.n}. ${esc(c.title)}</option>`).join('');
     const boxes = [0, 0, 0, 0, 0, 0]; allCards().forEach(c => boxes[(S.cards[c.id] || { box: 0 }).box]++);
     return `<h1>Flashcards</h1><p class="sub">Spaced repetition (Leitner boxes): cards you know come back later, cards you miss come back today. ${ADD}</p>
       <div class="ar">البطاقات التعليمية بالتكرار المتباعد: ما تعرفه يعود بعد أيام، وما تخطئ فيه يعود اليوم.</div>
-      <div class="card row noprint"><label>Deck <select id="fch"><option value="">All chapters</option>${opts}</select></label><span class="muted">Boxes: ${boxes.map((b, i) => `${i}:${b}`).join(' · ')}</span></div>
+      <div class="card row noprint"><label>Deck <select id="fch"><option value="">All chapters</option>${opts}<option value="forms" ${chId === 'forms' ? 'selected' : ''}>🔀 Law forms: how do I find…? (all chapters)</option></select></label><span class="muted">Boxes: ${boxes.map((b, i) => `${i}:${b}`).join(' · ')}</span></div>
       <div id="fbox"></div>`;
   };
   function afterFlash(chId) {
@@ -3694,6 +4004,7 @@ window.SERWAY = {
       <h2>Lessons</h2><div class="card"><table><tr><th>Lesson</th><th>Quiz best</th><th>Attempts</th><th>Mastery</th></tr>${ls.map(l => { const st = S.lessons[l.id] || {}; const m = mastery(l.id); const [lv, cls] = level(m); return `<tr><td>${l.ch.n}. ${esc(l.title)}</td><td>${st.quizBest != null ? st.quizBest + '%' : '—'}</td><td>${st.quizAttempts || 0}</td><td><span class="${cls}">${lv}${m != null ? ' ' + m + '%' : ''}</span></td></tr>`; }).join('')}</table></div>
       <h2>Study time (last 14 days)</h2><div class="card"><svg viewBox="0 0 700 160" width="100%" role="img" aria-label="Minutes studied per day">${last14.map((x, k) => { const h = x[1] / maxM * 120; return `<rect x="${k * 50 + 8}" y="${130 - h}" width="34" height="${h}" rx="4" fill="var(--brand)"><title>${x[0]}: ${x[1]} min</title></rect><text x="${k * 50 + 25}" y="148" font-size="11" text-anchor="middle" fill="var(--muted)">${x[0]}</text>${x[1] ? `<text x="${k * 50 + 25}" y="${124 - h}" font-size="11" text-anchor="middle" fill="var(--ink)">${x[1]}</text>` : ''}`; }).join('')}</svg></div>
       <h2>Where mistakes happen</h2><div class="card">${Object.keys(mByCh).length ? `<table>${Object.entries(mByCh).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<tr><td>${esc(k)}</td><td><b>${v}</b></td></tr>`).join('')}</table>` : 'No mistakes recorded yet.'}</div>
+      <h2>Unit 0: Foundations</h2><div class="card"><table><tr><th>Skill</th><th>Level</th><th style="width:35%"></th></tr>${SKILLS().map(k => `<tr><td><a href="#skill/${k.id}">${esc(k.title)}</a></td><td>${skillPill(k.id)}</td><td>${bar(skillScore(k.id))}</td></tr>`).join('')}</table>${S.placement ? `<p class="muted">Placement test: ${S.placement.pct}% on ${new Date(S.placement.ts).toLocaleDateString()}</p>` : '<p class="muted">Placement test not taken yet.</p>'}</div>
       <h2>Recommendations</h2><div class="card"><ul class="clean">${weak.length ? weak.map(x => `<li>Review <a href="#lesson/${x.l.id}">${esc(x.l.title)}</a> (${x.m}%)</li>`).join('') : '<li>No lesson below 60%. Keep going.</li>'}<li>${recommend().why}</li></ul></div>`;
   };
   function afterReport() {
@@ -3736,6 +4047,7 @@ window.SERWAY = {
       const hay = [l.title, l.ar, ...l.terms.map(t => t.join(' ')), ...l.formulas.map(f => f.name + ' ' + f.f)].join(' ').replace(/<[^>]+>/g, '').toLowerCase();
       if (hay.includes(qs)) out.push(`<a href="#lesson/${l.id}">Ch ${l.ch.n} · ${esc(l.title)}</a>`);
     });
+    SKILLS().forEach(k => { if ((k.title + ' ' + k.ar).toLowerCase().includes(qs)) out.push(`<a href="#skill/${k.id}">Unit 0 · ${esc(k.title)}</a>`); });
     return out.slice(0, 12);
   }
 
@@ -3744,11 +4056,120 @@ window.SERWAY = {
 
   // ---------- router ----------
   const NAV = [['home', '🏠 Home', 'الرئيسية'], ['course', '📚 Course map', 'خريطة المقرر'], ['practice', '♾️ Unlimited practice', 'تدريب'], ['exam', '⏱️ Exam simulator', 'محاكي الاختبار'], ['flashcards', '🃏 Flashcards', 'البطاقات'], ['mistakes', '📓 Mistake journal', 'دفتر الأخطاء'], ['formulas', '∑ Formula sheet', 'القوانين'], ['rearrange', '🔀 Rearranging laws', 'ترتيب القوانين'], ['tools', '🧰 Tools', 'أدوات'], ['plan', '🗓️ Study planner', 'مخطط المذاكرة'], ['report', '📈 Progress report', 'تقرير الإنجاز'], ['sources', '📘 Sources & gaps', 'المصادر']];
+  // ---------- Unit 0: foundation skills, placement test, readiness checks (content_found.js) ----------
+  const SKILLS = () => window.FOUND || [];
+  const skillById = id => SKILLS().find(k => k.id === id);
+  function skillScore(id) { const st = S.found[id]; if (st && st.best != null) return st.best; const p = S.placement && S.placement.res[id]; return p ? Math.round(p[0] / p[1] * 100) : null; }
+  const skillPill = id => { const m = skillScore(id); const [lv, cls] = level(m); return `<span class="${cls}">${lv}${m != null ? ' · ' + m + '%' : ''}</span>`; };
+  const usesLinks = k => k.uses.map(u => u[0] === 'lab' ? `<a href="Virtual_Lab.html">⚗ Virtual lab</a> <span class="muted">(${u[1]})</span>` : `<a href="#lesson/${u[0]}">${esc(lessonById(u[0]).title)}</a> <span class="muted">(${u[1]})</span>`).join('<br>');
+  function readyBox(c) {
+    const ks = (PREREQ[c.id] || []).map(skillById).filter(Boolean); if (!ks.length) return '';
+    return `<div class="card ready"><h3 style="margin-top:0">🧱 Are you ready for this chapter? <span class="muted" style="font-weight:400">· هل أنت جاهز؟</span></h3>
+      <div class="ar">هذا الفصل يعتمد على هذه المهارات من الوحدة صفر. حل سؤالًا واحدًا لكل مهارة لتعرف هل تحتاج مراجعتها قبل البدء.</div>
+      ${ks.map(k => `<div class="lessonlink"><span><a href="#skill/${k.id}"><b>${esc(k.title)}</b></a><br><small class="muted">${k.ar}</small></span>${skillPill(k.id)}</div>`).join('')}
+      <div class="row noprint" style="margin-top:8px"><button class="btn small" id="rdygo" data-ch="${c.id}">Quick readiness check (${ks.length} questions)</button></div><div id="rdybox"></div></div>`;
+  }
+  function afterChapter(id) {
+    const b = $('#rdygo'); if (!b) return;
+    b.onclick = () => {
+      b.disabled = true; const ks = PREREQ[id].map(skillById); const items = ks.map(k => k.gen()); const res = {};
+      $('#rdybox').innerHTML = items.map((it, i) => `<div data-rd="${i}"><div class="muted" style="font-size:13px;margin-top:8px">${esc(ks[i].title)}</div>${qHTML(it, 'rd' + i)}</div>`).join('') + '<div id="rdyres"></div>';
+      checkAllBtn($('#rdyres'), items.map((it, i) => wireQ(document.querySelector(`[data-rd="${i}"]`), it, ok => { res[ks[i].id] = ok; if (!ok) logMistake(it, '(readiness)', null); }, { deferred: true })), () => {
+        const miss = ks.filter(k => !res[k.id]);
+        $('#rdyres').innerHTML = `<div class="card">${miss.length ? `<b>Review before you start:</b> ${miss.map(k => `<a href="#skill/${k.id}">${esc(k.title)}</a>`).join(' · ')}<div class="ar">راجع هذه المهارات قبل البدء بالفصل: ${miss.map(k => k.ar).join('، ')}.</div>` : '<b>✔ You are ready. Start the first lesson.</b><div class="ar">أنت جاهز، ابدأ بالدرس الأول.</div>'}</div>`;
+      });
+    };
+  }
+  views.found = () => `<h1>Unit 0: Foundations <span class="muted" style="font-size:18px;font-weight:400">· الوحدة صفر: التأسيس</span></h1>
+    <p class="sub">The maths and reading skills the course uses without teaching them. ${ADD}</p>
+    <div class="ar">مقرر الفيزياء يفترض أنك تعرف هذه المهارات (سجل الفجوات G‑03). كل مهارة فيها شرح عربي مبسط، ومثال محلول، وتمارين بأرقام جديدة كل مرة، وروابط للدروس التي تستخدمها.</div>
+    <div class="card row" style="justify-content:space-between"><span>${S.placement ? `Placement test taken on ${new Date(S.placement.ts).toLocaleDateString()}: <b>${S.placement.pct}%</b>` : 'Not sure where to start? Take the placement test first.'}</span><a class="btn ${S.placement ? 'ghost' : ''}" href="#placement">${S.placement ? 'Retake placement test' : 'Placement test'}</a></div>
+    <div class="grid g2">${SKILLS().map((k, i) => `<a class="card" style="text-decoration:none;color:inherit" href="#skill/${k.id}"><div class="chap"><div><b>0.${i + 1} ${esc(k.title)}</b><div class="muted" style="font-size:13px"><bdi>${k.ar}</bdi></div></div>${skillPill(k.id)}</div>${bar(skillScore(k.id))}<div class="muted" style="font-size:12.5px;margin-top:6px">Used in: ${k.uses.map(u => u[0] === 'lab' ? 'lab' : 'Ch ' + lessonById(u[0]).ch.n).filter((x, j, a) => a.indexOf(x) === j).join(', ')}</div></a>`).join('')}</div>`;
+  views.skill = id => {
+    const k = skillById(id); if (!k) return views.found();
+    const i = SKILLS().indexOf(k), nx = SKILLS()[i + 1];
+    return `<div class="row muted" style="font-size:13px"><a href="#found">Unit 0: Foundations</a> › skill</div>
+      <h1>0.${i + 1} ${esc(k.title)}</h1><p class="sub"><bdi>${k.ar}</bdi> · ${ADD} ${skillPill(id)}</p>
+      <div class="card"><h3 style="margin-top:0">📖 Explanation · الشرح</h3>${k.explain.map(e => `<div class="ar">${e[0]}</div><p class="en-help">${e[1]}</p>`).join('')}
+      ${k.link ? `<a class="btn small ghost" href="${k.link}">Full guide: rearranging laws</a>` : ''}</div>
+      <div class="card"><h3 style="margin-top:0">✏️ Worked example · مثال محلول</h3><p><b>${k.example.q}</b></p><ol class="clean">${k.example.steps.map(x => `<li>${x}</li>`).join('')}</ol><p><b>Answer:</b> ${k.example.ans}</p></div>
+      <div class="card"><h3 style="margin-top:0">🎯 Practice: 5 fresh questions · تدريب</h3><div class="ar">أجب عن الأسئلة كلها ثم اضغط «تحقق». 4 من 5 تعني أنك أتقنت المهارة.</div><div id="skq"></div><div id="skres"></div></div>
+      <div class="card"><h3 style="margin-top:0">📍 Where the course uses it · أين تحتاجها في المقرر</h3>${usesLinks(k)}</div>
+      <div class="row noprint" style="justify-content:space-between;margin-top:18px"><a class="btn ghost" href="#found">← Unit 0</a>${nx ? `<a class="btn ghost" href="#skill/${nx.id}">${esc(nx.title)} →</a>` : `<a class="btn ghost" href="#lesson/ch1-l1">Start Chapter 1 →</a>`}</div>`;
+  };
+  function afterSkill(id) {
+    const k = skillById(id); if (!k) return;
+    const run = () => {
+      const items = [0, 1, 2, 3, 4].map(() => k.gen()); const res = {};
+      $('#skres').innerHTML = '';
+      $('#skq').innerHTML = items.map((it, i) => `<div data-sk="${i}">${qHTML(it, 'sk' + i)}</div>`).join('');
+      checkAllBtn($('#skq'), items.map((it, i) => wireQ(document.querySelector(`[data-sk="${i}"]`), it, (ok, given) => { res[i] = ok; if (!ok) logMistake(it, given, null); }, { deferred: true })), () => {
+        const pct = Math.round(Object.values(res).filter(Boolean).length / items.length * 100);
+        const st = S.found[id] = S.found[id] || {}; st.best = Math.max(st.best ?? 0, pct); st.last = pct; st.n = (st.n || 0) + 1; save();
+        $('#skres').innerHTML = `<div class="card"><b>Score: ${pct}%</b> (best ${st.best}%) ${pct >= 80 ? '✔ Mastered.' : 'Read the explanation again and try a new set.'}<div class="ar">${pct >= 80 ? 'ممتاز، أتقنت هذه المهارة.' : 'أعد قراءة الشرح والمثال، ثم جرّب مجموعة جديدة.'}</div><button class="btn small ghost" id="sknew">New set of questions</button></div>`;
+        $('#sknew').onclick = () => { document.querySelectorAll('.checkall').forEach(x => x.closest('.row').remove()); run(); };
+      });
+    };
+    run();
+  }
+  views.placement = () => `<h1>Placement test <span class="muted" style="font-size:18px;font-weight:400">· اختبار تحديد المستوى</span></h1>
+    <p class="sub">${SKILLS().length * 2} questions, two on each foundation skill. No timer, no feedback until the end. ${ADD}</p>
+    <div class="ar">سؤالان على كل مهارة من مهارات الوحدة صفر. أجب بصدق ولا تستعجل، والنتيجة تحدد لك من أين تبدأ: المهارات التي تتقنها تتخطاها، والباقي تراجعه قبل فصوله.</div>
+    <div id="plbox"><button class="btn" id="plgo">Start the placement test</button></div>`;
+  function afterPlacement() {
+    $('#plgo').onclick = () => {
+      const qs = []; SKILLS().forEach(k => { qs.push({ k, it: k.gen() }); qs.push({ k, it: k.gen() }); });
+      const ans = {};
+      $('#plbox').innerHTML = qs.map((x, i) => `<div data-pl="${i}"><div class="muted" style="font-size:13px;margin-top:10px">Q${i + 1} · ${esc(x.k.title)}</div>${qHTML(x.it, 'pl' + i)}</div>`).join('') + '<div id="plres"></div>';
+      const hs = qs.map((x, i) => wireQ(document.querySelector(`[data-pl="${i}"]`), x.it, (ok, given) => { ans[i] = { ok, given }; }, { deferred: true, silent: true, hideSol: true }));
+      const b = document.createElement('button'); b.className = 'btn'; b.textContent = 'Finish and see my plan · أنهِ الاختبار'; b.style.marginTop = '12px'; $('#plres').before(b);
+      b.onclick = () => {
+        hs.forEach(h => h.check());
+        const res = {}; qs.forEach((x, i) => { const r = res[x.k.id] = res[x.k.id] || [0, 0]; r[1]++; if (ans[i] && ans[i].ok) r[0]++; else logMistake(x.it, ans[i] ? ans[i].given : '(blank)', null); });
+        const good = Object.values(res).reduce((a, r) => a + r[0], 0), pct = Math.round(good / qs.length * 100);
+        S.placement = { ts: Date.now(), res, pct }; save(); b.remove();
+        const weak = SKILLS().filter(k => res[k.id][0] < 2);
+        $('#plbox').innerHTML = `<div class="card"><h2 style="margin-top:0">Result: ${pct}% (${good}/${qs.length})</h2><table><tr><th>Skill</th><th>Correct</th><th>Next step</th></tr>${SKILLS().map(k => { const r = res[k.id]; return `<tr><td><a href="#skill/${k.id}">${esc(k.title)}</a><br><small class="muted">${k.ar}</small></td><td><b>${r[0]}/${r[1]}</b></td><td>${r[0] === 2 ? '<span class="pill ok">skip it</span>' : r[0] === 1 ? '<span class="pill warn">quick review</span>' : '<span class="pill bad">study it</span>'}</td></tr>`; }).join('')}</table>
+          ${weak.length ? `<p><b>Your plan:</b> study ${weak.map(k => `<a href="#skill/${k.id}">${esc(k.title)}</a>`).join(', ')}, then start Chapter 1. Each chapter page also shows which of these it needs.</p><div class="ar">خطتك: راجع المهارات المعلَّمة أعلاه بالترتيب، ثم ابدأ الفصل الأول. وصفحة كل فصل تذكّرك بالمهارات التي يحتاجها.</div><a class="btn" href="#skill/${weak[0].id}">Start with: ${esc(weak[0].title)}</a>` : `<p><b>Your foundations are solid.</b> Start Chapter 1.</p><div class="ar">أساسك قوي، ابدأ الفصل الأول مباشرة.</div><a class="btn" href="#lesson/ch1-l1">Start Chapter 1</a>`}
+          <p class="muted" style="font-size:13px">Wrong answers were added to your mistake journal.</p></div>`;
+        window.scrollTo(0, 0);
+      };
+    };
+  }
+  // ---------- glossary & problem language ----------
+  views.glossary = () => `<h1>Course glossary <span class="muted" style="font-size:18px;font-weight:400">· قاموس المقرر</span></h1>
+    <p class="sub">Every English term from the lessons with its Arabic and meaning. <span class="pill src">📘 terms from the lessons</span></p>
+    <div class="ar">كل المصطلحات الإنجليزية في الدروس مع معناها بالعربي. ابحث بالعربي أو بالإنجليزي.</div>
+    <div class="card row noprint"><input id="gq" class="search" style="width:260px" placeholder="Search · ابحث"><select id="gch"><option value="">All chapters</option>${COURSE.map(c => `<option value="${c.id}">Ch ${c.n}. ${esc(c.title)}</option>`).join('')}</select><span class="muted" id="gn"></span></div>
+    <div class="card"><table id="gtab"><tr><th>Term</th><th class="arcell">بالعربية</th><th>Meaning</th><th>Lesson</th></tr>${allLessons().flatMap(l => l.terms.map(t => `<tr data-ch="${l.ch.id}" data-h="${esc((t.join(' ')).toLowerCase())}"><td><b>${t[0]}</b></td><td class="arcell">${t[1]}</td><td>${t[2]}</td><td><a href="#lesson/${l.id}">${l.ch.n}. ${esc(l.title)}</a></td></tr>`)).join('')}</table></div>`;
+  function afterGlossary() {
+    const f = () => { const q = $('#gq').value.trim().toLowerCase(), ch = $('#gch').value; let n = 0; document.querySelectorAll('#gtab tr[data-h]').forEach(r => { const ok = (!ch || r.dataset.ch === ch) && (!q || r.dataset.h.includes(q)); r.style.display = ok ? '' : 'none'; if (ok) n++; }); $('#gn').textContent = `${n} terms`; };
+    $('#gq').oninput = f; $('#gch').onchange = f; f();
+  }
+  views.phrases = () => `<h1>Problem language <span class="muted" style="font-size:18px;font-weight:400">· لغة المسائل</span></h1>
+    <p class="sub">Words in an English problem that hide a number or tell you what to do. ${ADD}</p>
+    <div class="ar">كثير من الأخطاء سببها فهم السؤال لا الفيزياء. هذه الكلمات تتكرر في أسئلة المقرر، وبعضها يعطيك رقمًا دون أن يكتبه، مثل from rest التي تعني أن السرعة الابتدائية صفر.</div>
+    ${PHRASES.map(g => `<div class="card"><h3 style="margin-top:0">${g.sec}</h3><table><tr><th>In the problem</th><th class="arcell">بالعربية</th><th>What it tells you</th></tr>${g.rows.map(r => `<tr><td><b>${r[0]}</b></td><td class="arcell">${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</table></div>`).join('')}
+    <div class="card"><h3 style="margin-top:0">Drill · تدريب</h3><div id="phbox"></div></div>`;
+  function afterPhrases() {
+    const rows = PHRASES.flatMap(g => g.rows); let score = 0, total = 0;
+    const next = () => {
+      const r = pick(rows), o = shuffle([r[2], ...shuffle(rows.filter(x => x[2] !== r[2])).slice(0, 3).map(x => x[2])]);
+      const item = { q: `In a problem you read “<b>${r[0]}</b>”. What does it tell you?`, o, a: o.indexOf(r[2]), why: `${r[0]} = ${r[1]} → ${r[2]}` };
+      $('#phbox').innerHTML = qHTML(item, 'ph') + `<div class="row" style="margin-top:8px"><button class="btn small" id="phnext">Next</button><span class="muted" id="phs">${score}/${total}</span></div>`;
+      wireQ($('#phbox'), item, ok => { total++; if (ok) score++; $('#phs').textContent = `${score}/${total}`; });
+      $('#phnext').onclick = next;
+    };
+    next();
+  }
+
+  const FNAV = [['placement', '🧭 Placement test', 'تحديد المستوى'], ['found', '🧱 Unit 0: Foundations', 'الوحدة صفر'], ['glossary', '🔤 Course glossary', 'قاموس المقرر'], ['phrases', '🗝️ Problem language', 'لغة المسائل']];
   views.course = () => `<h1>Course map</h1><p class="sub">General Physics · 10 chapters as ordered in your textbook. <span class="pill src">📘 BK chapter openers</span></p>` + COURSE.map(c => { const cm = chapterMastery(c); return `<div class="card"><div class="chap"><a href="#chapter/${c.id}"><b>Ch ${c.n}. ${esc(c.title)}</b></a><span class="muted"><bdi>${c.ar}</bdi> · ${c.src}</span></div>${bar(cm.avg)}${c.lessons.map((l, i) => { const m = mastery(l.id); const [lv, cls] = level(m); return `<a class="lessonlink" href="#lesson/${l.id}"><span>${c.n}.${i + 1} ${esc(l.title)}</span><span class="${cls}">${lv}${m != null ? ' ' + m + '%' : ''}</span></a>`; }).join('')}</div>`; }).join('');
 
   function sidebar(active) {
     const chs = COURSE.map(c => { const cm = chapterMastery(c); return `<a href="#chapter/${c.id}" class="${active === 'chapter/' + c.id ? 'active' : ''}"><span>${c.n}. ${esc(c.title)}</span><small>${cm.avg}%</small></a>`; }).join('');
-    return NAV.map(n => `<a href="#${n[0]}" class="${active.split('/')[0] === n[0] ? 'active' : ''}"><span>${n[1]}</span><small>${n[2]}</small></a>`).join('') + `<div class="sec">Chapters</div>` + chs;
+    const link = n => `<a href="#${n[0]}" class="${active.split('/')[0] === n[0] || (n[0] === 'found' && active.startsWith('skill')) ? 'active' : ''}"><span>${n[1]}</span><small>${n[2]}</small></a>`;
+    return NAV.map(link).join('') + `<div class="sec">Foundation · التأسيس</div>` + FNAV.map(link).join('') + `<div class="sec">Chapters</div>` + chs;
   }
   function route() {
     const h = (location.hash || '#home').slice(1); const [v, arg] = h.split('/');
@@ -3762,6 +4183,11 @@ window.SERWAY = {
     if (v === 'mistakes') afterMistakes();
     if (v === 'tools') afterTools();
     if (v === 'rearrange') afterRearrange();
+    if (v === 'chapter') afterChapter(arg);
+    if (v === 'skill') afterSkill(arg);
+    if (v === 'placement') afterPlacement();
+    if (v === 'glossary') afterGlossary();
+    if (v === 'phrases') afterPhrases();
     if (v === 'plan') afterPlan();
     if (v === 'report') afterReport();
     window.scrollTo(0, 0);

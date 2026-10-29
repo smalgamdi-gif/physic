@@ -64,7 +64,7 @@ body.hide-ar .ar{display:none}
 table{border-collapse:collapse;width:100%;font-size:14.5px}
 th,td{border-bottom:1px solid var(--line);text-align:left;padding:7px 8px;vertical-align:top}
 th{color:var(--muted);font-weight:600;font-size:13px}
-td.arcell{direction:rtl;text-align:right}
+td.arcell,th.arcell{direction:rtl;text-align:right}
 body.hide-ar td.arcell, body.hide-ar th.arcell{display:none}
 ul.clean{padding-left:20px;margin:6px 0}
 .q{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:10px 0;background:var(--panel)}
@@ -155,3 +155,6 @@ ul.clean{padding-left:20px;margin:6px 0}
 .fchip b{color:var(--brand)}
 @media (max-width:860px){.formula.big{font-size:18px}.form .formula{font-size:16px}.chain{font-size:15px}.form{gap:8px}.form .find{min-width:44px;font-size:16px}}
 @media print{.form{break-inside:avoid}}
+.ar bdi[dir=ltr]{unicode-bidi:isolate}
+.en-help{margin:2px 0 12px;font-size:14.5px;color:var(--muted)}
+.ready .lessonlink{margin:6px 0}

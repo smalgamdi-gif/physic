@@ -4,7 +4,7 @@
 
   // ---------- state ----------
   const KEY = 'physics-learning-lab-v1';
-  const blank = () => ({ lessons: {}, mistakes: [], cards: {}, exams: [], days: {}, plan: null, prefs: { ar: true, theme: 'light' } });
+  const blank = () => ({ lessons: {}, mistakes: [], cards: {}, exams: [], days: {}, plan: null, found: {}, placement: null, prefs: { ar: true, theme: 'light' } });
   let S;
   try { S = Object.assign(blank(), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { S = blank(); }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ } };
@@ -137,6 +137,9 @@
     const dev = ls.find(l => { const m = mastery(l.id); return m != null && m < 80; });
     const next = ls.find(l => mastery(l.id) == null);
     if (dev && (!next || ls.indexOf(dev) < ls.indexOf(next))) return { l: dev, why: `You are close on “${dev.title}” (${mastery(dev.id)}%). One more quiz attempt should lock it in.`, whyAr: 'أنت قريب من الإتقان؛ محاولة أخرى في الاختبار تكفي.' };
+    if (!S.placement && !ls.some(l => mastery(l.id) != null)) return { href: '#placement', label: 'Take the placement test', why: 'New here? A 15‑minute placement test checks the maths and reading skills the course assumes, then tells you where to start.', whyAr: 'أول مرة؟ اختبار تحديد المستوى (ربع ساعة) يقيس المهارات التي يفترضها المقرر، ثم يخبرك من أين تبدأ.' };
+    if (next) { const gap = (PREREQ[next.ch.id] || []).map(skillById).find(k => { const m = skillScore(k.id); return m != null && m < 80; });
+      if (gap) return { href: `#skill/${gap.id}`, label: `Open: ${gap.title}`, why: `Before “${next.title}”, strengthen a skill chapter ${next.ch.n} needs: “${gap.title}” (${skillScore(gap.id)}%).`, whyAr: `قبل هذا الدرس قوِّ مهارة يحتاجها الفصل: ${gap.ar}.` }; }
     if (next) return { l: next, why: `Next topic in the course order: “${next.title}”.`, whyAr: 'الموضوع التالي حسب ترتيب المقرر.' };
     return { l: null, why: 'All lessons are at 80% or more. Use the Exam simulator to train under time pressure.', whyAr: 'أتقنت كل الدروس؛ تدرّب الآن على محاكي الاختبار.' };
   }
@@ -167,13 +170,14 @@
       <div class="card">
         <h3 style="margin-top:0">🎯 Recommended next step</h3>
         <p>${r.why}</p><div class="ar">${r.whyAr}</div>
-        ${r.l ? `<a class="btn" href="#lesson/${r.l.id}">Open: ${esc(r.l.title)}</a>` : `<a class="btn" href="#exam">Open the exam simulator</a>`}
+        ${r.href ? `<a class="btn" href="${r.href}">${esc(r.label)}</a>` : r.l ? `<a class="btn" href="#lesson/${r.l.id}">Open: ${esc(r.l.title)}</a>` : `<a class="btn" href="#exam">Open the exam simulator</a>`}
         ${S.mistakes.filter(m => !m.reviewed).length ? ` <a class="btn ghost" href="#mistakes">Review ${S.mistakes.filter(m => !m.reviewed).length} mistakes</a>` : ''}
       </div>
       <h2>Chapters</h2>
       <div class="grid g2">${COURSE.map(c => { const cm = chapterMastery(c); return `<a class="card" style="text-decoration:none;color:inherit" href="#chapter/${c.id}"><div class="chap"><div><b>Ch ${c.n}. ${esc(c.title)}</b><div class="muted" style="font-size:13px">${c.lessons.length} lessons · <bdi>${c.ar}</bdi></div></div><b>${cm.avg}%</b></div>${bar(cm.avg)}</a>`; }).join('')}</div>
       <h2>How to use this tutor <span class="pill add">🧩</span></h2>
       <div class="card"><ol class="clean">
+        <li>New to the course? Take the <a href="#placement">Placement test</a>, then study the <a href="#found">Unit 0</a> skills it marks.</li>
         <li>Open the recommended lesson and go through the 14 steps in order.</li>
         <li>Answer the quick checks and the short quiz <b>before</b> looking at solutions; your answers update your mastery.</li>
         <li>Every wrong answer goes to the <a href="#mistakes">Mistake journal</a>. Clear it weekly.</li>
@@ -187,6 +191,7 @@
     const cm = chapterMastery(c);
     return `<h1>Chapter ${c.n}: ${esc(c.title)}</h1><p class="sub"><bdi>${c.ar}</bdi> · ${srcPill(c.src)}</p>
       <div class="card"><div class="chap"><b>Chapter mastery</b><b>${cm.avg}%</b></div>${bar(cm.avg)}</div>
+      ${readyBox(c)}
       ${c.lessons.map((l, i) => { const m = mastery(l.id); const [lv, cls] = level(m); return `<a class="lessonlink" href="#lesson/${l.id}"><span><b>${c.n}.${i + 1} ${esc(l.title)}</b><br><small class="muted">${l.ar}</small></span><span class="row"><span class="${cls}">${lv}${m != null ? ' · ' + m + '%' : ''}</span></span></a>`; }).join('')}
       <div class="row noprint" style="margin-top:14px"><a class="btn ghost" href="#exam/${c.id}">Chapter exam</a><a class="btn ghost" href="#practice/${c.id}">Unlimited practice</a><a class="btn ghost" href="#formulas/${c.id}">Formula sheet</a></div>`;
   };
@@ -371,13 +376,23 @@
     }));
     return cards;
   }
-  function dueCards(chId) { const now = Date.now(); return allCards().filter(c => (!chId || c.ch === chId) && (!S.cards[c.id] || S.cards[c.id].due <= now)); }
+  // one card per rearranged form: "how do you find R in Ohm's law?" (own deck, so the regular decks stay the same size)
+  function formCards() {
+    const cards = [];
+    COURSE.forEach(c => c.lessons.forEach(l => l.formulas.forEach((f, i) => (FM(l, i) || []).forEach((x, k) => {
+      if (x.base) return;
+      cards.push({ id: `${l.id}-f${i}-v${k}`, ch: c.id, form: true, front: `<div class="muted" style="font-size:13px">Law form · Ch ${c.n} · ${esc(l.title)}</div><div class="formula">${f.f}</div><b>How do you find ${x.find}?</b><div class="muted" style="font-size:14px">${x.en}</div><div class="ar" style="text-align:center">${x.ar}</div>`,
+        back: `<div class="formula">${x.f}</div>${chain(x.steps)}<div style="font-size:14px">${x.how}</div><div class="ar" style="text-align:center">${x.howAr}</div>` });
+    }))));
+    return cards;
+  }
+  function dueCards(chId) { const now = Date.now(); return (chId === 'forms' ? formCards() : allCards()).filter(c => (!chId || chId === 'forms' || c.ch === chId) && (!S.cards[c.id] || S.cards[c.id].due <= now)); }
   views.flashcards = (chId) => {
     const opts = COURSE.map(c => `<option value="${c.id}" ${c.id === chId ? 'selected' : ''}>Ch ${c.n}. ${esc(c.title)}</option>`).join('');
     const boxes = [0, 0, 0, 0, 0, 0]; allCards().forEach(c => boxes[(S.cards[c.id] || { box: 0 }).box]++);
     return `<h1>Flashcards</h1><p class="sub">Spaced repetition (Leitner boxes): cards you know come back later, cards you miss come back today. ${ADD}</p>
       <div class="ar">البطاقات التعليمية بالتكرار المتباعد: ما تعرفه يعود بعد أيام، وما تخطئ فيه يعود اليوم.</div>
-      <div class="card row noprint"><label>Deck <select id="fch"><option value="">All chapters</option>${opts}</select></label><span class="muted">Boxes: ${boxes.map((b, i) => `${i}:${b}`).join(' · ')}</span></div>
+      <div class="card row noprint"><label>Deck <select id="fch"><option value="">All chapters</option>${opts}<option value="forms" ${chId === 'forms' ? 'selected' : ''}>🔀 Law forms: how do I find…? (all chapters)</option></select></label><span class="muted">Boxes: ${boxes.map((b, i) => `${i}:${b}`).join(' · ')}</span></div>
       <div id="fbox"></div>`;
   };
   function afterFlash(chId) {
@@ -613,6 +628,7 @@
       <h2>Lessons</h2><div class="card"><table><tr><th>Lesson</th><th>Quiz best</th><th>Attempts</th><th>Mastery</th></tr>${ls.map(l => { const st = S.lessons[l.id] || {}; const m = mastery(l.id); const [lv, cls] = level(m); return `<tr><td>${l.ch.n}. ${esc(l.title)}</td><td>${st.quizBest != null ? st.quizBest + '%' : '—'}</td><td>${st.quizAttempts || 0}</td><td><span class="${cls}">${lv}${m != null ? ' ' + m + '%' : ''}</span></td></tr>`; }).join('')}</table></div>
       <h2>Study time (last 14 days)</h2><div class="card"><svg viewBox="0 0 700 160" width="100%" role="img" aria-label="Minutes studied per day">${last14.map((x, k) => { const h = x[1] / maxM * 120; return `<rect x="${k * 50 + 8}" y="${130 - h}" width="34" height="${h}" rx="4" fill="var(--brand)"><title>${x[0]}: ${x[1]} min</title></rect><text x="${k * 50 + 25}" y="148" font-size="11" text-anchor="middle" fill="var(--muted)">${x[0]}</text>${x[1] ? `<text x="${k * 50 + 25}" y="${124 - h}" font-size="11" text-anchor="middle" fill="var(--ink)">${x[1]}</text>` : ''}`; }).join('')}</svg></div>
       <h2>Where mistakes happen</h2><div class="card">${Object.keys(mByCh).length ? `<table>${Object.entries(mByCh).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<tr><td>${esc(k)}</td><td><b>${v}</b></td></tr>`).join('')}</table>` : 'No mistakes recorded yet.'}</div>
+      <h2>Unit 0: Foundations</h2><div class="card"><table><tr><th>Skill</th><th>Level</th><th style="width:35%"></th></tr>${SKILLS().map(k => `<tr><td><a href="#skill/${k.id}">${esc(k.title)}</a></td><td>${skillPill(k.id)}</td><td>${bar(skillScore(k.id))}</td></tr>`).join('')}</table>${S.placement ? `<p class="muted">Placement test: ${S.placement.pct}% on ${new Date(S.placement.ts).toLocaleDateString()}</p>` : '<p class="muted">Placement test not taken yet.</p>'}</div>
       <h2>Recommendations</h2><div class="card"><ul class="clean">${weak.length ? weak.map(x => `<li>Review <a href="#lesson/${x.l.id}">${esc(x.l.title)}</a> (${x.m}%)</li>`).join('') : '<li>No lesson below 60%. Keep going.</li>'}<li>${recommend().why}</li></ul></div>`;
   };
   function afterReport() {
@@ -655,6 +671,7 @@
       const hay = [l.title, l.ar, ...l.terms.map(t => t.join(' ')), ...l.formulas.map(f => f.name + ' ' + f.f)].join(' ').replace(/<[^>]+>/g, '').toLowerCase();
       if (hay.includes(qs)) out.push(`<a href="#lesson/${l.id}">Ch ${l.ch.n} · ${esc(l.title)}</a>`);
     });
+    SKILLS().forEach(k => { if ((k.title + ' ' + k.ar).toLowerCase().includes(qs)) out.push(`<a href="#skill/${k.id}">Unit 0 · ${esc(k.title)}</a>`); });
     return out.slice(0, 12);
   }
 
@@ -663,11 +680,120 @@
 
   // ---------- router ----------
   const NAV = [['home', '🏠 Home', 'الرئيسية'], ['course', '📚 Course map', 'خريطة المقرر'], ['practice', '♾️ Unlimited practice', 'تدريب'], ['exam', '⏱️ Exam simulator', 'محاكي الاختبار'], ['flashcards', '🃏 Flashcards', 'البطاقات'], ['mistakes', '📓 Mistake journal', 'دفتر الأخطاء'], ['formulas', '∑ Formula sheet', 'القوانين'], ['rearrange', '🔀 Rearranging laws', 'ترتيب القوانين'], ['tools', '🧰 Tools', 'أدوات'], ['plan', '🗓️ Study planner', 'مخطط المذاكرة'], ['report', '📈 Progress report', 'تقرير الإنجاز'], ['sources', '📘 Sources & gaps', 'المصادر']];
+  // ---------- Unit 0: foundation skills, placement test, readiness checks (content_found.js) ----------
+  const SKILLS = () => window.FOUND || [];
+  const skillById = id => SKILLS().find(k => k.id === id);
+  function skillScore(id) { const st = S.found[id]; if (st && st.best != null) return st.best; const p = S.placement && S.placement.res[id]; return p ? Math.round(p[0] / p[1] * 100) : null; }
+  const skillPill = id => { const m = skillScore(id); const [lv, cls] = level(m); return `<span class="${cls}">${lv}${m != null ? ' · ' + m + '%' : ''}</span>`; };
+  const usesLinks = k => k.uses.map(u => u[0] === 'lab' ? `<a href="Virtual_Lab.html">⚗ Virtual lab</a> <span class="muted">(${u[1]})</span>` : `<a href="#lesson/${u[0]}">${esc(lessonById(u[0]).title)}</a> <span class="muted">(${u[1]})</span>`).join('<br>');
+  function readyBox(c) {
+    const ks = (PREREQ[c.id] || []).map(skillById).filter(Boolean); if (!ks.length) return '';
+    return `<div class="card ready"><h3 style="margin-top:0">🧱 Are you ready for this chapter? <span class="muted" style="font-weight:400">· هل أنت جاهز؟</span></h3>
+      <div class="ar">هذا الفصل يعتمد على هذه المهارات من الوحدة صفر. حل سؤالًا واحدًا لكل مهارة لتعرف هل تحتاج مراجعتها قبل البدء.</div>
+      ${ks.map(k => `<div class="lessonlink"><span><a href="#skill/${k.id}"><b>${esc(k.title)}</b></a><br><small class="muted">${k.ar}</small></span>${skillPill(k.id)}</div>`).join('')}
+      <div class="row noprint" style="margin-top:8px"><button class="btn small" id="rdygo" data-ch="${c.id}">Quick readiness check (${ks.length} questions)</button></div><div id="rdybox"></div></div>`;
+  }
+  function afterChapter(id) {
+    const b = $('#rdygo'); if (!b) return;
+    b.onclick = () => {
+      b.disabled = true; const ks = PREREQ[id].map(skillById); const items = ks.map(k => k.gen()); const res = {};
+      $('#rdybox').innerHTML = items.map((it, i) => `<div data-rd="${i}"><div class="muted" style="font-size:13px;margin-top:8px">${esc(ks[i].title)}</div>${qHTML(it, 'rd' + i)}</div>`).join('') + '<div id="rdyres"></div>';
+      checkAllBtn($('#rdyres'), items.map((it, i) => wireQ(document.querySelector(`[data-rd="${i}"]`), it, ok => { res[ks[i].id] = ok; if (!ok) logMistake(it, '(readiness)', null); }, { deferred: true })), () => {
+        const miss = ks.filter(k => !res[k.id]);
+        $('#rdyres').innerHTML = `<div class="card">${miss.length ? `<b>Review before you start:</b> ${miss.map(k => `<a href="#skill/${k.id}">${esc(k.title)}</a>`).join(' · ')}<div class="ar">راجع هذه المهارات قبل البدء بالفصل: ${miss.map(k => k.ar).join('، ')}.</div>` : '<b>✔ You are ready. Start the first lesson.</b><div class="ar">أنت جاهز، ابدأ بالدرس الأول.</div>'}</div>`;
+      });
+    };
+  }
+  views.found = () => `<h1>Unit 0: Foundations <span class="muted" style="font-size:18px;font-weight:400">· الوحدة صفر: التأسيس</span></h1>
+    <p class="sub">The maths and reading skills the course uses without teaching them. ${ADD}</p>
+    <div class="ar">مقرر الفيزياء يفترض أنك تعرف هذه المهارات (سجل الفجوات G‑03). كل مهارة فيها شرح عربي مبسط، ومثال محلول، وتمارين بأرقام جديدة كل مرة، وروابط للدروس التي تستخدمها.</div>
+    <div class="card row" style="justify-content:space-between"><span>${S.placement ? `Placement test taken on ${new Date(S.placement.ts).toLocaleDateString()}: <b>${S.placement.pct}%</b>` : 'Not sure where to start? Take the placement test first.'}</span><a class="btn ${S.placement ? 'ghost' : ''}" href="#placement">${S.placement ? 'Retake placement test' : 'Placement test'}</a></div>
+    <div class="grid g2">${SKILLS().map((k, i) => `<a class="card" style="text-decoration:none;color:inherit" href="#skill/${k.id}"><div class="chap"><div><b>0.${i + 1} ${esc(k.title)}</b><div class="muted" style="font-size:13px"><bdi>${k.ar}</bdi></div></div>${skillPill(k.id)}</div>${bar(skillScore(k.id))}<div class="muted" style="font-size:12.5px;margin-top:6px">Used in: ${k.uses.map(u => u[0] === 'lab' ? 'lab' : 'Ch ' + lessonById(u[0]).ch.n).filter((x, j, a) => a.indexOf(x) === j).join(', ')}</div></a>`).join('')}</div>`;
+  views.skill = id => {
+    const k = skillById(id); if (!k) return views.found();
+    const i = SKILLS().indexOf(k), nx = SKILLS()[i + 1];
+    return `<div class="row muted" style="font-size:13px"><a href="#found">Unit 0: Foundations</a> › skill</div>
+      <h1>0.${i + 1} ${esc(k.title)}</h1><p class="sub"><bdi>${k.ar}</bdi> · ${ADD} ${skillPill(id)}</p>
+      <div class="card"><h3 style="margin-top:0">📖 Explanation · الشرح</h3>${k.explain.map(e => `<div class="ar">${e[0]}</div><p class="en-help">${e[1]}</p>`).join('')}
+      ${k.link ? `<a class="btn small ghost" href="${k.link}">Full guide: rearranging laws</a>` : ''}</div>
+      <div class="card"><h3 style="margin-top:0">✏️ Worked example · مثال محلول</h3><p><b>${k.example.q}</b></p><ol class="clean">${k.example.steps.map(x => `<li>${x}</li>`).join('')}</ol><p><b>Answer:</b> ${k.example.ans}</p></div>
+      <div class="card"><h3 style="margin-top:0">🎯 Practice: 5 fresh questions · تدريب</h3><div class="ar">أجب عن الأسئلة كلها ثم اضغط «تحقق». 4 من 5 تعني أنك أتقنت المهارة.</div><div id="skq"></div><div id="skres"></div></div>
+      <div class="card"><h3 style="margin-top:0">📍 Where the course uses it · أين تحتاجها في المقرر</h3>${usesLinks(k)}</div>
+      <div class="row noprint" style="justify-content:space-between;margin-top:18px"><a class="btn ghost" href="#found">← Unit 0</a>${nx ? `<a class="btn ghost" href="#skill/${nx.id}">${esc(nx.title)} →</a>` : `<a class="btn ghost" href="#lesson/ch1-l1">Start Chapter 1 →</a>`}</div>`;
+  };
+  function afterSkill(id) {
+    const k = skillById(id); if (!k) return;
+    const run = () => {
+      const items = [0, 1, 2, 3, 4].map(() => k.gen()); const res = {};
+      $('#skres').innerHTML = '';
+      $('#skq').innerHTML = items.map((it, i) => `<div data-sk="${i}">${qHTML(it, 'sk' + i)}</div>`).join('');
+      checkAllBtn($('#skq'), items.map((it, i) => wireQ(document.querySelector(`[data-sk="${i}"]`), it, (ok, given) => { res[i] = ok; if (!ok) logMistake(it, given, null); }, { deferred: true })), () => {
+        const pct = Math.round(Object.values(res).filter(Boolean).length / items.length * 100);
+        const st = S.found[id] = S.found[id] || {}; st.best = Math.max(st.best ?? 0, pct); st.last = pct; st.n = (st.n || 0) + 1; save();
+        $('#skres').innerHTML = `<div class="card"><b>Score: ${pct}%</b> (best ${st.best}%) ${pct >= 80 ? '✔ Mastered.' : 'Read the explanation again and try a new set.'}<div class="ar">${pct >= 80 ? 'ممتاز، أتقنت هذه المهارة.' : 'أعد قراءة الشرح والمثال، ثم جرّب مجموعة جديدة.'}</div><button class="btn small ghost" id="sknew">New set of questions</button></div>`;
+        $('#sknew').onclick = () => { document.querySelectorAll('.checkall').forEach(x => x.closest('.row').remove()); run(); };
+      });
+    };
+    run();
+  }
+  views.placement = () => `<h1>Placement test <span class="muted" style="font-size:18px;font-weight:400">· اختبار تحديد المستوى</span></h1>
+    <p class="sub">${SKILLS().length * 2} questions, two on each foundation skill. No timer, no feedback until the end. ${ADD}</p>
+    <div class="ar">سؤالان على كل مهارة من مهارات الوحدة صفر. أجب بصدق ولا تستعجل، والنتيجة تحدد لك من أين تبدأ: المهارات التي تتقنها تتخطاها، والباقي تراجعه قبل فصوله.</div>
+    <div id="plbox"><button class="btn" id="plgo">Start the placement test</button></div>`;
+  function afterPlacement() {
+    $('#plgo').onclick = () => {
+      const qs = []; SKILLS().forEach(k => { qs.push({ k, it: k.gen() }); qs.push({ k, it: k.gen() }); });
+      const ans = {};
+      $('#plbox').innerHTML = qs.map((x, i) => `<div data-pl="${i}"><div class="muted" style="font-size:13px;margin-top:10px">Q${i + 1} · ${esc(x.k.title)}</div>${qHTML(x.it, 'pl' + i)}</div>`).join('') + '<div id="plres"></div>';
+      const hs = qs.map((x, i) => wireQ(document.querySelector(`[data-pl="${i}"]`), x.it, (ok, given) => { ans[i] = { ok, given }; }, { deferred: true, silent: true, hideSol: true }));
+      const b = document.createElement('button'); b.className = 'btn'; b.textContent = 'Finish and see my plan · أنهِ الاختبار'; b.style.marginTop = '12px'; $('#plres').before(b);
+      b.onclick = () => {
+        hs.forEach(h => h.check());
+        const res = {}; qs.forEach((x, i) => { const r = res[x.k.id] = res[x.k.id] || [0, 0]; r[1]++; if (ans[i] && ans[i].ok) r[0]++; else logMistake(x.it, ans[i] ? ans[i].given : '(blank)', null); });
+        const good = Object.values(res).reduce((a, r) => a + r[0], 0), pct = Math.round(good / qs.length * 100);
+        S.placement = { ts: Date.now(), res, pct }; save(); b.remove();
+        const weak = SKILLS().filter(k => res[k.id][0] < 2);
+        $('#plbox').innerHTML = `<div class="card"><h2 style="margin-top:0">Result: ${pct}% (${good}/${qs.length})</h2><table><tr><th>Skill</th><th>Correct</th><th>Next step</th></tr>${SKILLS().map(k => { const r = res[k.id]; return `<tr><td><a href="#skill/${k.id}">${esc(k.title)}</a><br><small class="muted">${k.ar}</small></td><td><b>${r[0]}/${r[1]}</b></td><td>${r[0] === 2 ? '<span class="pill ok">skip it</span>' : r[0] === 1 ? '<span class="pill warn">quick review</span>' : '<span class="pill bad">study it</span>'}</td></tr>`; }).join('')}</table>
+          ${weak.length ? `<p><b>Your plan:</b> study ${weak.map(k => `<a href="#skill/${k.id}">${esc(k.title)}</a>`).join(', ')}, then start Chapter 1. Each chapter page also shows which of these it needs.</p><div class="ar">خطتك: راجع المهارات المعلَّمة أعلاه بالترتيب، ثم ابدأ الفصل الأول. وصفحة كل فصل تذكّرك بالمهارات التي يحتاجها.</div><a class="btn" href="#skill/${weak[0].id}">Start with: ${esc(weak[0].title)}</a>` : `<p><b>Your foundations are solid.</b> Start Chapter 1.</p><div class="ar">أساسك قوي، ابدأ الفصل الأول مباشرة.</div><a class="btn" href="#lesson/ch1-l1">Start Chapter 1</a>`}
+          <p class="muted" style="font-size:13px">Wrong answers were added to your mistake journal.</p></div>`;
+        window.scrollTo(0, 0);
+      };
+    };
+  }
+  // ---------- glossary & problem language ----------
+  views.glossary = () => `<h1>Course glossary <span class="muted" style="font-size:18px;font-weight:400">· قاموس المقرر</span></h1>
+    <p class="sub">Every English term from the lessons with its Arabic and meaning. <span class="pill src">📘 terms from the lessons</span></p>
+    <div class="ar">كل المصطلحات الإنجليزية في الدروس مع معناها بالعربي. ابحث بالعربي أو بالإنجليزي.</div>
+    <div class="card row noprint"><input id="gq" class="search" style="width:260px" placeholder="Search · ابحث"><select id="gch"><option value="">All chapters</option>${COURSE.map(c => `<option value="${c.id}">Ch ${c.n}. ${esc(c.title)}</option>`).join('')}</select><span class="muted" id="gn"></span></div>
+    <div class="card"><table id="gtab"><tr><th>Term</th><th class="arcell">بالعربية</th><th>Meaning</th><th>Lesson</th></tr>${allLessons().flatMap(l => l.terms.map(t => `<tr data-ch="${l.ch.id}" data-h="${esc((t.join(' ')).toLowerCase())}"><td><b>${t[0]}</b></td><td class="arcell">${t[1]}</td><td>${t[2]}</td><td><a href="#lesson/${l.id}">${l.ch.n}. ${esc(l.title)}</a></td></tr>`)).join('')}</table></div>`;
+  function afterGlossary() {
+    const f = () => { const q = $('#gq').value.trim().toLowerCase(), ch = $('#gch').value; let n = 0; document.querySelectorAll('#gtab tr[data-h]').forEach(r => { const ok = (!ch || r.dataset.ch === ch) && (!q || r.dataset.h.includes(q)); r.style.display = ok ? '' : 'none'; if (ok) n++; }); $('#gn').textContent = `${n} terms`; };
+    $('#gq').oninput = f; $('#gch').onchange = f; f();
+  }
+  views.phrases = () => `<h1>Problem language <span class="muted" style="font-size:18px;font-weight:400">· لغة المسائل</span></h1>
+    <p class="sub">Words in an English problem that hide a number or tell you what to do. ${ADD}</p>
+    <div class="ar">كثير من الأخطاء سببها فهم السؤال لا الفيزياء. هذه الكلمات تتكرر في أسئلة المقرر، وبعضها يعطيك رقمًا دون أن يكتبه، مثل from rest التي تعني أن السرعة الابتدائية صفر.</div>
+    ${PHRASES.map(g => `<div class="card"><h3 style="margin-top:0">${g.sec}</h3><table><tr><th>In the problem</th><th class="arcell">بالعربية</th><th>What it tells you</th></tr>${g.rows.map(r => `<tr><td><b>${r[0]}</b></td><td class="arcell">${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</table></div>`).join('')}
+    <div class="card"><h3 style="margin-top:0">Drill · تدريب</h3><div id="phbox"></div></div>`;
+  function afterPhrases() {
+    const rows = PHRASES.flatMap(g => g.rows); let score = 0, total = 0;
+    const next = () => {
+      const r = pick(rows), o = shuffle([r[2], ...shuffle(rows.filter(x => x[2] !== r[2])).slice(0, 3).map(x => x[2])]);
+      const item = { q: `In a problem you read “<b>${r[0]}</b>”. What does it tell you?`, o, a: o.indexOf(r[2]), why: `${r[0]} = ${r[1]} → ${r[2]}` };
+      $('#phbox').innerHTML = qHTML(item, 'ph') + `<div class="row" style="margin-top:8px"><button class="btn small" id="phnext">Next</button><span class="muted" id="phs">${score}/${total}</span></div>`;
+      wireQ($('#phbox'), item, ok => { total++; if (ok) score++; $('#phs').textContent = `${score}/${total}`; });
+      $('#phnext').onclick = next;
+    };
+    next();
+  }
+
+  const FNAV = [['placement', '🧭 Placement test', 'تحديد المستوى'], ['found', '🧱 Unit 0: Foundations', 'الوحدة صفر'], ['glossary', '🔤 Course glossary', 'قاموس المقرر'], ['phrases', '🗝️ Problem language', 'لغة المسائل']];
   views.course = () => `<h1>Course map</h1><p class="sub">General Physics · 10 chapters as ordered in your textbook. <span class="pill src">📘 BK chapter openers</span></p>` + COURSE.map(c => { const cm = chapterMastery(c); return `<div class="card"><div class="chap"><a href="#chapter/${c.id}"><b>Ch ${c.n}. ${esc(c.title)}</b></a><span class="muted"><bdi>${c.ar}</bdi> · ${c.src}</span></div>${bar(cm.avg)}${c.lessons.map((l, i) => { const m = mastery(l.id); const [lv, cls] = level(m); return `<a class="lessonlink" href="#lesson/${l.id}"><span>${c.n}.${i + 1} ${esc(l.title)}</span><span class="${cls}">${lv}${m != null ? ' ' + m + '%' : ''}</span></a>`; }).join('')}</div>`; }).join('');
 
   function sidebar(active) {
     const chs = COURSE.map(c => { const cm = chapterMastery(c); return `<a href="#chapter/${c.id}" class="${active === 'chapter/' + c.id ? 'active' : ''}"><span>${c.n}. ${esc(c.title)}</span><small>${cm.avg}%</small></a>`; }).join('');
-    return NAV.map(n => `<a href="#${n[0]}" class="${active.split('/')[0] === n[0] ? 'active' : ''}"><span>${n[1]}</span><small>${n[2]}</small></a>`).join('') + `<div class="sec">Chapters</div>` + chs;
+    const link = n => `<a href="#${n[0]}" class="${active.split('/')[0] === n[0] || (n[0] === 'found' && active.startsWith('skill')) ? 'active' : ''}"><span>${n[1]}</span><small>${n[2]}</small></a>`;
+    return NAV.map(link).join('') + `<div class="sec">Foundation · التأسيس</div>` + FNAV.map(link).join('') + `<div class="sec">Chapters</div>` + chs;
   }
   function route() {
     const h = (location.hash || '#home').slice(1); const [v, arg] = h.split('/');
@@ -681,6 +807,11 @@
     if (v === 'mistakes') afterMistakes();
     if (v === 'tools') afterTools();
     if (v === 'rearrange') afterRearrange();
+    if (v === 'chapter') afterChapter(arg);
+    if (v === 'skill') afterSkill(arg);
+    if (v === 'placement') afterPlacement();
+    if (v === 'glossary') afterGlossary();
+    if (v === 'phrases') afterPhrases();
     if (v === 'plan') afterPlan();
     if (v === 'report') afterReport();
     window.scrollTo(0, 0);
