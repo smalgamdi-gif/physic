@@ -5,6 +5,8 @@
   const $ = (s, r = document) => r.querySelector(s);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const fmt = (x, d = 3) => { if (!isFinite(x)) return '—'; const a = Math.abs(x); if (a !== 0 && (a >= 1e5 || a < 1e-3)) return x.toExponential(d - 1); return String(+x.toPrecision(d + 1)); };
+  // {{a // b}} is drawn as a fraction a over b (same markup as the tutor)
+  const mathify = s => String(s).replace(/\{\{(.+?)\s*\/\/\s*(.+?)\}\}/g, (m, a, b) => `<span class="frac"><span class="nu">${a.trim()}</span><span class="de">${b.trim()}</span></span>`);
   const rad = d => d * Math.PI / 180, deg = r => r * 180 / Math.PI;
   const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
   const roundTo = (x, res) => Math.round(x / res) * res;
@@ -97,7 +99,7 @@
       skills: ['Levelling the force table', 'Tapping the table to reduce pulley friction', 'Reading angles at the string, not the pulley rim']
     },
     {
-      id: 'newton2', title: 'E3 · Newton\'s second law: cart and hanging mass', ar: 'قانون نيوتن الثاني: عربة وثقل معلّق', src: 'S04 §3 · BK p.59–62, Exercise 4 p.66', law: 'ΣF = m a  →  a = m_h g / (M + m_h)',
+      id: 'newton2', title: 'E3 · Newton\'s second law: cart and hanging mass', ar: 'قانون نيوتن الثاني: عربة وثقل معلّق', src: 'S04 §3 · BK p.59–62, Exercise 4 p.66', law: 'ΣF = m a  →  a = {{m_h g // M + m_h}}',
       objective: 'Show that acceleration is proportional to the net force when the total mass is constant, and find the system mass from the slope.',
       apparatus: ['Low‑friction track and cart (M)', 'Pulley, string, slotted masses (moved between cart and hanger so total mass stays constant)', 'Motion sensor (acceleration resolution 0.01 m/s²)'],
       procedure: ['Choose the total system mass (cart + all slotted masses).', 'Put mass m_h on the hanger; the rest stays on the cart.', 'Release; read the acceleration a.', 'Move 20 g from cart to hanger and repeat (keep total mass constant).', 'Plot a against F = m_h g. Slope = 1/(total mass).'],
@@ -115,7 +117,7 @@
       skills: ['Levelling the track', 'Aligning the string parallel to the track', 'Catching the cart safely before it hits the pulley']
     },
     {
-      id: 'young', title: 'E4 · Young\'s modulus of a wire', ar: 'معامل يونغ لسلك', src: 'S06 §1 · BK p.87–89', law: 'F/A = Y ΔL/L,  A = π(d/2)²',
+      id: 'young', title: 'E4 · Young\'s modulus of a wire', ar: 'معامل يونغ لسلك', src: 'S06 §1 · BK p.87–89', law: '{{F // A}} = Y {{ΔL // L}},   A = π ( {{d // 2}} )²',
       objective: 'Load a long wire, measure its extension and find Young\'s modulus from the stress–strain graph.',
       apparatus: ['Long wire clamped at the top', 'Slotted masses (0.5 kg each)', 'Vernier/micrometer scale for extension (resolution 0.01 mm)', 'Micrometer for diameter', 'Material selector: steel, copper, aluminium (🧩 typical textbook values: Y = 2.0×10¹¹, 1.1×10¹¹, 7.0×10¹⁰ N/m²; not in your course files)'],
       procedure: ['Measure L and the diameter d (use the radius r = d/2 for the area).', 'Add load m; read the extension ΔL.', 'Record stress F/A and strain ΔL/L for 6–8 loads.', 'Plot stress against strain; the slope in the straight (elastic) region is Y.', 'Unload to check the wire returns to its length (below the elastic limit).'],
@@ -192,7 +194,7 @@
       skills: ['Zeroing a dial gauge', 'Handling steam safely', 'Waiting for thermal equilibrium']
     },
     {
-      id: 'ohm', title: 'E8 · Ohm\'s law, resistivity and combinations', ar: 'قانون أوم والمقاومية وتوصيل المقاومات', src: 'S09U §2, §4 · BK p.149–157', law: 'V = R I,   R = ρ ℓ / A,   series ΣR, parallel 1/R = Σ1/R',
+      id: 'ohm', title: 'E8 · Ohm\'s law, resistivity and combinations', ar: 'قانون أوم والمقاومية وتوصيل المقاومات', src: 'S09U §2, §4 · BK p.149–157', law: 'V = R I,   R = {{ρ ℓ // A}},   series R = ΣRᵢ,   parallel {{1 // R}} = Σ {{1 // Rᵢ}}',
       objective: 'Verify Ohm\'s law, find an unknown resistance from the V–I graph, and check series/parallel rules.',
       apparatus: ['Variable DC supply (0–12 V)', 'Ammeter (resolution 1 mA) and voltmeter (resolution 0.01 V)', 'Resistors and a resistance wire'],
       procedure: ['Choose the circuit mode.', 'Vary the supply voltage V in steps.', 'Record V and I.', 'Plot V against I; slope = R (or R_eq).', 'In "resistance wire" mode vary the length ℓ at fixed V and plot R against ℓ: slope = ρ/A.'],
@@ -213,7 +215,7 @@
       skills: ['Connecting the ammeter in series and the voltmeter in parallel', 'Choosing meter ranges', 'Switching off between readings to avoid heating']
     },
     {
-      id: 'capacitor', title: 'E9 · Parallel‑plate capacitor', ar: 'المكثف ذو اللوحين المتوازيين', src: 'S08 §5 · BK p.136–141', law: 'C = ε₀ A / d,   U = ½ C V²',
+      id: 'capacitor', title: 'E9 · Parallel‑plate capacitor', ar: 'المكثف ذو اللوحين المتوازيين', src: 'S08 §5 · BK p.136–141', law: 'C = {{ε₀ A // d}},   U = ½ C V²',
       objective: 'Show that C ∝ 1/d and determine ε₀ from the slope of C against 1/d.',
       apparatus: ['Two square plates on a sliding rail (side adjustable)', 'Spacers to set d (resolution 0.1 mm)', 'Capacitance meter (resolution 0.1 pF)'],
       procedure: ['Set the plate side a (A = a²).', 'Set separation d and read C.', 'Repeat for 6 separations.', 'Plot C against 1/d; slope = ε₀A.', 'Compute ε₀ = slope / A and compare with 8.85×10⁻¹² C²/N·m².'],
@@ -252,7 +254,7 @@
       skills: ['Aligning the block with the protractor centre', 'Working in a darkened room', 'Laser safety (never look into the beam)']
     },
     {
-      id: 'coulomb', title: 'E11 · Coulomb\'s law with a torsion/force sensor', ar: 'قانون كولوم بمستشعر قوة', src: 'S08 §2 · BK p.126–130', law: 'F = k q₁ q₂ / r²,  k ≈ 9×10⁹ N·m²/C²',
+      id: 'coulomb', title: 'E11 · Coulomb\'s law with a torsion/force sensor', ar: 'قانون كولوم بمستشعر قوة', src: 'S08 §2 · BK p.126–130', law: 'F = {{k q₁ q₂ // r²}},   k ≈ 9×10⁹ N·m²/C²',
       objective: 'Show that the electric force varies as 1/r² and determine k from the slope.',
       apparatus: ['Two small conducting spheres on insulating stands', 'High‑voltage charger (charges set in nC)', 'Force sensor (resolution 0.1 mN)', 'Distance scale (resolution 1 mm)'],
       procedure: ['Charge both spheres (q₁, q₂).', 'Set the centre‑to‑centre distance r.', 'Read the force F.', 'Repeat for 6 distances.', 'Plot F against 1/r²; slope = k q₁q₂ → k = slope/(q₁q₂).'],
@@ -298,7 +300,7 @@
     $('#exp').innerHTML = `
       <div class="row" style="justify-content:space-between"><h1>${esc(e.title)}</h1><span class="pill add">🧩 Additional design · law from ${esc(e.src)}</span></div>
       <p class="sub"><bdi>${e.ar}</bdi></p>
-      <div class="formula">${e.law}</div>${LAWW[e.id] ? `<div class="words"><div class="ar"><bdi>🗣 ${LAWW[e.id][0]}</bdi></div><div class="en">🗣 <b>In words:</b> ${LAWW[e.id][1]}</div></div>` : ''}
+      <div class="formula">${mathify(e.law)}</div>${LAWW[e.id] ? `<div class="words"><div class="ar"><bdi>🗣 ${LAWW[e.id][0]}</bdi></div><div class="en">🗣 <b>In words:</b> ${LAWW[e.id][1]}</div></div>` : ''}
       <div class="grid g2">
         <div class="card"><h3>🎯 Objective</h3><p>${e.objective}</p><h3>🧪 Apparatus (virtual)</h3><ul>${e.apparatus.map(a => `<li>${a}</li>`).join('')}</ul></div>
         <div class="card"><h3>📋 Procedure</h3><ol>${e.procedure.map(a => `<li>${a}</li>`).join('')}</ol></div>

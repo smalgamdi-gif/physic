@@ -180,7 +180,7 @@ COURSE.push({
         { en: 'Unit: watt W = J/s = kg·m²/s³. Do not confuse W (watt) with W (work).', ar: 'وحدتها الواط، لا تخلط بين رمز الواط ورمز الشغل.' }
       ],
       terms: [['Power', 'القدرة', 'Rate of work'], ['Watt', 'الواط', 'J/s']],
-      formulas: [{ f: 'P = dW/dt  (average: P = W/t)', name: '(5.5)', sym: [['P', 'power', 'W'], ['t', 'time', 's']], cond: '—' }],
+      formulas: [{ f: 'P = {{dW // dt}}  (average: P = {{W // t}})', name: '(5.5)', sym: [['P', 'power', 'W'], ['t', 'time', 's']], cond: '—' }],
       life: { en: 'Climbing stairs fast feels harder: same work, more power.', ar: 'صعود الدرج بسرعة متعب أكثر: نفس الشغل بقدرة أكبر.' },
       worked: { src: 'S05 Ex 5.10 · BK p.81', q: '2 kg raised 3 m in 5 s. Work and power?', steps: ['W = mgh = 2·9.8·3 = 58.8 J', 'P = 58.8/5 = 11.76 W'], ans: 'P = 11.76 W' },
       tryit: { src: '🧩 additional design', q: 'A 60 kg student climbs 4 m of stairs in 8 s. Average power?', ans: 294, tol: 0.01, unit: 'W', hint: 'W = mgh', sol: '60·9.8·4/8 = 294 W' },
@@ -208,9 +208,9 @@ COURSE.push({
       ],
       terms: [['Stress', 'الإجهاد', 'F/A'], ['Strain', 'الانفعال', 'ΔL/L'], ['Young\'s modulus', 'معامل يونغ', 'Elasticity of length'], ['Bulk modulus', 'معامل المرونة الحجمي', 'Elasticity of volume'], ['Shear modulus', 'معامل القص', 'Elasticity of shape'], ['Elastic limit', 'حد المرونة', 'Max stress with full recovery']],
       formulas: [
-        { f: 'F/A = Y ΔL/L', name: 'Young (6.1)', sym: [['Y', 'Young\'s modulus', 'N/m²'], ['ΔL', 'extension', 'm']], cond: 'Below elastic limit.' },
-        { f: 'F/A = −B ΔV/V', name: 'Bulk (6.2)', sym: [['B', 'bulk modulus', 'N/m²']], cond: 'Minus: volume decreases as pressure increases.' },
-        { f: 'F/A = S x/L', name: 'Shear (6.3)', sym: [['x', 'shift of top face', 'm']], cond: 'Tangential force.' }
+        { f: '{{F // A}} = Y {{ΔL // L}}', name: 'Young (6.1)', sym: [['Y', 'Young\'s modulus', 'N/m²'], ['ΔL', 'extension', 'm']], cond: 'Below elastic limit.' },
+        { f: '{{F // A}} = −B {{ΔV // V}}', name: 'Bulk (6.2)', sym: [['B', 'bulk modulus', 'N/m²']], cond: 'Minus: volume decreases as pressure increases.' },
+        { f: '{{F // A}} = S {{x // L}}', name: 'Shear (6.3)', sym: [['x', 'shift of top face', 'm']], cond: 'Tangential force.' }
       ],
       life: { en: 'Elevator cables are chosen so the stress stays far below the elastic limit.', ar: 'كابلات المصاعد تُختار بحيث يبقى الإجهاد بعيدًا عن حد المرونة.' },
       worked: { src: 'S06 Ex 6.1 · BK p.89', q: '2500 N on a 10 m wire of diameter 3.5 mm, extension 0.5 cm. Stress, strain, Y?', steps: ['A = π(1.75×10⁻³)² = 9.62×10⁻⁶ m²', 'Stress = 2500/9.62×10⁻⁶ = 2.6×10⁸ N/m²', 'Strain = 0.005/10 = 5×10⁻⁴', 'Y = 2.6×10⁸ / 5×10⁻⁴ = 5.2×10¹¹ N/m²'], ans: 'Y = 5.2 × 10¹¹ N/m²' },
@@ -238,7 +238,7 @@ COURSE.push({
         { en: 'Pressure depends on depth, not on the shape of the container (BK p.93).', ar: 'الضغط يعتمد على العمق لا على شكل الإناء.' }
       ],
       terms: [['Density', 'الكثافة', 'm/V'], ['Pressure', 'الضغط', 'F/A'], ['Pascal', 'باسكال', 'N/m²'], ['Atmospheric pressure', 'الضغط الجوي', '≈ 1×10⁵ Pa']],
-      formulas: [{ f: 'ρ = m/V', name: '(6.4)', sym: [['ρ', 'density', 'kg/m³']], cond: '—' }, { f: 'P = F/A ,  P = P₀ + ρgh', name: '(6.5–6.6)', sym: [['h', 'depth', 'm'], ['P₀', 'atmospheric pressure', 'Pa']], cond: 'Fluid at rest.' }],
+      formulas: [{ f: 'ρ = {{m // V}}', name: '(6.4)', sym: [['ρ', 'density', 'kg/m³']], cond: '—' }, { f: 'P = {{F // A}} ,  P = P₀ + ρgh', name: '(6.5–6.6)', sym: [['h', 'depth', 'm'], ['P₀', 'atmospheric pressure', 'Pa']], cond: 'Fluid at rest.' }],
       life: { en: 'Every 10 m of sea water adds about 1 atmosphere of pressure on a diver.', ar: 'كل 10 أمتار من ماء البحر تضيف ضغطًا جويًا تقريبًا.' },
       worked: { src: 'S06 Ex 6.5 · BK p.93', q: 'Submarine at 30 m, hatch area 2 m², ρ = 1025 kg/m³. Force on hatch?', steps: ['P = P₀ + ρgh = 10⁵ + 1025·9.8·30 = 401 350 Pa', 'F = PA = 802 700 N'], ans: 'F = 8.03 × 10⁵ N' },
       tryit: { src: 'BK p.100 Exercise 5', q: 'A 65 kg student stands on one foot of area 250 cm². Pressure on the ground?', ans: 25480, tol: 0.01, unit: 'Pa', hint: 'A = 0.025 m², F = mg', sol: '637/0.025 = 25 480 Pa (both feet: 12 740 Pa)' },
@@ -265,7 +265,7 @@ COURSE.push({
         { en: 'Barometer: P₀ = ρgh (mercury column 0.76 m). Manometer: P = P₀ + ρgh.', ar: 'البارومتر يقيس الضغط الجوي، والمانومتر يقيس ضغط غاز محصور.' }
       ],
       terms: [['Pascal\'s law', 'قاعدة باسكال', 'Pressure transmitted undiminished'], ['Hydraulic press', 'المكبس الهيدروليكي', 'Force multiplier'], ['Barometer', 'البارومتر', 'Measures P₀'], ['Manometer', 'المانومتر', 'Measures gas pressure']],
-      formulas: [{ f: 'f/a = F/A', name: 'Hydraulic press', sym: [['a, A', 'small/large piston area', 'm²']], cond: 'Same level, fluid at rest.' }, { f: 'P₀ = ρgh ,  P = P₀ + ρgh', name: 'Barometer / manometer', sym: [['h', 'column height difference', 'm']], cond: '—' }],
+      formulas: [{ f: '{{f // a}} = {{F // A}}', name: 'Hydraulic press', sym: [['a, A', 'small/large piston area', 'm²']], cond: 'Same level, fluid at rest.' }, { f: 'P₀ = ρgh ,  P = P₀ + ρgh', name: 'Barometer / manometer', sym: [['h', 'column height difference', 'm']], cond: '—' }],
       life: { en: 'A garage lift raises a 1500 kg car with a small pump because the large piston has many times the area.', ar: 'رافعة الورشة ترفع سيارة بمضخة صغيرة لأن مساحة المكبس الكبير أكبر بكثير.' },
       worked: { src: 'BK Ex 6.6 p.94', q: 'Piston radii 2 cm and 20 cm. Large piston force 2000 N. Small piston force?', steps: ['f = F·a/A = 2000·(π·0.02²)/(π·0.2²)', 'f = 2000/100 = 20 N'], ans: 'f = 20 N' },
       tryit: { src: 'BK p.101 Exercise 9', q: 'Pistons of diameters 60 and 180 (same units). Small force 10 N. Large force?', ans: 90, tol: 0.01, unit: 'N', hint: '(180/60)² = 9', sol: 'F = 10 × 9 = 90 N' },

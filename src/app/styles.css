@@ -131,3 +131,27 @@ ul.clean{padding-left:20px;margin:6px 0}
 .opt.sel{border-color:var(--brand);background:var(--brand-soft);font-weight:600}
 .pill.ext{background:#e6f4ea;color:#1e6b3a}
 :root[data-theme="dark"] .pill.ext{background:#173527;color:#7fdca3}
+/* fractions: {{a // b}} drawn as a over b */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.2;margin:0 .12em}
+.frac>.nu{border-bottom:1.5px solid currentColor;padding:0 .25em .1em}
+.frac>.de{padding:.1em .25em 0}
+.qt .frac,.sol .frac,li .frac,p .frac,td .frac,.fdesc .frac,.opt .frac{font-size:.92em}
+.formula.big{font-size:22px;padding:12px 16px}
+/* every form of a law */
+.forms{margin-top:14px;border-top:1px dashed var(--line);padding-top:10px}
+.forms .fh{font-weight:700;margin-bottom:2px}
+.form{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+.form:last-child{border-bottom:0;padding-bottom:0}
+.form .find{flex:none;min-width:52px;padding:4px 8px;border-radius:10px;background:var(--brand-soft);color:var(--brand);display:flex;flex-direction:column;align-items:center;font-weight:800;font-family:"Cambria Math","Cambria","Times New Roman",serif;font-size:18px;line-height:1.2}
+.form .find small{font:600 10.5px "Segoe UI",sans-serif;text-transform:uppercase;letter-spacing:.04em;opacity:.8}
+.form .fbody{flex:1;min-width:0}
+.form .formula{margin:0 0 6px;font-size:19px}
+.fdesc{font-size:14.5px;margin:2px 0}
+.how{margin-top:6px}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-family:"Cambria Math","Cambria","Times New Roman",serif;font-size:17px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:4px 0}
+.chain .arr{color:var(--brand);font-family:"Segoe UI",sans-serif}
+.fchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.fchip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:8px;padding:4px 9px;font-family:"Cambria Math","Cambria","Times New Roman",serif;font-size:15px;background:var(--bg)}
+.fchip b{color:var(--brand)}
+@media (max-width:860px){.formula.big{font-size:18px}.form .formula{font-size:16px}.chain{font-size:15px}.form{gap:8px}.form .find{min-width:44px;font-size:16px}}
+@media print{.form{break-inside:avoid}}

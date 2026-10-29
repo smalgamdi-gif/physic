@@ -45,7 +45,7 @@ COURSE.push({
         { en: 'Powers apply to the prefix too: 1 cm³ = (10⁻² m)³ = 10⁻⁶ m³.', ar: 'الأس يُطبَّق على البادئة أيضًا: السنتيمتر المكعب = 10⁻⁶ m³.' }
       ],
       terms: [['Conversion factor', 'معامل التحويل', 'Number linking two units, e.g. 60 s/min'], ['Compound unit', 'وحدة مركبة', 'Unit made of several units, e.g. m/s']],
-      formulas: [{ f: '1 km/h = 10³ m / 3600 s = 1/3.6 m/s', name: 'Speed conversion', sym: [['km/h', 'kilometre per hour', '—']], cond: 'Divide km/h by 3.6 to get m/s.' }, { f: '1 g/cm³ = 10⁻³ kg / (10⁻²)³ m³ = 10³ kg/m³', name: 'Density conversion', sym: [['ρ', 'density', 'kg/m³']], cond: '—' }],
+      formulas: [{ f: '1 km/h = {{10³ m // 3600 s}} = {{1 // 3.6}} m/s', name: 'Speed conversion', sym: [['km/h', 'kilometre per hour', '—']], cond: 'Divide km/h by 3.6 to get m/s.' }, { f: '1 g/cm³ = {{10⁻³ kg // (10⁻²)³ m³}} = 10³ kg/m³', name: 'Density conversion', sym: [['ρ', 'density', 'kg/m³']], cond: '—' }],
       life: { en: 'A road sign of 90 km/h means 25 m/s: in one second the car moves 25 m (S01 Ex 1.1).', ar: 'لوحة 90 km/h تعني أن السيارة تقطع 25 مترًا كل ثانية.' },
       worked: { src: 'S01 Ex 1.2 · BK p.16', q: 'Mercury density is 13.6 g/cm³. Express it in SI.', steps: ['ρ = 13.6 g/cm³', 'Replace g → 10⁻³ kg and cm³ → (10⁻²)³ m³', 'ρ = 13.6 × 10⁻³ / 10⁻⁶ = 1.36 × 10⁴ kg/m³'], ans: '1.36 × 10⁴ kg/m³' },
       tryit: { src: 'BK p.20 Exercise 8', q: 'An iron cube has mass 856 g and side 5.32 cm. Find its density in SI units.', ans: 5685, tol: 0.02, unit: 'kg/m³', hint: 'V = (5.32 cm)³ = 150.6 cm³; then convert g/cm³ to kg/m³.', sol: 'ρ = 856 / 150.6 = 5.685 g/cm³ = 5.685 × 10³ kg/m³' },
@@ -133,7 +133,7 @@ COURSE.push({
       ],
       terms: [['Resultant', 'المحصلة', 'Single vector equal to the sum'], ['Head‑to‑tail', 'رأس لذيل', 'Graphical addition method'], ['Cosine rule', 'قانون جيب التمام', 'C² = A² + B² − 2AB cos θ']],
       formulas: [
-        { f: 'C = √(A² + B²) ,  θ = tan⁻¹(B/A)', name: 'Perpendicular vectors', sym: [['C', 'resultant magnitude', 'same as A'], ['θ', 'angle of C from A', '°']], cond: 'Only when A ⟂ B.' },
+        { f: 'C = √(A² + B²) ,  θ = tan⁻¹( {{B // A}} )', name: 'Perpendicular vectors', sym: [['C', 'resultant magnitude', 'same as A'], ['θ', 'angle of C from A', '°']], cond: 'Only when A ⟂ B.' },
         { f: 'C = √(A² + B² − 2AB cos θ)', name: 'Cosine rule', sym: [['θ', 'angle between A and B inside the triangle', '°']], cond: 'θ is the triangle angle (Ex 2.2 uses 60°, i.e. 180° − 120°).' }
       ],
       life: { en: 'A boat heading north at 4 m/s in a 3 m/s east current moves at 5 m/s relative to the shore.', ar: 'قارب يتجه شمالًا 4 م/ث في تيار شرقي 3 م/ث سرعته المحصلة 5 م/ث.' },
@@ -252,7 +252,7 @@ COURSE.push({
         { en: 'Power rule: d/dt(tⁿ) = n tⁿ⁻¹, derivative of a constant = 0.', ar: 'قاعدة الاشتقاق: مشتقة tⁿ هي n tⁿ⁻¹.' }
       ],
       terms: [['Average speed', 'السرعة القياسية المتوسطة', 'd/Δt'], ['Average velocity', 'السرعة المتجهة المتوسطة', 'Δx/Δt'], ['Instantaneous velocity', 'السرعة اللحظية', 'dx/dt']],
-      formulas: [{ f: 'v_av = Δx/Δt ,  v = dx/dt', name: 'Velocity (3.2, 3.3)', sym: [['v', 'velocity', 'm/s'], ['t', 'time', 's']], cond: '—' }],
+      formulas: [{ f: 'v_av = {{Δx // Δt}} ,  v = {{dx // dt}}', name: 'Velocity (3.2, 3.3)', sym: [['v', 'velocity', 'm/s'], ['t', 'time', 's']], cond: '—' }],
       life: { en: 'Bisha → Makkah 450 km in 9 h: average 50 km/h even if the speedometer showed 120 at times.', ar: 'رحلة بيشة–مكة 450 كم في 9 ساعات متوسطها 50 كم/س.' },
       worked: { src: 'S03 Ex 3.2 · BK p.43–44', q: 'x(t) = 6t² − t + 1. Find v at t = 3 s and v_av between 0 and 3 s.', steps: ['x(0) = 1 m, x(3) = 52 m → Δx = 51 m', 'v = dx/dt = 12t − 1 → v(3) = 35 m/s', 'v_av = 51/3 = 17 m/s'], ans: 'v(3) = 35 m/s, v_av = 17 m/s' },
       tryit: { src: 'BK p.53 Exercise 7', q: 'x(t) = 3t − 4t² + t³. Find the average velocity between t = 2 s and t = 4 s.', ans: 7, tol: 0.01, unit: 'm/s', hint: 'x(2) = −2 m, x(4) = 12 m.', sol: 'v_av = (12 − (−2))/2 = 7 m/s; v(3) = 3 − 24 + 27 = 6 m/s' },
@@ -280,7 +280,7 @@ COURSE.push({
         { en: 'Negative a does not necessarily mean slowing down: if a and v are both negative, the object speeds up (BK p.45).', ar: 'التسارع السالب لا يعني دائمًا التباطؤ؛ إذا كانت السرعة سالبة أيضًا فالجسم يتسارع.' }
       ],
       terms: [['Acceleration', 'التسارع', 'Rate of change of velocity'], ['Deceleration', 'التباطؤ', 'Speed decreasing (a opposite to v)']],
-      formulas: [{ f: 'a_av = Δv/Δt ,  a = dv/dt', name: 'Acceleration (3.4, 3.5)', sym: [['a', 'acceleration', 'm/s²']], cond: '—' }],
+      formulas: [{ f: 'a_av = {{Δv // Δt}} ,  a = {{dv // dt}}', name: 'Acceleration (3.4, 3.5)', sym: [['a', 'acceleration', 'm/s²']], cond: '—' }],
       life: { en: 'A car going 0 → 100 km/h in 10 s has an average acceleration of 2.78 m/s².', ar: 'سيارة من 0 إلى 100 كم/س في 10 ثوانٍ تسارعها 2.78 م/ث².' },
       worked: { src: 'S03 Ex 3.3 · BK p.45–46', q: 'x(t) = 2t³ − 3t² + 2t. Find a at t = 3 s.', steps: ['v = 6t² − 6t + 2', 'a = 12t − 6', 'a(3) = 36 − 6 = 30 m/s²'], ans: '30 m/s²' },
       tryit: { src: 'BK p.52 Exercise 3a', q: 'A train at 30 m/s slows to a stop in 44 s. Find its acceleration.', ans: -0.682, tol: 0.02, unit: 'm/s²', hint: 'a = (0 − 30)/44', sol: 'a = −0.68 m/s² (deceleration)' },

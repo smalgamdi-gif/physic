@@ -30,6 +30,10 @@
   const SW = id => (window.SERWAY || {})[id];
   const swItem = p => p.o ? { q: `<span class="muted" style="font-size:13px">Serway ${p.id} · PDF p.${p.page}</span><br>${p.q}`, o: p.o, a: p.a, why: `${p.sol}<br><b>Book answer:</b> ${p.ans}` } : { q: `<span class="muted" style="font-size:13px">Serway ${p.id} · PDF p.${p.page}</span><br>${p.q}`, num: p.num, tol: p.tol, unit: p.unit, sol: `${p.sol}<br><b>Book answer:</b> ${p.ans}` };
   const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  // {{a // b}} in the content is drawn as a fraction: a over b
+  const mathify = s => String(s).replace(/\{\{(.+?)\s*\/\/\s*(.+?)\}\}/g, (m, a, b) => `<span class="frac"><span class="nu">${a.trim()}</span><span class="de">${b.trim()}</span></span>`);
+  (function deepMath(o) { for (const k in o) { const v = o[k]; if (typeof v === 'string') { if (v.includes('{{')) o[k] = mathify(v); } else if (v && typeof v === 'object') deepMath(v); } })([window.COURSE, window.FORMS || {}]);
+  const fx = s => subs(mathify(s));
   const fmt = (x, d = 3) => { if (!isFinite(x)) return String(x); const a = Math.abs(x); if (a !== 0 && (a >= 1e5 || a < 1e-3)) return x.toExponential(d - 1).replace('e', ' × 10^').replace('+', ''); return String(+x.toPrecision(d + 1)); };
 
   function parseNum(str) {
@@ -55,16 +59,16 @@
   // Renders one question (MCQ or numeric). onDone(correct) fires once.
   function qHTML(item, key) {
     if (item.o) {
-      return `<div class="q" data-key="${key}"><div class="qt">${item.q}</div><div class="opts">${item.o.map((o, i) => `<button class="opt" data-i="${i}">${String.fromCharCode(65 + i)}. ${o}</button>`).join('')}</div><div class="fbwrap"></div></div>`;
+      return `<div class="q" data-key="${key}"><div class="qt">${fx(item.q)}</div><div class="opts">${item.o.map((o, i) => `<button class="opt" data-i="${i}">${String.fromCharCode(65 + i)}. ${fx(o)}</button>`).join('')}</div><div class="fbwrap"></div></div>`;
     }
-    return `<div class="q" data-key="${key}"><div class="qt">${item.q}</div><div class="numin"><input type="text" inputmode="decimal" placeholder="e.g. 2.5 or 1.6e-19"> <span class="muted">${esc(item.unit || '')}</span> <button class="btn small chk">Check</button></div><div class="fbwrap"></div></div>`;
+    return `<div class="q" data-key="${key}"><div class="qt">${fx(item.q)}</div><div class="numin"><input type="text" inputmode="decimal" placeholder="e.g. 2.5 or 1.6e-19"> <span class="muted">${esc(item.unit || '')}</span> <button class="btn small chk">Check</button></div><div class="fbwrap"></div></div>`;
   }
   function wireQ(root, item, onDone, opts = {}) {
     const box = root.querySelector('.q');
     const fb = box.querySelector('.fbwrap');
     let done = false;
     const show = (ok, extra) => {
-      fb.innerHTML = `<div class="fb ${ok ? 'ok' : 'bad'}">${ok ? '✔ Correct' : '✘ Not quite'}${extra ? ' — ' + extra : ''}${opts.hideSol ? '' : `<div class="sol">${item.why || item.sol || ''}</div>`}</div>`;
+      fb.innerHTML = `<div class="fb ${ok ? 'ok' : 'bad'}">${ok ? '✔ Correct' : '✘ Not quite'}${extra ? ' — ' + extra : ''}${opts.hideSol ? '' : `<div class="sol">${fx(item.why || item.sol || '')}</div>`}</div>`;
     };
     if (item.o) {
       let picked = null;
@@ -202,7 +206,7 @@
       ${step(2, 'Why do we need this?', 'لماذا نحتاجه؟', `<p>${l.why.en}</p><div class="ar">${l.why.ar}</div>`)}
       ${step(3, 'Step‑by‑step explanation', 'شرح متدرج', l.explain.map((e, i) => `<div class="card" style="margin:8px 0"><span class="pill">${i === 0 ? 'Basics' : i === l.explain.length - 1 && l.explain.length > 2 ? 'University level' : 'Building up'}</span><p style="margin:6px 0">${e.en}</p><div class="ar">${e.ar}</div></div>`).join(''))}
       ${step(4, 'English terms explained', 'المصطلحات', `<table><tr><th>Term</th><th class="arcell">بالعربية</th><th>Meaning</th></tr>${l.terms.map(t => `<tr><td><b>${t[0]}</b></td><td class="arcell">${t[1]}</td><td>${t[2]}</td></tr>`).join('')}</table>`)}
-      ${step(5, 'Laws, symbols & units', 'القوانين والرموز والوحدات', l.formulas.map((f, fi) => `<div class="card" style="margin:8px 0"><b>${f.name}</b><div class="formula">${f.f}</div>${words(l, fi)}<table><tr><th>Symbol</th><th>Meaning</th><th>SI unit</th></tr>${f.sym.map(s => `<tr><td>${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td></tr>`).join('')}</table></div>`).join(''))}
+      ${step(5, 'Laws, symbols & units', 'القوانين والرموز والوحدات', l.formulas.map((f, fi) => `<div class="card" style="margin:8px 0"><b>${f.name}</b><div class="formula big">${f.f}</div>${words(l, fi)}${symTable(f)}${formsHTML(l, fi)}</div>`).join(''))}
       ${step(6, 'Assumptions & when to use', 'الافتراضات وشروط الاستخدام', conds.length ? `<ul class="clean">${conds.map(f => `<li><b>${f.name}:</b> ${f.cond}</li>`).join('')}</ul>` : '<p class="muted">No special conditions beyond the definitions above.</p>')}
       ${step(7, 'Real‑life example', 'مثال من الحياة', `<div class="addbox">${ADD}<p style="margin:6px 0">${l.life.en}</p><div class="ar">${l.life.ar}</div></div>`)}
       ${step(8, 'Worked example, step by step', 'مثال محلول خطوة بخطوة', `<div class="card">${srcPill(l.worked.src)}<p><b>${l.worked.q}</b></p><ol class="clean" id="wsteps">${l.worked.steps.map((s, i) => `<li data-i="${i}" style="${i ? 'display:none' : ''}">${s}</li>`).join('')}</ol><div class="row noprint"><button class="btn small" id="wnext">Show next step</button><button class="btn small ghost" id="wall">Show all</button></div><p id="wans" style="display:none"><b>Answer:</b> ${l.worked.ans}</p>${l.worked.note ? `<div class="note">⚠ ${l.worked.note}</div>` : ''}</div>`)}
@@ -267,28 +271,28 @@
     { ch: 'ch2', f: () => { const a = R(2, 12), b = R(2, 12); return { q: `A = ${a} units east, B = ${b} units north. |A + B| = ?`, ans: Math.hypot(a, b), unit: 'units', sol: `√(${a}² + ${b}²) = ${fmt(Math.hypot(a, b))}` }; } },
     { ch: 'ch2', f: () => { const A = R(2, 20), t = pick([30, 37, 45, 53, 60, 120, 150, 210, 300]); return { q: `|A| = ${A}, θ = ${t}° from +x. Find Aₓ.`, ans: A * Math.cos(t * Math.PI / 180), unit: '', sol: `Aₓ = ${A} cos ${t}° = ${fmt(A * Math.cos(t * Math.PI / 180))}` }; } },
     { ch: 'ch2', f: () => { const a = [R(-5, 6), R(-5, 6), R(-5, 6)], b = [R(-5, 6), R(-5, 6), R(-5, 6)]; const d = a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; return { q: `A = ${a[0]}î + ${a[1]}ĵ + ${a[2]}k̂, B = ${b[0]}î + ${b[1]}ĵ + ${b[2]}k̂. A·B = ?`, ans: d, unit: '', sol: `${a[0]}·${b[0]} + ${a[1]}·${b[1]} + ${a[2]}·${b[2]} = ${d}` }; } },
-    { ch: 'ch3', f: () => { const h = R(5, 120); const t = Math.sqrt(2 * h / 9.8); return { q: `A stone is dropped from rest from ${h} m. Time to reach the ground?`, ans: t, unit: 's', sol: `h = ½gt² → t = √(2·${h}/9.8) = ${fmt(t)} s` }; } },
+    { ch: 'ch3', f: () => { const h = R(5, 120); const t = Math.sqrt(2 * h / 9.8); return { q: `A stone is dropped from rest from ${h} m. Time to reach the ground?`, ans: t, unit: 's', sol: `h = ½gt² → t = √( {{2 × ${h} // 9.8}} ) = ${fmt(t)} s` }; } },
     { ch: 'ch3', f: () => { const v = R(5, 40), a = R(1, 6, 1), d = R(10, 200); const vf = Math.sqrt(v * v + 2 * a * d); return { q: `A car at ${v} m/s accelerates at ${a} m/s² over ${d} m. Final speed?`, ans: vf, unit: 'm/s', sol: `v_f = √(${v}² + 2·${a}·${d}) = ${fmt(vf)} m/s` }; } },
-    { ch: 'ch3', f: () => { const v = R(10, 60); return { q: `A ball is thrown up at ${v} m/s. Maximum height?`, ans: v * v / 19.6, unit: 'm', sol: `y_max = v²/2g = ${fmt(v * v / 19.6)} m` }; } },
-    { ch: 'ch4', f: () => { const m = R(2, 50), F = R(10, 300); return { q: `A net force of ${F} N acts on ${m} kg. Acceleration?`, ans: F / m, unit: 'm/s²', sol: `a = F/m = ${fmt(F / m)} m/s²` }; } },
+    { ch: 'ch3', f: () => { const v = R(10, 60); return { q: `A ball is thrown up at ${v} m/s. Maximum height?`, ans: v * v / 19.6, unit: 'm', sol: `y_max = {{v_i² // 2g}} = {{${v}² // 2 × 9.8}} = ${fmt(v * v / 19.6)} m` }; } },
+    { ch: 'ch4', f: () => { const m = R(2, 50), F = R(10, 300); return { q: `A net force of ${F} N acts on ${m} kg. Acceleration?`, ans: F / m, unit: 'm/s²', sol: `a = {{ΣF // m}} = {{${F} // ${m}}} = ${fmt(F / m)} m/s²` }; } },
     { ch: 'ch4', f: () => { const m = R(40, 100), a = R(1, 4, 1), up = Math.random() < .5; const n = m * (9.8 + (up ? a : -a)); return { q: `A ${m} kg person stands on a scale in an elevator accelerating ${up ? 'upward' : 'downward'} at ${a} m/s². Scale reading?`, ans: n, unit: 'N', sol: `n = m(g ${up ? '+' : '−'} a) = ${fmt(n)} N` }; } },
     { ch: 'ch5', f: () => { const F = R(10, 200), d = R(1, 20), t = pick([0, 30, 45, 60, 90, 120]); const W = F * d * Math.cos(t * Math.PI / 180); return { q: `F = ${F} N at ${t}° to a displacement of ${d} m. Work?`, ans: Math.abs(W) < 1e-9 ? 0 : W, unit: 'J', sol: `W = Fd cos θ = ${fmt(W)} J` }; } },
     { ch: 'ch5', f: () => { const m = R(1, 1500), v = R(1, 30); return { q: `Kinetic energy of ${m} kg at ${v} m/s?`, ans: .5 * m * v * v, unit: 'J', sol: `½mv² = ${fmt(.5 * m * v * v)} J` }; } },
-    { ch: 'ch5', f: () => { const m = R(1, 100), h = R(1, 30), t = R(2, 30); return { q: `${m} kg is lifted ${h} m in ${t} s. Average power?`, ans: m * 9.8 * h / t, unit: 'W', sol: `P = mgh/t = ${fmt(m * 9.8 * h / t)} W` }; } },
+    { ch: 'ch5', f: () => { const m = R(1, 100), h = R(1, 30), t = R(2, 30); return { q: `${m} kg is lifted ${h} m in ${t} s. Average power?`, ans: m * 9.8 * h / t, unit: 'W', sol: `P = {{m g h // t}} = {{${m} × 9.8 × ${h} // ${t}}} = ${fmt(m * 9.8 * h / t)} W` }; } },
     { ch: 'ch6', f: () => { const h = R(1, 100), rho = pick([1000, 1025, 13600, 900]); return { q: `Pressure due to a ${h} m column of liquid of density ${rho} kg/m³ (no atmosphere)?`, ans: rho * 9.8 * h, unit: 'Pa', sol: `ρgh = ${fmt(rho * 9.8 * h)} Pa` }; } },
     { ch: 'ch6', f: () => { const r1 = R(2, 10), r2 = R(1, r1 - 0.5, 1), v1 = R(1, 5, 1); const v2 = v1 * (r1 / r2) ** 2; return { q: `Water flows at ${v1} m/s in a pipe of radius ${r1} cm that narrows to ${r2} cm. New speed?`, ans: v2, unit: 'm/s', sol: `v₂ = v₁(r₁/r₂)² = ${fmt(v2)} m/s` }; } },
     { ch: 'ch6', f: () => { const F = R(100, 5000), d = R(1, 4, 1), L = R(1, 10), dL = R(1, 9) / 1000; const A = Math.PI * (d / 2000) ** 2; const Y = F / A / (dL / L); return { q: `A ${L} m wire of diameter ${d} mm stretches ${fmt(dL * 1000)} mm under ${F} N. Young's modulus?`, ans: Y, unit: 'N/m²', sol: `A = π(${d / 2} mm)² ; Y = (F/A)/(ΔL/L) = ${fmt(Y)} N/m²` }; } },
-    { ch: 'ch7', f: () => { const F = R(-40, 220); return { q: `Convert ${F} °F to °C.`, ans: (F - 32) * 5 / 9, unit: '°C', sol: `5/9 (${F} − 32) = ${fmt((F - 32) * 5 / 9)} °C` }; } },
+    { ch: 'ch7', f: () => { const F = R(-40, 220); return { q: `Convert ${F} °F to °C.`, ans: (F - 32) * 5 / 9, unit: '°C', sol: `{{5 // 9}} (${F} − 32) = ${fmt((F - 32) * 5 / 9)} °C` }; } },
     { ch: 'ch7', f: () => { const m = R(0.1, 5, 2), c = pick([[4186, 'water'], [900, 'aluminium'], [385, 'copper'], [2220, 'ice']]), dT = R(5, 80); return { q: `Heat to warm ${m} kg of ${c[1]} (c = ${c[0]} J/kg·K) by ${dT} K?`, ans: m * c[0] * dT, unit: 'J', sol: `Q = mcΔT = ${fmt(m * c[0] * dT)} J` }; } },
     { ch: 'ch7', f: () => { const L0 = R(1, 50), a = pick([1.2e-5, 1.7e-5, 1.8e-5, 2.4e-5]), dT = R(20, 400); return { q: `A ${L0} m bar (α = ${a.toExponential(1)} °C⁻¹) is heated by ${dT} °C. Expansion?`, ans: a * L0 * dT, unit: 'm', sol: `Δℓ = αℓΔT = ${fmt(a * L0 * dT)} m` }; } },
-    { ch: 'ch8', f: () => { const q1 = R(1, 20), q2 = R(1, 20), r = R(1, 50); const F = 9e9 * q1 * 1e-6 * q2 * 1e-6 / (r / 100) ** 2; return { q: `Force between ${q1} μC and ${q2} μC, ${r} cm apart?`, ans: F, unit: 'N', sol: `F = kq₁q₂/r² = ${fmt(F)} N` }; } },
-    { ch: 'ch8', f: () => { const a = R(2, 30), b = R(1, 10), d = R(1, 10) / 1000; const C = 8.85e-12 * (a / 100) * (b / 100) / d; return { q: `Parallel plates ${a} cm × ${b} cm, ${fmt(d * 1000)} mm apart, vacuum. Capacitance?`, ans: C, unit: 'F', sol: `C = ε₀A/d = ${fmt(C)} F` }; } },
-    { ch: 'ch8', f: () => { const c1 = R(1, 20), c2 = R(1, 20), ser = Math.random() < .5; const C = ser ? c1 * c2 / (c1 + c2) : c1 + c2; return { q: `${c1} μF and ${c2} μF in ${ser ? 'series' : 'parallel'}. C_eq?`, ans: C, unit: 'μF', sol: ser ? `C₁C₂/(C₁+C₂) = ${fmt(C)} μF` : `C₁ + C₂ = ${C} μF` }; } },
-    { ch: 'ch9', f: () => { const V = R(1, 240), R0 = R(2, 500); return { q: `${V} V across ${R0} Ω. Current?`, ans: V / R0, unit: 'A', sol: `I = V/R = ${fmt(V / R0)} A` }; } },
-    { ch: 'ch9', f: () => { const r = [R(2, 60), R(2, 60), R(2, 60)]; const p = 1 / (1 / r[0] + 1 / r[1] + 1 / r[2]); return { q: `${r.join(' Ω, ')} Ω in parallel. R_eq?`, ans: p, unit: 'Ω', sol: `1/R = Σ1/Rᵢ → R = ${fmt(p)} Ω` }; } },
-    { ch: 'ch9', f: () => { const V = pick([12, 120, 230, 240]), P = R(10, 2500); return { q: `A ${P} W device runs on ${V} V. Resistance?`, ans: V * V / P, unit: 'Ω', sol: `R = V²/P = ${fmt(V * V / P)} Ω` }; } },
-    { ch: 'ch10', f: () => { const n = pick([1.33, 1.5, 1.52, 1.66, 2.42]), t = R(10, 70); const t2 = Math.asin(Math.sin(t * Math.PI / 180) / n) * 180 / Math.PI; return { q: `Light goes from air into a medium (n = ${n}) at ${t}°. Refraction angle?`, ans: t2, unit: '°', sol: `θ₂ = sin⁻¹(sin ${t}° / ${n}) = ${fmt(t2)}°` }; } },
-    { ch: 'ch10', f: () => { const n = pick([1.33, 1.46, 1.5, 1.52, 1.66, 2.42]); const c = Math.asin(1 / n) * 180 / Math.PI; return { q: `Critical angle from a medium with n = ${n} into air?`, ans: c, unit: '°', sol: `sin θc = 1/${n} → θc = ${fmt(c)}°` }; } }
+    { ch: 'ch8', f: () => { const q1 = R(1, 20), q2 = R(1, 20), r = R(1, 50); const F = 9e9 * q1 * 1e-6 * q2 * 1e-6 / (r / 100) ** 2; return { q: `Force between ${q1} μC and ${q2} μC, ${r} cm apart?`, ans: F, unit: 'N', sol: `F = {{k q₁ q₂ // r²}} = {{9×10⁹ × ${q1}×10⁻⁶ × ${q2}×10⁻⁶ // (${r / 100})²}} = ${fmt(F)} N` }; } },
+    { ch: 'ch8', f: () => { const a = R(2, 30), b = R(1, 10), d = R(1, 10) / 1000; const C = 8.85e-12 * (a / 100) * (b / 100) / d; return { q: `Parallel plates ${a} cm × ${b} cm, ${fmt(d * 1000)} mm apart, vacuum. Capacitance?`, ans: C, unit: 'F', sol: `C = {{ε₀ A // d}} = ${fmt(C)} F` }; } },
+    { ch: 'ch8', f: () => { const c1 = R(1, 20), c2 = R(1, 20), ser = Math.random() < .5; const C = ser ? c1 * c2 / (c1 + c2) : c1 + c2; return { q: `${c1} μF and ${c2} μF in ${ser ? 'series' : 'parallel'}. C_eq?`, ans: C, unit: 'μF', sol: ser ? `C_eq = {{C₁ C₂ // C₁ + C₂}} = {{${c1} × ${c2} // ${c1} + ${c2}}} = ${fmt(C)} μF` : `C₁ + C₂ = ${C} μF` }; } },
+    { ch: 'ch9', f: () => { const V = R(1, 240), R0 = R(2, 500); return { q: `${V} V across ${R0} Ω. Current?`, ans: V / R0, unit: 'A', sol: `I = {{V // R}} = {{${V} // ${R0}}} = ${fmt(V / R0)} A` }; } },
+    { ch: 'ch9', f: () => { const r = [R(2, 60), R(2, 60), R(2, 60)]; const p = 1 / (1 / r[0] + 1 / r[1] + 1 / r[2]); return { q: `${r.join(' Ω, ')} Ω in parallel. R_eq?`, ans: p, unit: 'Ω', sol: `{{1 // R_eq}} = {{1 // ${r[0]}}} + {{1 // ${r[1]}}} + {{1 // ${r[2]}}} → R_eq = ${fmt(p)} Ω` }; } },
+    { ch: 'ch9', f: () => { const V = pick([12, 120, 230, 240]), P = R(10, 2500); return { q: `A ${P} W device runs on ${V} V. Resistance?`, ans: V * V / P, unit: 'Ω', sol: `R = {{V² // P}} = {{${V}² // ${P}}} = ${fmt(V * V / P)} Ω` }; } },
+    { ch: 'ch10', f: () => { const n = pick([1.33, 1.5, 1.52, 1.66, 2.42]), t = R(10, 70); const t2 = Math.asin(Math.sin(t * Math.PI / 180) / n) * 180 / Math.PI; return { q: `Light goes from air into a medium (n = ${n}) at ${t}°. Refraction angle?`, ans: t2, unit: '°', sol: `θ₂ = sin⁻¹( {{sin ${t}° // ${n}}} ) = ${fmt(t2)}°` }; } },
+    { ch: 'ch10', f: () => { const n = pick([1.33, 1.46, 1.5, 1.52, 1.66, 2.42]); const c = Math.asin(1 / n) * 180 / Math.PI; return { q: `Critical angle from a medium with n = ${n} into air?`, ans: c, unit: '°', sol: `sin θ_c = {{1 // ${n}}} → θ_c = ${fmt(c)}°` }; } }
   ];
   const genFor = chId => G.filter(g => !chId || g.ch === chId);
 
@@ -352,7 +356,7 @@
       $('#ebox').innerHTML = `<div class="card"><h2 style="margin-top:0">Score: ${pct}% (${good}/${qs.length})</h2>
         <table><tr><th>Chapter</th><th>Correct</th><th></th></tr>${Object.entries(by).map(([c, v]) => `<tr><td>${COURSE.find(x => x.id === c).title}</td><td>${v[0]}/${v[1]}</td><td style="width:40%">${bar(Math.round(v[0] / v[1] * 100))}</td></tr>`).join('')}</table>
         <p>Wrong and blank answers were added to your <a href="#mistakes">Mistake journal</a>.</p><div class="row"><a class="btn" href="#exam">New exam</a><a class="btn ghost" href="#report">Progress report</a></div></div>
-        <h2>Review</h2>` + qs.map((q, i) => { const a = ans[i]; const ok = !!(a && a.ok); return `<div class="q"><div class="qt">Q${i + 1}. ${q.q}</div><div class="fb ${ok ? 'ok' : 'bad'}">${ok ? '✔' : '✘'} Your answer: ${esc(a ? (q.o ? a.given : a.given + ' ' + (q.unit || '')) : '(blank)')} · Correct: ${q.o ? q.o[q.a] : fmt(q.num) + ' ' + (q.unit || '')}<div class="sol">${q.why || q.sol || ''}</div></div></div>`; }).join('');
+        <h2>Review</h2>` + qs.map((q, i) => { const a = ans[i]; const ok = !!(a && a.ok); return `<div class="q"><div class="qt">Q${i + 1}. ${fx(q.q)}</div><div class="fb ${ok ? 'ok' : 'bad'}">${ok ? '✔' : '✘'} Your answer: ${esc(a ? (q.o ? a.given : a.given + ' ' + (q.unit || '')) : '(blank)')} · Correct: ${q.o ? q.o[q.a] : fmt(q.num) + ' ' + (q.unit || '')}<div class="sol">${fx(q.why || q.sol || '')}</div></div></div>`; }).join('');
       EXAM = null; window.scrollTo(0, 0);
     }
   }
@@ -381,8 +385,8 @@
       const due = shuffle(dueCards($('#fch').value));
       if (!due.length) { $('#fbox').innerHTML = `<div class="card">🎉 No cards due in this deck. Come back tomorrow or pick another deck.</div>`; return; }
       const c = due[0];
-      $('#fbox').innerHTML = `<div class="card flash" id="fcard"><div>${c.front}<div class="muted" style="font-size:13px;margin-top:10px">click to flip</div></div></div><div class="row noprint" id="fbtns" style="display:none"><button class="btn ghost" id="fno">✘ Didn't know</button><button class="btn" id="fyes">✔ Knew it</button><span class="muted">${due.length} due</span></div>`;
-      $('#fcard').onclick = () => { $('#fcard').innerHTML = `<div class="back">${c.back}</div>`; $('#fbtns').style.display = ''; };
+      $('#fbox').innerHTML = subs(`<div class="card flash" id="fcard"><div>${c.front}<div class="muted" style="font-size:13px;margin-top:10px">click to flip</div></div></div><div class="row noprint" id="fbtns" style="display:none"><button class="btn ghost" id="fno">✘ Didn't know</button><button class="btn" id="fyes">✔ Knew it</button><span class="muted">${due.length} due</span></div>`);
+      $('#fcard').onclick = () => { $('#fcard').innerHTML = subs(`<div class="back">${c.back}</div>`); $('#fbtns').style.display = ''; };
       const grade = ok => { const s = S.cards[c.id] || { box: 0 }; s.box = ok ? Math.min(5, s.box + 1) : 0; s.due = Date.now() + INTERVALS[s.box] * 86400000 + (ok ? 0 : 60000); S.cards[c.id] = s; save(); run(); };
       $('#fyes').onclick = () => grade(true); $('#fno').onclick = () => grade(false);
     };
@@ -402,12 +406,83 @@
     const c = $('#mclear'); if (c) c.onclick = () => { S.mistakes = S.mistakes.filter(m => !m.reviewed); save(); route(); };
   }
 
+  // ---------- every form of a law (content_forms.js) ----------
+  const FM = (l, i) => (window.FORMS || {})[l.id + '#' + i];
+  function symTable(f) {
+    const ar = f.sym.some(s => s[3]);
+    return `<table><tr><th>Symbol</th><th>Meaning</th>${ar ? '<th class="arcell">بالعربية</th>' : ''}<th>SI unit</th></tr>${f.sym.map(s => `<tr><td>${s[0]}</td><td>${s[1]}</td>${ar ? `<td class="arcell">${s[3] || ''}</td>` : ''}<td>${s[2]}</td></tr>`).join('')}</table>`;
+  }
+  const chain = steps => `<div class="chain">${steps.map(s => `<span>${s}</span>`).join('<span class="arr">⟹</span>')}</div>`;
+  const formRow = x => `<div class="form"><div class="find"><small>find</small><span>${x.find}</span></div><div class="fbody"><div class="formula">${x.f}</div>
+    <div class="fdesc">${x.base ? '<span class="pill src">📘 course form</span>' : '<span class="pill add" title="The course law, rearranged with algebra">🧩 rearranged</span>'} ${x.base ? '' : 'To find '}${x.en}</div><div class="ar">${x.ar}</div>
+    ${x.steps ? `<div class="how"><div class="muted" style="font-size:13px">How do we get it? · كيف وصلنا لهذا الشكل؟</div>${chain(x.steps)}<div class="fdesc">${x.how}</div><div class="ar">${x.howAr}</div></div>` : ''}</div></div>`;
+  function formsHTML(l, i) {
+    const fs = FM(l, i); if (!fs) return '';
+    return `<div class="forms"><div class="fh">🔀 One law, ${fs.length} forms <span class="muted" style="font-weight:400">· قانون واحد بعدة أشكال</span> <a class="noprint" style="font-size:13px;font-weight:400" href="#rearrange">how does rearranging work?</a></div>
+      <div class="ar">كل شكل يحسب كمية مختلفة: الرمز في المربع هو ما يحسبه الشكل، وتحته متى تستخدمه وكيف خرج من قانون المقرر.</div>${fs.map(formRow).join('')}</div>`;
+  }
+  const RULES = [
+    ['multiplied by something (V = R I, want R)', 'divide by it', 'مضروب في رمز: اقسم الطرفين على هذا الرمز'],
+    ['divided by something (ρ = {{m // V}}, want m)', 'multiply by it', 'مقسوم على رمز: اضرب الطرفين فيه'],
+    ['in the denominator (I = {{V // R}}, want R)', 'multiply by it first, then divide', 'موجود في المقام: اضرب الطرفين فيه أولًا ليصعد للبسط، ثم اقسم'],
+    ['with something added (T_K = T_C + 273, want T_C)', 'subtract it', 'أُضيف إليه شيء: اطرحه من الطرفين'],
+    ['with something subtracted (Δx = x₂ − x₁, want x₂)', 'add it', 'طُرح منه شيء: أضفه للطرفين'],
+    ['squared (KE = ½ m v², want v)', 'take the square root, as the last step', 'مربّع: خذ الجذر التربيعي في آخر خطوة'],
+    ['under a square root (C = √(A² + B²), want B)', 'square both sides first', 'تحت الجذر: ربّع الطرفين أولًا'],
+    ['upside down ({{1 // R_eq}} = …)', 'work out the other side, then flip both sides', 'في صورة مقلوب: احسب الطرف الآخر ثم اقلب الطرفين']
+  ];
+  const TRIANGLE = ['V = R I', 'Q = C V', 'ΣF = m a', 'P = V I', 'F_w = m g', 'm = ρ V', 'F = P A', 'W = P t', 'F = q E', 'I = J A', 'Δq = I Δt', 'Q = m L'];
+  views.rearrange = () => {
+    const ohm = lessonById('ch9-l2');
+    return `<h1>Rearranging a law <span class="muted" style="font-size:18px;font-weight:400">· كيف أغيّر شكل القانون</span></h1>
+    <p class="sub">One law answers several questions: move symbols until the one you want stands alone. ${ADD}</p>
+    <div class="ar">القانون الواحد يحسب أكثر من كمية. تخيّل القانون ميزانًا: أي عملية تعملها على طرف لازم تعملها على الطرف الثاني، حتى يبقى المجهول وحده في طرف.</div>
+    <div class="card"><h3 style="margin-top:0">The rules · القواعد</h3><table><tr><th>If the symbol you want is…</th><th>do this to both sides</th><th class="arcell">بالعربية</th></tr>${RULES.map(r => `<tr><td>${r[0]}</td><td><b>${r[1]}</b></td><td class="arcell">${r[2]}</td></tr>`).join('')}</table></div>
+    <div class="card"><h3 style="margin-top:0">Example: I want the resistance · مثال: أبي أحسب المقاومة</h3>
+      <p>Ohm's law in the course is <b>V = R I</b>. R is <i>multiplied</i> by I, so divide both sides by I. On the right, I ÷ I = 1 and R is left alone:</p>
+      ${chain(['V = R I', '{{V // I}} = {{R I // I}}', 'R = {{V // I}}'])}
+      <div class="ar">القانون في المقرر V = RI، والمقاومة R مضروبة في التيار I. نقسم الطرفين على I: في الطرف الأيمن RI ÷ I تُختصر I ويبقى R، وفي الطرف الأيسر يبقى V ÷ I. فيصير القانون R = V ÷ I، يعني: <b>المقاومة = فرق الجهد ÷ التيار</b>.</div>
+      <p>Numbers: a lamp draws 0.5 A on 12 V → R = {{12 // 0.5}} = 24 Ω.</p>
+      <p style="margin-bottom:0">The same law has three forms, one for each symbol:</p>${formsHTML(ohm, 0)}</div>
+    <div class="card"><h3 style="margin-top:0">Shortcut for three‑symbol laws: the triangle · طريقة المثلث</h3>
+      <div class="row" style="align-items:center;gap:22px"><svg viewBox="0 0 220 170" width="200" role="img" aria-label="Triangle with V on top, R and I at the bottom"><polygon points="110,8 212,162 8,162" style="fill:var(--brand-soft);stroke:var(--brand);stroke-width:2"/><line x1="58" y1="88" x2="162" y2="88" style="stroke:var(--brand);stroke-width:2"/><line x1="110" y1="88" x2="110" y2="162" style="stroke:var(--brand);stroke-width:2"/><text x="110" y="70" text-anchor="middle" style="fill:var(--ink);font:700 30px Cambria,serif">V</text><text x="76" y="140" text-anchor="middle" style="fill:var(--ink);font:700 28px Cambria,serif">R</text><text x="144" y="140" text-anchor="middle" style="fill:var(--ink);font:700 28px Cambria,serif">I</text></svg>
+      <div style="flex:1;min-width:220px"><p>Cover the symbol you want with your finger. What is left is its form:</p><ul class="clean"><li>cover <b>R</b> → V over I → R = {{V // I}}</li><li>cover <b>I</b> → V over R → I = {{V // R}}</li><li>cover <b>V</b> → R next to I → V = R I</li></ul>
+      <div class="ar">غطِّ الرمز المطلوب بإصبعك، والباقي هو شكل القانون: إذا كان الباقي فوق وتحت فهو قسمة، وإذا كانا متجاورين فهو ضرب.</div></div></div>
+      <p>It works for every law of the form <b>A = B × C</b> in the course:</p><div class="fchips">${TRIANGLE.map(t => `<span class="fchip">${t}</span>`).join('')}</div>
+      <div class="note">⚠ Only for laws of one product. For laws with squares, sums or fractions such as R = {{ρ ℓ // A}}, use the rules above.</div></div>
+    <div class="card"><h3 style="margin-top:0">Example with a fraction: R = {{ρ ℓ // A}}, I want the length ℓ · مثال بكسر</h3>
+      ${chain(['R = {{ρ ℓ // A}}', 'R A = ρ ℓ', 'ℓ = {{R A // ρ}}'])}
+      <p>A is in the denominator, so first multiply both sides by A. Now ℓ is multiplied by ρ, so divide by ρ.</p><div class="ar">A في المقام، فنضرب الطرفين في A ليصعد. بعدها ℓ مضروب في ρ، فنقسم الطرفين على ρ.</div></div>
+    <div class="card"><h3 style="margin-top:0">Practice: pick the right form · تدرّب: اختر الشكل الصحيح</h3><div class="ar">تمرين لا ينتهي من قوانين كل الفصول: يُعطى لك القانون والكمية المطلوبة، واختر الشكل الذي يحسبها.</div><div id="rbox"></div></div>
+    <p>Every law's forms are listed in its lesson (step 5) and in the <a href="#formulas">Formula sheet</a>.</p>`;
+  };
+  function afterRearrange() {
+    const pool = [];
+    allLessons().forEach(l => l.formulas.forEach((f, i) => { const fs = FM(l, i); if (fs && fs.some(x => !x.base)) pool.push({ l, f, fs }); }));
+    let score = 0, total = 0;
+    const next = () => {
+      let item;
+      for (let k = 0; k < 60 && !item; k++) {
+        const { l, f, fs } = pick(pool), target = pick(fs.filter(x => !x.base));
+        const others = shuffle(fs.filter(x => x !== target && x.find !== target.find)).slice(0, 3);
+        if (others.length < 2) continue;
+        const opts = shuffle([target, ...others]);
+        item = { q: `<span class="muted" style="font-size:13px">Ch ${l.ch.n} · ${esc(l.title)}</span><div class="formula">${f.f}</div>Which form gives <b>${target.find}</b>: ${target.en}?`, o: opts.map(x => x.f), a: opts.indexOf(target), why: target.steps ? chain(target.steps) + target.how + `<div class="ar">${target.howAr}</div>` : '' };
+      }
+      $('#rbox').innerHTML = qHTML(item, 'r') + `<div class="row" style="margin-top:8px"><button class="btn small" id="rnext">Next law</button><span class="muted" id="rscore">${score}/${total}</span></div>`;
+      wireQ($('#rbox'), item, ok => { total++; if (ok) score++; $('#rscore').textContent = `${score}/${total}`; });
+      $('#rnext').onclick = next;
+    };
+    next();
+  }
+
   // ---------- formula sheet ----------
   // formula in words: Arabic line, then the same in English
   const words = (l, i) => { const w = (window.WORDS || {})[l.id + '#' + i]; return w ? `<div class="words"><div class="ar"><bdi>🗣 ${w[0]}</bdi></div><div class="en">🗣 <b>In words:</b> ${w[1]}</div></div>` : ''; };
   views.formulas = (chId) => `<h1>Formula & unit sheet</h1><p class="sub">Every law in the course with symbols, units and conditions. Print it for revision. <span class="pill src">📘 course files</span></p>
     <div class="row noprint"><button class="btn small" onclick="window.print()">Print / save as PDF</button>${COURSE.map(c => `<a class="btn small ghost" href="#formulas/${c.id}">Ch ${c.n}</a>`).join('')}<a class="btn small ghost" href="#formulas">All</a></div>
-    ${COURSE.filter(c => !chId || c.id === chId).map(c => `<h2>Ch ${c.n}. ${esc(c.title)} <span class="muted" style="font-size:14px;font-weight:400"><bdi>${c.ar}</bdi> · ${c.src}</span></h2>${c.lessons.map(l => l.formulas.map((f, fi) => `<div class="card"><div class="row" style="justify-content:space-between"><b>${f.name}</b><a class="muted" style="font-size:13px" href="#lesson/${l.id}">${esc(l.title)}</a></div><div class="formula">${f.f}</div>${words(l, fi)}<div style="font-size:14px">${f.sym.map(s => `<b>${s[0]}</b>: ${s[1]} (${s[2]})`).join(' · ')}</div>${f.cond !== '—' ? `<div class="muted" style="font-size:14px">Condition: ${f.cond}</div>` : ''}</div>`).join('')).join('')}`).join('')}`;
+    <div class="card noprint">🔀 Under each law you see all its forms: the <b>bold symbol</b> is what that form finds. Open a lesson to see how each form comes from the course law, or read <a href="#rearrange">Rearranging a law</a>.<div class="ar">تحت كل قانون تجد كل أشكاله، والرمز العريض هو ما يحسبه ذلك الشكل. وطريقة الوصول لكل شكل موجودة داخل الدرس وفي صفحة «ترتيب القوانين».</div></div>
+    ${COURSE.filter(c => !chId || c.id === chId).map(c => `<h2>Ch ${c.n}. ${esc(c.title)} <span class="muted" style="font-size:14px;font-weight:400"><bdi>${c.ar}</bdi> · ${c.src}</span></h2>${c.lessons.map(l => l.formulas.map((f, fi) => `<div class="card"><div class="row" style="justify-content:space-between"><b>${f.name}</b><a class="muted" style="font-size:13px" href="#lesson/${l.id}">${esc(l.title)}</a></div><div class="formula">${f.f}</div>${words(l, fi)}<div style="font-size:14px">${f.sym.map(s => `<b>${s[0]}</b>: ${s[1]} (${s[2]})`).join(' · ')}</div>${f.cond !== '—' ? `<div class="muted" style="font-size:14px">Condition: ${f.cond}</div>` : ''}${FM(l, fi) ? `<div class="fchips">${FM(l, fi).map(x => `<span class="fchip" title="${esc(x.en)}"><b>${x.find}</b>${x.f}</span>`).join('')}</div>` : ''}</div>`).join('')).join('')}`).join('')}`;
 
   // ---------- tools ----------
   const UNITS = {
@@ -577,7 +652,7 @@
     qs = qs.toLowerCase().trim(); if (qs.length < 2) return [];
     const out = [];
     allLessons().forEach(l => {
-      const hay = [l.title, l.ar, ...l.terms.map(t => t.join(' ')), ...l.formulas.map(f => f.name + ' ' + f.f)].join(' ').toLowerCase();
+      const hay = [l.title, l.ar, ...l.terms.map(t => t.join(' ')), ...l.formulas.map(f => f.name + ' ' + f.f)].join(' ').replace(/<[^>]+>/g, '').toLowerCase();
       if (hay.includes(qs)) out.push(`<a href="#lesson/${l.id}">Ch ${l.ch.n} · ${esc(l.title)}</a>`);
     });
     return out.slice(0, 12);
@@ -587,7 +662,7 @@
   function subs(html) { return html.split(/(<[^>]*>)/).map(p => p.startsWith('<') ? p : p.replace(/([A-Za-zθρΔσεμλαΣ])_([A-Za-z0-9]{1,6})/g, '$1<sub>$2</sub>')).join(''); }
 
   // ---------- router ----------
-  const NAV = [['home', '🏠 Home', 'الرئيسية'], ['course', '📚 Course map', 'خريطة المقرر'], ['practice', '♾️ Unlimited practice', 'تدريب'], ['exam', '⏱️ Exam simulator', 'محاكي الاختبار'], ['flashcards', '🃏 Flashcards', 'البطاقات'], ['mistakes', '📓 Mistake journal', 'دفتر الأخطاء'], ['formulas', '∑ Formula sheet', 'القوانين'], ['tools', '🧰 Tools', 'أدوات'], ['plan', '🗓️ Study planner', 'مخطط المذاكرة'], ['report', '📈 Progress report', 'تقرير الإنجاز'], ['sources', '📘 Sources & gaps', 'المصادر']];
+  const NAV = [['home', '🏠 Home', 'الرئيسية'], ['course', '📚 Course map', 'خريطة المقرر'], ['practice', '♾️ Unlimited practice', 'تدريب'], ['exam', '⏱️ Exam simulator', 'محاكي الاختبار'], ['flashcards', '🃏 Flashcards', 'البطاقات'], ['mistakes', '📓 Mistake journal', 'دفتر الأخطاء'], ['formulas', '∑ Formula sheet', 'القوانين'], ['rearrange', '🔀 Rearranging laws', 'ترتيب القوانين'], ['tools', '🧰 Tools', 'أدوات'], ['plan', '🗓️ Study planner', 'مخطط المذاكرة'], ['report', '📈 Progress report', 'تقرير الإنجاز'], ['sources', '📘 Sources & gaps', 'المصادر']];
   views.course = () => `<h1>Course map</h1><p class="sub">General Physics · 10 chapters as ordered in your textbook. <span class="pill src">📘 BK chapter openers</span></p>` + COURSE.map(c => { const cm = chapterMastery(c); return `<div class="card"><div class="chap"><a href="#chapter/${c.id}"><b>Ch ${c.n}. ${esc(c.title)}</b></a><span class="muted"><bdi>${c.ar}</bdi> · ${c.src}</span></div>${bar(cm.avg)}${c.lessons.map((l, i) => { const m = mastery(l.id); const [lv, cls] = level(m); return `<a class="lessonlink" href="#lesson/${l.id}"><span>${c.n}.${i + 1} ${esc(l.title)}</span><span class="${cls}">${lv}${m != null ? ' ' + m + '%' : ''}</span></a>`; }).join('')}</div>`; }).join('');
 
   function sidebar(active) {
@@ -597,7 +672,7 @@
   function route() {
     const h = (location.hash || '#home').slice(1); const [v, arg] = h.split('/');
     const view = views[v] || views.home;
-    $('#main').innerHTML = subs(view(arg));
+    $('#main').innerHTML = fx(view(arg));
     $('#side').innerHTML = sidebar(h); $('#side').classList.remove('open');
     if (v === 'lesson') afterLesson(arg);
     if (v === 'practice') afterPractice(arg);
@@ -605,6 +680,7 @@
     if (v === 'flashcards') afterFlash(arg);
     if (v === 'mistakes') afterMistakes();
     if (v === 'tools') afterTools();
+    if (v === 'rearrange') afterRearrange();
     if (v === 'plan') afterPlan();
     if (v === 'report') afterReport();
     window.scrollTo(0, 0);

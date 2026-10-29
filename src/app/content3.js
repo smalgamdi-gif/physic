@@ -14,7 +14,7 @@ COURSE.push({
         { en: 'Absolute zero −273.15 °C = 0 K (gas pressure → 0, Fig 7.2). Write K, not °K (G‑17).', ar: 'الصفر المطلق −273.15 °C.' }
       ],
       terms: [['Temperature', 'درجة الحرارة', 'Measure of hotness'], ['Thermometer', 'مقياس الحرارة', 'Uses a thermometric property'], ['Absolute zero', 'الصفر المطلق', '0 K']],
-      formulas: [{ f: 'T_C = 5/9 (T_F − 32) ,  T_K = T_C + 273', name: '(7.1–7.2)', sym: [['T_C, T_F, T_K', 'temperatures', '°C, °F, K']], cond: 'ΔT in °C equals ΔT in K.' }],
+      formulas: [{ f: 'T_C = {{5 // 9}} (T_F − 32) ,  T_K = T_C + 273', name: '(7.1–7.2)', sym: [['T_C, T_F, T_K', 'temperatures', '°C, °F, K']], cond: 'ΔT in °C equals ΔT in K.' }],
       life: { en: 'A fever of 104 °F is 40 °C.', ar: 'حمى 104 فهرنهايت تساوي 40 مئوية.' },
       worked: { src: 'S07 Ex 7.1 · BK p.107', q: 'Room temperature 100 °F in °C and K?', steps: ['T_C = 5/9 (100 − 32) = 37.8 °C', 'T_K = 37.8 + 273 = 310.8 K'], ans: '37.8 °C, 310.8 K' },
       tryit: { src: 'BK p.120 Exercise 1', q: 'Oxygen freezes at −362 °F. Value in °C?', ans: -218.9, tol: 0.01, unit: '°C', hint: '5/9 × (−362 − 32)', sol: '5/9 × (−394) = −218.9 °C' },
@@ -101,7 +101,7 @@ COURSE.push({
         { en: 'Radiation: electromagnetic waves, no medium needed. Stefan–Boltzmann: Q = σAT⁴, σ = 5.67×10⁻⁸ W/m²K⁴, T in kelvin; Q here is energy per second of a black body (G‑16).', ar: 'الإشعاع لا يحتاج وسطًا، ويتناسب مع T⁴ بالكلفن.' }
       ],
       terms: [['Thermal conductivity k_c', 'معامل التوصيل الحراري', 'W/m·K'], ['Temperature gradient', 'الميل الحراري', '(T₁ − T₂)/x'], ['Convection', 'الحمل', 'Fluid motion'], ['Radiation', 'الإشعاع', 'EM waves'], ['Black body', 'الجسم الأسود', 'Ideal emitter']],
-      formulas: [{ f: 'H = k_c A (T₁ − T₂)/x', name: 'Conduction (7.9)', sym: [['H', 'heat rate', 'W or cal/s'], ['x', 'thickness', 'm']], cond: 'Steady state.' }, { f: 'Q = σ A T⁴', name: 'Stefan–Boltzmann (7.10)', sym: [['σ', '5.67×10⁻⁸', 'W/m²K⁴'], ['T', 'absolute temperature', 'K']], cond: 'Ideal black body; per second.' }],
+      formulas: [{ f: 'H = {{k_c A (T₁ − T₂) // x}}', name: 'Conduction (7.9)', sym: [['H', 'heat rate', 'W or cal/s'], ['x', 'thickness', 'm']], cond: 'Steady state.' }, { f: 'Q = σ A T⁴', name: 'Stefan–Boltzmann (7.10)', sym: [['σ', '5.67×10⁻⁸', 'W/m²K⁴'], ['T', 'absolute temperature', 'K']], cond: 'Ideal black body; per second.' }],
       life: { en: 'Double‑glazed windows trap air (poor conductor) to cut heat loss.', ar: 'النوافذ المزدوجة تحبس الهواء الرديء التوصيل.' },
       worked: { src: '🧩 built on (7.9), data of BK Ex.5', q: 'Copper bar 1 m, A = 2 cm², ends at 100 °C and 0 °C, k = 0.2 cal/s·cm·°C. Heat in 10 min?', steps: ['H = 0.2 × 2 × 100/100 = 0.4 cal/s', 'Q = 0.4 × 600 = 240 cal'], ans: '240 cal ≈ 1004 J' },
       tryit: { src: '🧩 additional design', q: 'A black body of area 1 m² at 300 K. Radiated power?', ans: 459.3, tol: 0.01, unit: 'W', hint: 'σ T⁴ with T = 300 K', sol: '5.67×10⁻⁸ × 300⁴ = 459 W' },
@@ -121,26 +121,26 @@ COURSE.push({
   lessons: [
     {
       id: 'ch8-l1', title: 'Electric charge & Coulomb\'s law', ar: 'الشحنة الكهربائية وقانون كولوم', src: 'S08 §1–2 · BK p.125–130',
-      goals: ['Describe charging by friction, contact, induction', 'Compute F = k q₁q₂/r²', 'Find the net force from several charges'],
+      goals: ['Describe charging by friction, contact, induction', 'Compute F = {{k q₁q₂ // r²}}', 'Find the net force from several charges'],
       goalsAr: 'ستتعرف طرق الشحن وتحسب القوة الكهربائية بين شحنتين ومحصلة عدة قوى.',
       why: { en: 'Laser printers and paint sprayers use electrostatic forces (BK p.125).', ar: 'الطابعات الليزرية وبخاخات الطلاء تستخدم القوى الكهروستاتيكية.' },
       explain: [
         { en: 'Two kinds of charge: negative (electron) and positive (proton). e = 1.6×10⁻¹⁹ C. Like charges repel, unlike attract.', ar: 'نوعان من الشحنات؛ المتشابهة تتنافر والمختلفة تتجاذب.' },
         { en: 'Charging: friction (electrons transfer), contact (charge shared), induction without contact.', ar: 'الشحن بالدلك والتلامس والحث.' },
-        { en: 'Coulomb\'s law: "the magnitude of electrical force between two charged particles is directly proportional to the product … (q₁q₂) and inversely with the square of the distance (r²)": F = k_e q₁q₂/r², k_e = 1/4πε₀ ≈ 9×10⁹ N·m²/C² (8.1).', ar: 'قانون كولوم: القوة تتناسب مع حاصل ضرب الشحنتين وعكسيًا مع مربع المسافة.' },
+        { en: 'Coulomb\'s law: "the magnitude of electrical force between two charged particles is directly proportional to the product … (q₁q₂) and inversely with the square of the distance (r²)": F = {{k_e q₁q₂ // r²}}, k_e = {{1 // 4πε₀}} ≈ 9×10⁹ N·m²/C² (8.1).', ar: 'قانون كولوم: القوة تتناسب مع حاصل ضرب الشحنتين وعكسيًا مع مربع المسافة.' },
         { en: 'Several charges: compute each force separately, then add as vectors (BK Ex 8.4).', ar: 'مع عدة شحنات نجمع القوى جمعًا اتجاهيًا.' }
       ],
       terms: [['Coulomb (C)', 'كولوم', 'Unit of charge'], ['Elementary charge e', 'الشحنة الأولية', '1.6×10⁻¹⁹ C'], ['Induction', 'الحث', 'Charging without contact'], ['Permittivity ε₀', 'السماحية', '8.85×10⁻¹² C²/N·m²']],
-      formulas: [{ f: 'F = k_e |q₁ q₂| / r²', name: 'Coulomb (8.1)', sym: [['k_e', '9×10⁹', 'N·m²/C²'], ['q', 'charge', 'C'], ['r', 'separation', 'm']], cond: 'Point charges.' }],
+      formulas: [{ f: 'F = {{k_e |q₁ q₂| // r²}}', name: 'Coulomb (8.1)', sym: [['F', 'electric force', 'N', 'القوة الكهربائية'], ['k_e', 'Coulomb constant = {{1 // 4πε₀}} ≈ 9×10⁹', 'N·m²/C²', 'ثابت كولوم'], ['q₁, q₂', 'the two charges', 'C', 'الشحنتان'], ['r', 'distance between the charges', 'm', 'المسافة بين الشحنتين']], cond: 'Point charges. Use the sizes of the charges, then get the direction from their signs: like charges repel, unlike attract.' }],
       life: { en: 'A balloon rubbed on hair sticks to a wall by induction.', ar: 'البالون المدلوك بالشعر يلتصق بالجدار بالحث.' },
-      worked: { src: 'S08 Ex 8.1 · BK p.128', q: 'Force between a sodium nucleus (Z = 11) and an electron 1.2×10⁻¹¹ m away?', steps: ['q₁ = 11×1.6×10⁻¹⁹ C, q₂ = 1.6×10⁻¹⁹ C', 'F = 9×10⁹ × (17.6×10⁻¹⁹)(1.6×10⁻¹⁹)/(1.2×10⁻¹¹)²', 'F = 1.76×10⁻⁵ N (attractive)'], ans: '1.76 × 10⁻⁵ N' },
-      tryit: { src: 'BK p.142 Exercise 3', q: '+10 μC and −6 μC, 0.5 cm apart in vacuum. Force magnitude?', ans: 21600, tol: 0.01, unit: 'N', hint: 'r = 0.005 m', sol: '9×10⁹·60×10⁻¹²/(2.5×10⁻⁵) = 21 600 N, attraction' },
+      worked: { src: 'S08 Ex 8.1 · BK p.128', q: 'Force between a sodium nucleus (Z = 11) and an electron 1.2×10⁻¹¹ m away?', steps: ['q₁ = 11×1.6×10⁻¹⁹ C, q₂ = 1.6×10⁻¹⁹ C', 'F = {{9×10⁹ × (17.6×10⁻¹⁹)(1.6×10⁻¹⁹) // (1.2×10⁻¹¹)²}}', 'F = 1.76×10⁻⁵ N (attractive)'], ans: '1.76 × 10⁻⁵ N' },
+      tryit: { src: 'BK p.142 Exercise 3', q: '+10 μC and −6 μC, 0.5 cm apart in vacuum. Force magnitude?', ans: 21600, tol: 0.01, unit: 'N', hint: 'r = 0.005 m', sol: 'F = {{9×10⁹ × 60×10⁻¹² // 2.5×10⁻⁵}} = 21 600 N, attraction' },
       checks: [
-        { q: 'Distance doubles → F becomes…', o: ['F/2', 'F/4', '2F', '4F'], a: 1, why: 'F ∝ 1/r².' },
-        { q: 'Repulsive force 2.4 N on +5 μC at 25 cm. Unknown charge? (S08 Ex 8.2)', o: ['+3.33 μC', '−3.33 μC', '+33 μC', '+0.33 μC'], a: 0, why: 'F r²/(k q).' }
+        { q: 'Distance doubles → F becomes…', o: ['F/2', 'F/4', '2F', '4F'], a: 1, why: 'F ∝ {{1 // r²}}.' },
+        { q: 'Repulsive force 2.4 N on +5 μC at 25 cm. Unknown charge? (S08 Ex 8.2)', o: ['+3.33 μC', '−3.33 μC', '+33 μC', '+0.33 μC'], a: 0, why: 'q = {{F r² // k q}}.' }
       ],
-      mistakes: [['Forgetting to square r', 'F ∝ 1/r².'], ['Not converting μC and cm', 'μC = 10⁻⁶ C, cm = 10⁻² m.']],
-      summary: ['Like repel, unlike attract', 'F = k q₁q₂/r²', 'Net force = vector sum'],
+      mistakes: [['Forgetting to square r', 'F ∝ {{1 // r²}}.'], ['Not converting μC and cm', 'μC = 10⁻⁶ C, cm = 10⁻² m.']],
+      summary: ['Like repel, unlike attract', 'F = {{k q₁q₂ // r²}}', 'Net force = vector sum'],
       quiz: [
         { q: 'Equal charges 3×10⁻⁵ C, 6 m apart. Distance from q₁ where force on q₃ is zero (BK Ex.1)?', num: 3, tol: 0, unit: 'm', sol: 'Equal charges → midpoint, 3 m' },
         { q: 'BK Ex 8.4: q_A = 3 μC between q_B = 5 μC (2 cm) and q_C = 12 μC (5 cm). Net force on A?', num: 207.9, tol: 0.01, unit: 'N', sol: '337.5 − 129.6 = 207.9 N' }
@@ -148,45 +148,45 @@ COURSE.push({
     },
     {
       id: 'ch8-l2', title: 'Electric field', ar: 'المجال الكهربائي', src: 'S08 §3 · BK p.130–131',
-      goals: ['Compute E = F/q_t = k q/r²', 'Draw field lines'],
+      goals: ['Compute E = {{F // q_t}} = {{k q // r²}}', 'Draw field lines'],
       goalsAr: 'ستحسب شدة المجال الكهربائي وترسم خطوطه.',
       why: { en: 'The field tells the force on any charge placed at a point, without knowing that charge first.', ar: 'المجال يحدد القوة على أي شحنة توضع في النقطة.' },
       explain: [
-        { en: '"The electrical field at a point is defined as the electrical force affecting a positive point‑test charge of the unit placed at that point": E = F/q_t = k_e q/r² (8.2). Unit N/C.', ar: 'المجال = القوة على وحدة الشحنات الموجبة.' },
+        { en: '"The electrical field at a point is defined as the electrical force affecting a positive point‑test charge of the unit placed at that point": E = {{F // q_t}} = {{k_e q // r²}} (8.2). Unit N/C.', ar: 'المجال = القوة على وحدة الشحنات الموجبة.' },
         { en: 'Direction: away from + charges, toward − charges. Field lines: density ∝ field strength (Faraday) (Fig 8.6).', ar: 'خطوط المجال تخرج من الموجب وتدخل السالب، وكثافتها تدل على الشدة.' }
       ],
       terms: [['Electric field', 'المجال الكهربائي', 'Force per unit positive charge'], ['Test charge', 'شحنة الاختبار', 'Small positive charge'], ['Field lines', 'خطوط المجال', 'Visual representation']],
-      formulas: [{ f: 'E = F/q_t = k_e q/r²', name: '(8.2)', sym: [['E', 'field', 'N/C']], cond: 'Point charge.' }],
+      formulas: [{ f: 'E = {{F // q_t}} = {{k_e q // r²}}', name: '(8.2)', sym: [['E', 'electric field', 'N/C', 'المجال الكهربائي'], ['F', 'force on the test charge', 'N', 'القوة على شحنة الاختبار'], ['q_t', 'test charge', 'C', 'شحنة الاختبار'], ['q', 'charge that makes the field', 'C', 'الشحنة المولّدة للمجال'], ['r', 'distance from q', 'm', 'البعد عن الشحنة']], cond: 'kq/r² is for a point charge. E points away from + charges and toward − charges.' }],
       life: { en: 'Thunderclouds create fields strong enough to ionise air → lightning.', ar: 'السحب الرعدية تولد مجالًا يؤين الهواء فيحدث البرق.' },
-      worked: { src: 'S08 Ex 8.3 · BK p.131', q: 'Field 5 m from +10 μC?', steps: ['E = 9×10⁹ × 10×10⁻⁶ / 5²', 'E = 3600 N/C, away from the charge'], ans: '3600 N/C' },
-      tryit: { src: 'BK p.142 Exercise 2', q: 'Field 3.5 cm from +2 μC?', ans: 1.469e7, tol: 0.01, unit: 'N/C', hint: 'r = 0.035 m', sol: '9×10⁹·2×10⁻⁶/0.035² = 1.47×10⁷ N/C' },
+      worked: { src: 'S08 Ex 8.3 · BK p.131', q: 'Field 5 m from +10 μC?', steps: ['E = {{9×10⁹ × 10×10⁻⁶ // 5²}}', 'E = 3600 N/C, away from the charge'], ans: '3600 N/C' },
+      tryit: { src: 'BK p.142 Exercise 2', q: 'Field 3.5 cm from +2 μC?', ans: 1.469e7, tol: 0.01, unit: 'N/C', hint: 'r = 0.035 m', sol: 'E = {{9×10⁹ × 2×10⁻⁶ // (0.035)²}} = 1.47×10⁷ N/C' },
       checks: [{ q: 'Field lines of a negative charge point…', o: ['outward', 'inward', 'in circles'], a: 1, why: 'Toward − charges.' }],
-      mistakes: [['Using the test charge in E = kq/r²', 'q is the source charge.']],
-      summary: ['E = F/q_t', 'E = kq/r²', 'Out of +, into −'],
-      quiz: [{ q: 'A 2 μC charge feels 0.04 N. E = ?', num: 20000, tol: 0, unit: 'N/C', sol: '🧩 0.04/2×10⁻⁶ = 2×10⁴ N/C' }]
+      mistakes: [['Using the test charge in E = {{kq // r²}}', 'q is the source charge.']],
+      summary: ['E = {{F // q_t}}', 'E = {{kq // r²}}', 'Out of +, into −'],
+      quiz: [{ q: 'A 2 μC charge feels 0.04 N. E = ?', num: 20000, tol: 0, unit: 'N/C', sol: '🧩 E = {{0.04 // 2×10⁻⁶}} = 2×10⁴ N/C' }]
     },
     {
       id: 'ch8-l3', title: 'Electric potential', ar: 'الجهد الكهربائي', src: 'S08 §4 · BK p.131–135',
-      goals: ['Use ΔV = W/q_t and ΔV = Ed', 'Compute V = kq/r and sum potentials'],
+      goals: ['Use ΔV = {{W // q_t}} and ΔV = Ed', 'Compute V = {{kq // r}} and sum potentials'],
       goalsAr: 'ستحسب فرق الجهد في مجال منتظم وجهد شحنة نقطية ومجموع الجهود.',
       why: { en: 'Batteries and sockets are rated in volts: potential is how electric energy is delivered.', ar: 'البطاريات تُقاس بالفولت، والجهد هو طريقة نقل الطاقة الكهربائية.' },
       explain: [
-        { en: 'ΔV = V_A − V_B = W/q_t: work per unit positive charge moved against the field (8.3). 1 V = 1 J/C.', ar: 'فرق الجهد = الشغل لكل وحدة شحنة.' },
+        { en: 'ΔV = V_A − V_B = {{W // q_t}}: work per unit positive charge moved against the field (8.3). 1 V = 1 J/C.', ar: 'فرق الجهد = الشغل لكل وحدة شحنة.' },
         { en: 'Uniform field (between plates): ΔV = Ed (8.4).', ar: 'في المجال المنتظم ΔV = Ed.' },
-        { en: 'Point charge: V = k_e q/r (8.5), a scalar with sign. Several charges: add algebraically.', ar: 'جهد الشحنة النقطية كمية قياسية بإشارة، وتُجمع جبريًا.' }
+        { en: 'Point charge: V = {{k_e q // r}} (8.5), a scalar with sign. Several charges: add algebraically.', ar: 'جهد الشحنة النقطية كمية قياسية بإشارة، وتُجمع جبريًا.' }
       ],
       terms: [['Potential difference', 'فرق الجهد', 'Volt'], ['Electric potential', 'الجهد الكهربائي', 'Work per unit charge from infinity'], ['Volt', 'الفولت', 'J/C']],
-      formulas: [{ f: 'ΔV = W/q_t = E d', name: '(8.3–8.4)', sym: [['d', 'distance along field', 'm']], cond: 'Ed for a uniform field.' }, { f: 'V = k_e q / r', name: '(8.5)', sym: [['V', 'potential', 'V']], cond: 'Point charge, V(∞) = 0.' }],
+      formulas: [{ f: 'ΔV = {{W // q_t}} = E d', name: '(8.3–8.4)', sym: [['ΔV', 'potential difference', 'V', 'فرق الجهد'], ['W', 'work to move the charge', 'J', 'الشغل'], ['q_t', 'test charge', 'C', 'شحنة الاختبار'], ['E', 'uniform field', 'N/C = V/m', 'المجال المنتظم'], ['d', 'distance along the field', 'm', 'المسافة باتجاه المجال']], cond: 'Ed for a uniform field.' }, { f: 'V = {{k_e q // r}}', name: '(8.5)', sym: [['V', 'potential', 'V', 'الجهد'], ['q', 'point charge, with its sign', 'C', 'الشحنة بإشارتها'], ['r', 'distance from the charge', 'm', 'البعد عن الشحنة']], cond: 'Point charge, V(∞) = 0.' }],
       life: { en: 'A 9 V battery gives each coulomb 9 J of energy.', ar: 'بطارية 9 فولت تعطي كل كولوم 9 جول.' },
-      worked: { src: 'BK Ex 8.5 p.134–135', q: 'q₁ = −2 μC at origin, q₂ = +9 μC at 4 cm on y. V at P (6 cm on x)?', steps: ['V₁ = 9×10⁹(−2×10⁻⁶)/0.06 = −3×10⁵ V', 'r₂ = √(0.06² + 0.04²) = 0.0721 m → V₂ = 11.23×10⁵ V', 'V = 8.23×10⁵ V'], ans: '8.23 × 10⁵ V' },
-      tryit: { src: 'BK p.142 Exercise 4', q: 'Moving 25 μC 10 cm against a uniform field raises its energy by 4 mJ. ΔV = ?', ans: 160, tol: 0.01, unit: 'V', hint: 'ΔV = W/q', sol: 'ΔV = 4×10⁻³/25×10⁻⁶ = 160 V; E = 160/0.1 = 1600 V/m' },
+      worked: { src: 'BK Ex 8.5 p.134–135', q: 'q₁ = −2 μC at origin, q₂ = +9 μC at 4 cm on y. V at P (6 cm on x)?', steps: ['V₁ = {{9×10⁹ × (−2×10⁻⁶) // 0.06}} = −3×10⁵ V', 'r₂ = √(0.06² + 0.04²) = 0.0721 m → V₂ = {{9×10⁹ × 9×10⁻⁶ // 0.0721}} = 11.23×10⁵ V', 'V = 8.23×10⁵ V'], ans: '8.23 × 10⁵ V' },
+      tryit: { src: 'BK p.142 Exercise 4', q: 'Moving 25 μC 10 cm against a uniform field raises its energy by 4 mJ. ΔV = ?', ans: 160, tol: 0.01, unit: 'V', hint: 'ΔV = {{W // q}}', sol: 'ΔV = {{4×10⁻³ // 25×10⁻⁶}} = 160 V; E = {{160 // 0.1}} = 1600 V/m' },
       checks: [
         { q: 'Plates 0.2 cm apart, E = 1000 N/C (S08 Ex 8.5). ΔV?', o: ['2 V', '200 V', '0.2 V', '2000 V'], a: 0, why: '1000·0.002.' },
         { q: 'V of −2 μC at 6 cm (S08)?', o: ['−3×10⁵ V', '3×10⁵ V', '−5×10⁶ V', '0'], a: 0, why: 'Sign kept.' }
       ],
-      mistakes: [['Adding potentials as vectors', 'Potential is scalar: add with signs.'], ['Using r² in V', 'V ∝ 1/r, E ∝ 1/r².']],
-      summary: ['ΔV = W/q', 'ΔV = Ed', 'V = kq/r (scalar)'],
-      quiz: [{ q: 'V at 1 m from 8 μC (BK Ex.5)?', num: 72000, tol: 0, unit: 'V', sol: '9×10⁹·8×10⁻⁶/1 = 7.2×10⁴ V' }]
+      mistakes: [['Adding potentials as vectors', 'Potential is scalar: add with signs.'], ['Using r² in V', 'V ∝ {{1 // r}}, E ∝ {{1 // r²}}.']],
+      summary: ['ΔV = {{W // q}}', 'ΔV = Ed', 'V = {{kq // r}} (scalar)'],
+      quiz: [{ q: 'V at 1 m from 8 μC (BK Ex.5)?', num: 72000, tol: 0, unit: 'V', sol: 'V = {{9×10⁹ × 8×10⁻⁶ // 1}} = 7.2×10⁴ V' }]
     },
     {
       id: 'ch8-l4', title: 'Capacitors: capacitance, combinations, energy', ar: 'المكثفات: السعة والتوصيل والطاقة', src: 'S08 §5 · BK p.135–141',
@@ -195,29 +195,29 @@ COURSE.push({
       why: { en: 'Camera flashes and defibrillators store energy in capacitors.', ar: 'فلاش الكاميرا وجهاز إنعاش القلب يخزنان الطاقة في مكثفات.' },
       explain: [
         { en: 'Q ∝ V → Q = CV (8.6). Capacitance C (farad, F = C/V): "the amount of electrical charge accumulated on the capacitor plate when a unit difference of voltage is applied".', ar: 'السعة = الشحنة لكل وحدة جهد.' },
-        { en: 'Parallel plates: C = ε₀A/d (8.7), ε₀ = 8.85×10⁻¹² C²/N·m².', ar: 'سعة المكثف المستوي تزيد بالمساحة وتقل بالمسافة.' },
-        { en: 'Series: same Q, V adds → 1/C_eq = Σ1/Cᵢ (8.8). Parallel: same V, Q adds → C_eq = ΣCᵢ (8.9). (Opposite to resistors!)', ar: 'التوالي: نفس الشحنة. التوازي: نفس الجهد. عكس المقاومات.' },
-        { en: 'Energy: U = ½Q²/C = ½CV² = ½QV (8.10).', ar: 'الطاقة المخزنة ½CV².' }
+        { en: 'Parallel plates: C = {{ε₀A // d}} (8.7), ε₀ = 8.85×10⁻¹² C²/N·m².', ar: 'سعة المكثف المستوي تزيد بالمساحة وتقل بالمسافة.' },
+        { en: 'Series: same Q, V adds → {{1 // C_eq}} = Σ{{1 // Cᵢ}} (8.8). Parallel: same V, Q adds → C_eq = ΣCᵢ (8.9). (Opposite to resistors!)', ar: 'التوالي: نفس الشحنة. التوازي: نفس الجهد. عكس المقاومات.' },
+        { en: 'Energy: U = {{Q² // 2C}} = ½CV² = ½QV (8.10).', ar: 'الطاقة المخزنة ½CV².' }
       ],
       terms: [['Capacitance', 'السعة', 'C = Q/V'], ['Farad', 'الفاراد', 'C/V'], ['Dielectric', 'العازل', 'Insulator between plates'], ['Series / parallel', 'توالي / توازي', 'Connection types']],
       formulas: [
-        { f: 'Q = C V ,  C = ε₀ A / d', name: '(8.6–8.7)', sym: [['A', 'plate area', 'm²'], ['d', 'separation', 'm']], cond: 'Vacuum between plates.' },
-        { f: 'Series: 1/C_eq = Σ 1/Cᵢ  ·  Parallel: C_eq = Σ Cᵢ', name: '(8.8–8.9)', sym: [['C_eq', 'equivalent', 'F']], cond: '—' },
-        { f: 'U = ½ C V²', name: '(8.10)', sym: [['U', 'energy', 'J']], cond: '—' }
+        { f: 'Q = C V ,  C = {{ε₀ A // d}}', name: '(8.6–8.7)', sym: [['Q', 'charge on one plate', 'C', 'شحنة اللوح'], ['C', 'capacitance', 'F', 'السعة'], ['V', 'voltage between the plates', 'V', 'فرق الجهد'], ['ε₀', 'permittivity of free space 8.85×10⁻¹²', 'C²/N·m²', 'سماحية الفراغ'], ['A', 'plate area', 'm²', 'مساحة اللوح'], ['d', 'separation', 'm', 'المسافة بين اللوحين']], cond: 'Vacuum between plates.' },
+        { f: 'Series: {{1 // C_eq}} = {{1 // C₁}} + {{1 // C₂}} + …   ·   Parallel: C_eq = C₁ + C₂ + …', name: '(8.8–8.9)', sym: [['C_eq', 'equivalent capacitance', 'F', 'السعة المكافئة'], ['C₁, C₂', 'each capacitor', 'F', 'سعة كل مكثف']], cond: 'Series: same Q on each. Parallel: same V on each.' },
+        { f: 'U = ½ C V² = {{Q² // 2C}} = ½ Q V', name: '(8.10)', sym: [['U', 'stored energy', 'J', 'الطاقة المخزنة'], ['C', 'capacitance', 'F', 'السعة'], ['V', 'voltage', 'V', 'فرق الجهد'], ['Q', 'charge', 'C', 'الشحنة']], cond: '—' }
       ],
       life: { en: 'A phone touchscreen detects your finger as a change in capacitance.', ar: 'شاشة اللمس تكتشف إصبعك من تغير السعة.' },
-      worked: { src: 'S08 Ex 8.9 · BK p.140–141', q: 'C₁ = C₂ = 6 μF in parallel, then in series with C₃ = 12 μF, V = 50 V. C_t, Q_t, charges?', steps: ['C₁₂ = 12 μF', '1/C_t = 1/12 + 1/12 → C_t = 6 μF', 'Q_t = 6×10⁻⁶·50 = 3×10⁻⁴ C = Q₃', 'V₃ = V₁₂ = 25 V → Q₁ = Q₂ = 1.5×10⁻⁴ C'], ans: 'C_t = 6 μF, Q_t = 3×10⁻⁴ C' },
+      worked: { src: 'S08 Ex 8.9 · BK p.140–141', q: 'C₁ = C₂ = 6 μF in parallel, then in series with C₃ = 12 μF, V = 50 V. C_t, Q_t, charges?', steps: ['C₁₂ = 12 μF', '{{1 // C_t}} = {{1 // 12}} + {{1 // 12}} = {{2 // 12}} → C_t = 6 μF', 'Q_t = 6×10⁻⁶·50 = 3×10⁻⁴ C = Q₃', 'V₃ = V₁₂ = 25 V → Q₁ = Q₂ = 1.5×10⁻⁴ C'], ans: 'C_t = 6 μF, Q_t = 3×10⁻⁴ C' },
       tryit: { src: 'BK p.143 Exercise 8', q: 'Two capacitors: series 10 μF, parallel 45 μF. Larger capacitance?', ans: 30, tol: 0.01, unit: 'μF', hint: 'C₁ + C₂ = 45, C₁C₂ = 450', sol: 'Roots of x² − 45x + 450 = 0: 30 μF and 15 μF' },
       checks: [
-        { q: '10 cm × 10 cm plates, 0.2 cm apart, vacuum (S08 Ex 8.7). C?', o: ['4.42×10⁻¹¹ F', '4.42×10⁻⁹ F', '8.85×10⁻¹² F', '0.05 F'], a: 0, why: 'ε₀A/d.' },
+        { q: '10 cm × 10 cm plates, 0.2 cm apart, vacuum (S08 Ex 8.7). C?', o: ['4.42×10⁻¹¹ F', '4.42×10⁻⁹ F', '8.85×10⁻¹² F', '0.05 F'], a: 0, why: 'C = {{ε₀A // d}}.' },
         { q: '20 μF at 1000 V. U? (S08 Ex 8.8)', o: ['10 J', '20 J', '0.01 J', '1000 J'], a: 0, why: '½·20×10⁻⁶·10⁶.' }
       ],
       mistakes: [['Using resistor rules for capacitors', 'Capacitors: parallel adds directly.']],
-      summary: ['Q = CV, C = ε₀A/d', 'Series: same Q; parallel: same V', 'U = ½CV²'],
+      summary: ['Q = CV, C = {{ε₀A // d}}', 'Series: same Q; parallel: same V', 'U = ½CV²'],
       quiz: [
-        { q: 'Three 10 μF in series (BK Ex.9). C_eq?', num: 3.33, tol: 0.01, unit: 'μF', sol: '10/3' },
-        { q: 'A = 0.1 m², d = 0.01 m, vacuum (BK Ex.6). C in pF?', num: 88.5, tol: 0.01, unit: 'pF', sol: '8.85×10⁻¹²·0.1/0.01 = 8.85×10⁻¹¹ F = 88.5 pF' },
-        { q: 'C₁, 5C₁, 5C₁ in series on 30 V (BK Ex.7). V across C₁?', num: 21.43, tol: 0.01, unit: 'V', sol: 'V ∝ 1/C → V₁ : V₂ : V₃ = 1 : 0.2 : 0.2 → V₁ = 30/1.4 = 21.4 V, V₂ = V₃ = 4.29 V' }
+        { q: 'Three 10 μF in series (BK Ex.9). C_eq?', num: 3.33, tol: 0.01, unit: 'μF', sol: 'C_eq = {{10 // 3}} = 3.33 μF' },
+        { q: 'A = 0.1 m², d = 0.01 m, vacuum (BK Ex.6). C in pF?', num: 88.5, tol: 0.01, unit: 'pF', sol: 'C = {{8.85×10⁻¹² × 0.1 // 0.01}} = 8.85×10⁻¹¹ F = 88.5 pF' },
+        { q: 'C₁, 5C₁, 5C₁ in series on 30 V (BK Ex.7). V across C₁?', num: 21.43, tol: 0.01, unit: 'V', sol: 'V ∝ 1/C → V₁ : V₂ : V₃ = 1 : 0.2 : 0.2 → V₁ = {{30 // 1.4}} = 21.4 V, V₂ = V₃ = 4.29 V' }
       ]
     }
   ]
@@ -228,68 +228,68 @@ COURSE.push({
   lessons: [
     {
       id: 'ch9-l1', title: 'Electric current & current density', ar: 'التيار الكهربائي وكثافة التيار', src: 'S09U §1 · BK p.147–149',
-      goals: ['Compute I = Δq/Δt', 'Use I = nevA and J = I/A = nev', 'Find drift speed'],
+      goals: ['Compute I = {{Δq // Δt}}', 'Use I = nevA and J = {{I // A}} = nev', 'Find drift speed'],
       goalsAr: 'ستحسب شدة التيار وكثافته وسرعة الانجراف.',
       why: { en: 'Choosing wire thickness for a home appliance depends on current density.', ar: 'اختيار سمك سلك الجهاز يعتمد على كثافة التيار.' },
       explain: [
-        { en: 'S09U: "The electric current is defined as the rate of flow of electric charge through the conductor. The direction of the current is opposite the direction of flow of electrons." I = dq/dt; 1 A = 1 C/s (9.1).', ar: 'التيار معدل تدفق الشحنة، واتجاهه عكس حركة الإلكترونات.' },
+        { en: 'S09U: "The electric current is defined as the rate of flow of electric charge through the conductor. The direction of the current is opposite the direction of flow of electrons." I = {{dq // dt}}; 1 A = 1 C/s (9.1).', ar: 'التيار معدل تدفق الشحنة، واتجاهه عكس حركة الإلكترونات.' },
         { en: '⚠ The older S09 says "rate of flow of negative charges"; use S09U (gap G‑13).', ar: 'تنبيه: اعتمد تعريف الملف المحدَّث.' },
-        { en: 'Microscopic: Δq = nevAΔt → I = nevA (9.2); J = I/A = nev (9.3) in A/m²; n = ρN_A/A_mass for one free electron per atom.', ar: 'الصيغة المجهرية للتيار وكثافته.' }
+        { en: 'Microscopic: Δq = nevAΔt → I = nevA (9.2); J = {{I // A}} = nev (9.3) in A/m²; n = {{ρN_A // A_mass}} for one free electron per atom.', ar: 'الصيغة المجهرية للتيار وكثافته.' }
       ],
       terms: [['Current', 'التيار', 'Ampere'], ['Current density', 'كثافة التيار', 'A/m²'], ['Drift speed', 'سرعة الانجراف', 'v of carriers'], ['Charge carriers', 'حاملات الشحنة', 'Free electrons']],
-      formulas: [{ f: 'I = dq/dt = n e v A', name: '(9.1–9.2)', sym: [['n', 'carriers per m³', 'm⁻³'], ['v', 'drift speed', 'm/s'], ['A', 'cross‑section', 'm²']], cond: '—' }, { f: 'J = I/A = n e v', name: '(9.3)', sym: [['J', 'current density', 'A/m²']], cond: '—' }],
+      formulas: [{ f: 'I = {{dq // dt}} = n e v A', name: '(9.1–9.2)', sym: [['I', 'current', 'A', 'التيار'], ['q', 'charge', 'C', 'الشحنة'], ['t', 'time', 's', 'الزمن'], ['n', 'free electrons per m³', 'm⁻³', 'عدد الإلكترونات الحرة في المتر المكعب'], ['e', 'electron charge 1.6×10⁻¹⁹', 'C', 'شحنة الإلكترون'], ['v', 'drift speed', 'm/s', 'سرعة الانجراف'], ['A', 'cross‑section area', 'm²', 'مساحة المقطع']], cond: 'Average current: I = {{Δq // Δt}}.' }, { f: 'J = {{I // A}} = n e v', name: '(9.3)', sym: [['J', 'current density', 'A/m²', 'كثافة التيار'], ['I', 'current', 'A', 'التيار'], ['A', 'cross‑section area', 'm²', 'مساحة المقطع']], cond: '—' }],
       life: { en: 'Electrons drift slower than a snail (~10⁻⁴ m/s), yet lights switch on instantly because the field travels fast.', ar: 'الإلكترونات تنجرف ببطء شديد، لكن المجال ينتشر بسرعة فتضيء المصابيح فورًا.' },
-      worked: { src: 'BK Ex 9.3 p.149', q: 'Copper wire A = 2×10⁻⁶ m², I = 8 A, n = 8×10²⁸ m⁻³. J and v?', steps: ['J = 8/2×10⁻⁶ = 4×10⁶ A/m²', 'v = J/(ne) = 4×10⁶/(8×10²⁸·1.6×10⁻¹⁹)', 'v = 3.13×10⁻⁴ m/s'], ans: 'v = 3.13 × 10⁻⁴ m/s' },
-      tryit: { src: 'S09U Ex 9.2 (see G‑12)', q: '2 A through a cross‑section of 0.1 cm². J = ?', ans: 200000, tol: 0.01, unit: 'A/m²', hint: '1 cm² = 10⁻⁴ m², so A = 1×10⁻⁵ m²', sol: 'J = 2/10⁻⁵ = 2×10⁵ A/m² (the slides convert with 10⁻² and print 2000 A/m²)' },
-      checks: [{ q: '10 C in 50 ms (Ex 9.1). I?', o: ['200 A', '0.5 A', '500 A', '20 A'], a: 0, why: '10/0.05.' }],
+      worked: { src: 'BK Ex 9.3 p.149', q: 'Copper wire A = 2×10⁻⁶ m², I = 8 A, n = 8×10²⁸ m⁻³. J and v?', steps: ['J = {{I // A}} = {{8 // 2×10⁻⁶}} = 4×10⁶ A/m²', 'v = {{J // ne}} = {{4×10⁶ // 8×10²⁸ × 1.6×10⁻¹⁹}}', 'v = 3.13×10⁻⁴ m/s'], ans: 'v = 3.13 × 10⁻⁴ m/s' },
+      tryit: { src: 'S09U Ex 9.2 (see G‑12)', q: '2 A through a cross‑section of 0.1 cm². J = ?', ans: 200000, tol: 0.01, unit: 'A/m²', hint: '1 cm² = 10⁻⁴ m², so A = 1×10⁻⁵ m²', sol: 'J = {{2 // 10⁻⁵}} = 2×10⁵ A/m² (the slides convert with 10⁻² and print 2000 A/m²)' },
+      checks: [{ q: '10 C in 50 ms (Ex 9.1). I?', o: ['200 A', '0.5 A', '500 A', '20 A'], a: 0, why: 'I = {{10 // 0.05}} = 200 A.' }],
       mistakes: [['Converting cm² with 10⁻²', 'cm² → 10⁻⁴ m².']],
-      summary: ['I = dq/dt', 'I = nevA', 'J = I/A = nev'],
+      summary: ['I = {{dq // dt}}', 'I = nevA', 'J = {{I // A}} = nev'],
       quiz: [
-        { q: '40 Ah battery at 0.5 A (BK Ex.1). Hours?', num: 80, tol: 0, unit: 'h', sol: '40/0.5 = 80 h' },
+        { q: '40 Ah battery at 0.5 A (BK Ex.1). Hours?', num: 80, tol: 0, unit: 'h', sol: 't = {{40 // 0.5}} = 80 h' },
         { q: 'Copper wire r = 1 mm, I = 4 A, n = 8.5×10²⁸ (BK Ex.4). Drift speed?', num: 9.36e-5, tol: 0.02, unit: 'm/s', sol: 'J = 1.27×10⁶ A/m² → v = 9.36×10⁻⁵ m/s' }
       ]
     },
     {
       id: 'ch9-l2', title: 'Ohm\'s law & resistivity', ar: 'قانون أوم والمقاومية', src: 'S09U §2 · BK p.149–152',
-      goals: ['Use V = RI', 'Use R = ρℓ/A and ρ = 1/σ'],
+      goals: ['Use V = RI', 'Use R = {{ρℓ // A}} and ρ = {{1 // σ}}'],
       goalsAr: 'ستطبق قانون أوم وتحسب المقاومة من أبعاد السلك.',
       why: { en: 'Every circuit calculation starts from V = RI.', ar: 'كل حسابات الدوائر تبدأ من V = RI.' },
       explain: [
         { en: 'Ohm\'s law: "the voltage difference between the two ends of a conductor is proportional to the intensity of the electrical current passing through it, when its temperature is constant": V = RI (9.5). 1 Ω = 1 V/A.', ar: 'قانون أوم عند ثبوت درجة الحرارة.' },
-        { en: 'Microscopic form J = σE. Resistivity ρ = 1/σ (Ω·m).', ar: 'المقاومية مقلوب الموصلية.' },
-        { en: 'R = ρℓ/A (9.4): ∝ length, ∝ 1/area. Doubling both length and radius halves R (Ex 9.4).', ar: 'المقاومة تزيد بالطول وتقل بالمساحة.' }
+        { en: 'Microscopic form J = σE. Resistivity ρ = {{1 // σ}} (Ω·m).', ar: 'المقاومية مقلوب الموصلية.' },
+        { en: 'R = {{ρℓ // A}} (9.4): ∝ length, ∝ {{1 // area}}. Doubling both length and radius halves R (Ex 9.4).', ar: 'المقاومة تزيد بالطول وتقل بالمساحة.' }
       ],
       terms: [['Resistance', 'المقاومة', 'Ω'], ['Resistivity ρ', 'المقاومة النوعية', 'Ω·m'], ['Conductivity σ', 'الموصلية', '1/(Ω·m)'], ['Ohmic', 'أومي', 'Obeys V ∝ I']],
-      formulas: [{ f: 'V = R I', name: '(9.5)', sym: [['V', 'voltage', 'V'], ['R', 'resistance', 'Ω'], ['I', 'current', 'A']], cond: 'Constant temperature.' }, { f: 'R = ρ ℓ / A ,  ρ = 1/σ', name: '(9.4)', sym: [['ℓ', 'length', 'm'], ['A', 'πr²', 'm²']], cond: '—' }],
+      formulas: [{ f: 'V = R I', name: '(9.5)', sym: [['V', 'voltage', 'V', 'فرق الجهد'], ['R', 'resistance', 'Ω', 'المقاومة'], ['I', 'current', 'A', 'التيار']], cond: 'Constant temperature.' }, { f: 'R = {{ρ ℓ // A}} ,  ρ = {{1 // σ}}', name: '(9.4)', sym: [['R', 'resistance', 'Ω', 'المقاومة'], ['ρ', 'resistivity', 'Ω·m', 'المقاومية'], ['ℓ', 'length', 'm', 'الطول'], ['A', 'cross‑section area = πr²', 'm²', 'مساحة المقطع'], ['σ', 'conductivity', '(Ω·m)⁻¹', 'الموصلية']], cond: 'A uses the radius: r = d/2.' }],
       life: { en: 'Extension cords for heaters are thick: a larger A means less resistance and less heating.', ar: 'تمديدات السخانات سميكة لتقليل المقاومة.' },
-      worked: { src: 'S09U Ex 9.5 · BK p.152 (see G‑11)', q: 'Nichrome wire 1 m, "0.2 mm diameter", ρ = 10⁻⁶ Ω·m, 20 V. R and I?', steps: ['Source solution uses r = 0.2 mm: R = 10⁻⁶·1/(π·(0.2×10⁻³)²) = 7.96 Ω → I = 2.5 A', 'If 0.2 mm is the diameter, r = 0.1 mm: R = 31.8 Ω → I = 0.63 A'], ans: 'Source: 7.96 Ω, 2.5 A', note: 'Ask your instructor which reading is intended (G‑11).' },
-      tryit: { src: 'BK p.158 Exercise 3', q: 'Silver 10 cm long across 20 V, ρ = 1.59×10⁻⁸ Ω·m. Current density?', ans: 1.258e10, tol: 0.02, unit: 'A/m²', hint: 'E = V/ℓ, J = E/ρ', sol: 'E = 200 V/m → J = 200/1.59×10⁻⁸ = 1.26×10¹⁰ A/m²' },
+      worked: { src: 'S09U Ex 9.5 · BK p.152 (see G‑11)', q: 'Nichrome wire 1 m, "0.2 mm diameter", ρ = 10⁻⁶ Ω·m, 20 V. R and I?', steps: ['Source solution uses r = 0.2 mm: R = {{10⁻⁶ × 1 // π × (0.2×10⁻³)²}} = 7.96 Ω → I = {{20 // 7.96}} = 2.5 A', 'If 0.2 mm is the diameter, r = 0.1 mm: R = 31.8 Ω → I = 0.63 A'], ans: 'Source: 7.96 Ω, 2.5 A', note: 'Ask your instructor which reading is intended (G‑11).' },
+      tryit: { src: 'BK p.158 Exercise 3', q: 'Silver 10 cm long across 20 V, ρ = 1.59×10⁻⁸ Ω·m. Current density?', ans: 1.258e10, tol: 0.02, unit: 'A/m²', hint: 'E = {{V // ℓ}}, J = {{E // ρ}}', sol: 'E = {{20 // 0.1}} = 200 V/m → J = {{200 // 1.59×10⁻⁸}} = 1.26×10¹⁰ A/m²' },
       checks: [{ q: 'Doubling length and radius makes R…', o: ['double', 'half', '4×', 'same'], a: 1, why: 'ℓ×2, A×4 → R/2 (Ex 9.4).' }],
       mistakes: [['Using diameter for r', 'Halve it.']],
-      summary: ['V = RI', 'R = ρℓ/A', 'σ = 1/ρ'],
+      summary: ['V = RI', 'R = {{ρℓ // A}}', 'σ = {{1 // ρ}}'],
       quiz: [
-        { q: 'Iron ρ = 10×10⁻⁸ Ω·m (BK Ex.2). σ = ?', num: 1e7, tol: 0.01, unit: 'S/m', sol: '1/10⁻⁷ = 10⁷ (Ω·m)⁻¹' },
-        { q: 'Nichrome wire 48 Ω on 240 V (BK Ex.8). I = ?', num: 5, tol: 0, unit: 'A', sol: '240/48' }
+        { q: 'Iron ρ = 10×10⁻⁸ Ω·m (BK Ex.2). σ = ?', num: 1e7, tol: 0.01, unit: 'S/m', sol: 'σ = {{1 // 10⁻⁷}} = 10⁷ (Ω·m)⁻¹' },
+        { q: 'Nichrome wire 48 Ω on 240 V (BK Ex.8). I = ?', num: 5, tol: 0, unit: 'A', sol: 'I = {{240 // 48}} = 5 A' }
       ]
     },
     {
       id: 'ch9-l3', title: 'Electric power', ar: 'القدرة الكهربائية', src: 'S09U §3 · BK p.153',
-      goals: ['Use P = VI = RI² = V²/R'],
+      goals: ['Use P = VI = RI² = {{V² // R}}'],
       goalsAr: 'ستحسب القدرة الكهربائية بالصيغ الثلاث.',
       why: { en: 'Electricity bills charge for energy = power × time.', ar: 'فاتورة الكهرباء تحسب الطاقة = القدرة × الزمن.' },
       explain: [
-        { en: 'Power: energy per unit time to move charges: P = W/Δt = QV/Δt = VI (9.6).', ar: 'القدرة الكهربائية = VI.' },
-        { en: 'With Ohm\'s law: P = RI² = V²/R. Choose the form that uses the known quantities.', ar: 'اختر الصيغة حسب المعطيات.' }
+        { en: 'Power: energy per unit time to move charges: P = {{W // Δt}} = {{QV // Δt}} = VI (9.6).', ar: 'القدرة الكهربائية = VI.' },
+        { en: 'With Ohm\'s law: P = RI² = {{V² // R}}. Choose the form that uses the known quantities.', ar: 'اختر الصيغة حسب المعطيات.' }
       ],
       terms: [['Electric power', 'القدرة الكهربائية', 'Watt'], ['Kilowatt‑hour', 'كيلوواط ساعة', '3.6×10⁶ J (Appendix)']],
-      formulas: [{ f: 'P = V I = R I² = V²/R', name: '(9.6)', sym: [['P', 'power', 'W']], cond: '—' }],
+      formulas: [{ f: 'P = V I = R I² = {{V² // R}}', name: '(9.6)', sym: [['P', 'power', 'W', 'القدرة'], ['V', 'voltage', 'V', 'الجهد'], ['I', 'current', 'A', 'التيار'], ['R', 'resistance', 'Ω', 'المقاومة']], cond: 'Use the V and I of the same device.' }],
       life: { en: 'A 2000 W kettle on 230 V draws about 8.7 A.', ar: 'غلاية 2000 واط على 230 فولت تسحب 8.7 أمبير.' },
-      worked: { src: 'S09U Ex 9.6 · BK p.153', q: '8 Ω heater on 120 V. I and P?', steps: ['I = 120/8 = 15 A', 'P = 120²/8 = 1800 W'], ans: '15 A, 1800 W' },
-      tryit: { src: 'BK p.158 Exercise 5', q: '480 Ω bulb on 240 V. Power?', ans: 120, tol: 0, unit: 'W', hint: 'P = V²/R', sol: '57 600/480 = 120 W' },
-      checks: [{ q: 'Oven 1800 W on 240 V (BK Ex.6). I?', o: ['7.5 A', '0.13 A', '432 A', '75 A'], a: 0, why: 'P/V. R = 32 Ω.' }],
-      mistakes: [['Using P = V²/R with the wrong V', 'V across that resistor.']],
-      summary: ['P = VI', 'P = I²R = V²/R'],
-      quiz: [{ q: 'Same oven: resistance?', num: 32, tol: 0, unit: 'Ω', sol: 'V²/P = 57 600/1800 = 32 Ω' }]
+      worked: { src: 'S09U Ex 9.6 · BK p.153', q: '8 Ω heater on 120 V. I and P?', steps: ['I = {{V // R}} = {{120 // 8}} = 15 A', 'P = {{V² // R}} = {{120² // 8}} = 1800 W'], ans: '15 A, 1800 W' },
+      tryit: { src: 'BK p.158 Exercise 5', q: '480 Ω bulb on 240 V. Power?', ans: 120, tol: 0, unit: 'W', hint: 'P = {{V² // R}}', sol: 'P = {{240² // 480}} = {{57 600 // 480}} = 120 W' },
+      checks: [{ q: 'Oven 1800 W on 240 V (BK Ex.6). I?', o: ['7.5 A', '0.13 A', '432 A', '75 A'], a: 0, why: 'I = {{P // V}} = {{1800 // 240}} = 7.5 A.' }],
+      mistakes: [['Using P = {{V² // R}} with the wrong V', 'V across that resistor.']],
+      summary: ['P = VI', 'P = I²R = {{V² // R}}'],
+      quiz: [{ q: 'Same oven: resistance?', num: 32, tol: 0, unit: 'Ω', sol: 'R = {{V² // P}} = {{57 600 // 1800}} = 32 Ω' }]
     },
     {
       id: 'ch9-l4', title: 'Resistors in series and parallel', ar: 'توصيل المقاومات على التوالي والتوازي', src: 'S09U §4 · BK p.154–157',
@@ -298,20 +298,20 @@ COURSE.push({
       why: { en: 'House outlets are in parallel so each device gets the full voltage.', ar: 'مقابس المنزل على التوازي ليحصل كل جهاز على الجهد كاملًا.' },
       explain: [
         { en: 'Series: same current; ΔV = IR₁ + IR₂ → R_eq = R₁ + R₂ + … (9.7).', ar: 'التوالي: نفس التيار، والمقاومات تُجمع.' },
-        { en: 'Parallel: same voltage; I = I₁ + I₂ → 1/R_eq = 1/R₁ + 1/R₂ + … (9.8).', ar: 'التوازي: نفس الجهد، ونجمع المقلوبات.' },
+        { en: 'Parallel: same voltage; I = I₁ + I₂ → {{1 // R_eq}} = {{1 // R₁}} + {{1 // R₂}} + … (9.8).', ar: 'التوازي: نفس الجهد، ونجمع المقلوبات.' },
         { en: 'Mixed: simplify step by step from the innermost group (Ex 9.9).', ar: 'المختلطة: بسّط خطوة خطوة.' }
       ],
       terms: [['Series', 'توالي', 'One path'], ['Parallel', 'توازي', 'Several branches'], ['Equivalent resistance', 'المقاومة المكافئة', 'R_eq']],
-      formulas: [{ f: 'Series: R_eq = ΣRᵢ  ·  Parallel: 1/R_eq = Σ1/Rᵢ', name: '(9.7–9.8)', sym: [['R_eq', 'equivalent', 'Ω']], cond: '—' }],
+      formulas: [{ f: 'Series: R_eq = R₁ + R₂ + …   ·   Parallel: {{1 // R_eq}} = {{1 // R₁}} + {{1 // R₂}} + …', name: '(9.7–9.8)', sym: [['R_eq', 'equivalent resistance', 'Ω', 'المقاومة المكافئة'], ['R₁, R₂', 'each resistor', 'Ω', 'كل مقاومة']], cond: 'Series: same I in each. Parallel: same V on each.' }],
       life: { en: 'Old Christmas lights in series all go dark when one bulb fails.', ar: 'أضواء الزينة القديمة على التوالي تنطفئ كلها إذا تعطل مصباح.' },
-      worked: { src: 'S09U Ex 9.9 · BK p.156–157', q: 'R₁ = 10 Ω in series with [ (R₂ = 5 + R₃ = 5) ∥ R₄ = 10 ], 15 V between a and c.', steps: ['R₂₃ = 10 Ω', 'R₂₃₄ = (1/10 + 1/10)⁻¹ = 5 Ω', 'R_ac = 10 + 5 = 15 Ω → I = 1 A, 0.5 A in each branch'], ans: '15 Ω, 1 A' },
-      tryit: { src: 'BK p.158 Exercise 7', q: 'A 50 Ω wire is cut into five equal parts connected in parallel. R_eq?', ans: 2, tol: 0, unit: 'Ω', hint: 'Each part 10 Ω', sol: '10/5 = 2 Ω' },
+      worked: { src: 'S09U Ex 9.9 · BK p.156–157', q: 'R₁ = 10 Ω in series with [ (R₂ = 5 + R₃ = 5) ∥ R₄ = 10 ], 15 V between a and c.', steps: ['R₂₃ = 10 Ω', '{{1 // R₂₃₄}} = {{1 // 10}} + {{1 // 10}} → R₂₃₄ = 5 Ω', 'R_ac = 10 + 5 = 15 Ω → I = 1 A, 0.5 A in each branch'], ans: '15 Ω, 1 A' },
+      tryit: { src: 'BK p.158 Exercise 7', q: 'A 50 Ω wire is cut into five equal parts connected in parallel. R_eq?', ans: 2, tol: 0, unit: 'Ω', hint: 'Each part 10 Ω', sol: 'R_eq = {{R // n}} = {{10 // 5}} = 2 Ω' },
       checks: [
         { q: '18, 12, 6 Ω in series (Ex 9.7)?', o: ['36 Ω', '3.3 Ω', '12 Ω', '6 Ω'], a: 0, why: 'Sum.' },
-        { q: 'Same in parallel (Ex 9.8)?', o: ['3.3 Ω', '36 Ω', '11 Ω', '0.3 Ω'], a: 0, why: '36/11.' }
+        { q: 'Same in parallel (Ex 9.8)?', o: ['3.3 Ω', '36 Ω', '11 Ω', '0.3 Ω'], a: 0, why: '{{1 // R}} = {{1 // 18}} + {{1 // 12}} + {{1 // 6}} = {{11 // 36}} → R = {{36 // 11}} = 3.3 Ω.' }
       ],
       mistakes: [['Forgetting to invert 1/R_eq', 'Take the reciprocal at the end.']],
-      summary: ['Series adds R', 'Parallel adds 1/R', 'R_parallel < smallest R'],
+      summary: ['Series adds R', 'Parallel adds {{1 // R}}', 'R_parallel < smallest R'],
       quiz: [{ q: 'Two 6 Ω in parallel then 3 Ω in series. R_eq?', num: 6, tol: 0, unit: 'Ω', sol: '🧩 3 + 3 = 6 Ω' }]
     }
   ]
@@ -353,7 +353,7 @@ COURSE.push({
         { en: 'Into a denser medium the ray bends toward the normal; the path is reversible (Fig 10.6).', ar: 'عند الدخول لوسط أكبر معاملًا ينكسر مقتربًا من العمود.' }
       ],
       terms: [['Refraction', 'الانكسار', 'Change of direction at a boundary'], ['Refractive index', 'معامل الانكسار', 'n = c/v'], ['Snell\'s law', 'قانون سنل', 'n₁ sin θ₁ = n₂ sin θ₂']],
-      formulas: [{ f: 'n = c/v = λ/λₙ', name: 'Refractive index', sym: [['c', '3×10⁸ m/s', 'm/s'], ['λₙ', 'wavelength in medium', 'm']], cond: 'f constant.' }, { f: 'n₁ sin θ₁ = n₂ sin θ₂', name: 'Snell (10.3)', sym: [['θ', 'angle from normal', '°']], cond: '—' }],
+      formulas: [{ f: 'n = {{c // v}} = {{λ // λₙ}}', name: 'Refractive index', sym: [['c', '3×10⁸ m/s', 'm/s'], ['λₙ', 'wavelength in medium', 'm']], cond: 'f constant.' }, { f: 'n₁ sin θ₁ = n₂ sin θ₂', name: 'Snell (10.3)', sym: [['θ', 'angle from normal', '°']], cond: '—' }],
       life: { en: 'A straw looks bent in a glass of water.', ar: 'الماصة تبدو مكسورة في كوب الماء.' },
       worked: { src: 'S10 Ex 10.3 · BK p.168–169', q: '589 nm, air → glass (n = 1.52) at 30°. θ₂, v, λₙ?', steps: ['θ₂ = sin⁻¹(sin30°/1.52) = 19.2°', 'v = 3×10⁸/1.52 = 1.97×10⁸ m/s', 'λₙ = 589/1.52 = 388 nm'], ans: '19.2°, 1.97×10⁸ m/s, 388 nm' },
       tryit: { src: 'BK p.174 Exercise 8', q: 'Air → medium n = 1.458 at θ₁ = 45°. θ₂?', ans: 29.0, tol: 0.01, unit: '°', hint: 'sin θ₂ = sin45°/1.458', sol: 'sin θ₂ = 0.485 → θ₂ = 29.0°' },
@@ -381,7 +381,7 @@ COURSE.push({
         { en: 'If θ₁ > θ_c, all light is reflected back: total internal reflection (only when n₁ > n₂).', ar: 'إذا زادت زاوية السقوط عن الحرجة يحدث انعكاس كلي.' }
       ],
       terms: [['Dispersion', 'التشتت (التحلل)', 'n depends on λ'], ['Critical angle', 'الزاوية الحرجة', 'sin θ_c = n₂/n₁'], ['Total internal reflection', 'الانعكاس الكلي الداخلي', 'θ₁ > θ_c']],
-      formulas: [{ f: 'sin θ_c = n₂ / n₁', name: '(10.4)', sym: [['n₁', 'denser medium', '—'], ['n₂', 'less dense', '—']], cond: 'n₁ > n₂ only.' }],
+      formulas: [{ f: 'sin θ_c = {{n₂ // n₁}}', name: '(10.4)', sym: [['n₁', 'denser medium', '—'], ['n₂', 'less dense', '—']], cond: 'n₁ > n₂ only.' }],
       life: { en: 'Diamonds sparkle because their small critical angle (≈ 24°) traps light inside.', ar: 'يلمع الألماس لأن زاويته الحرجة صغيرة.' },
       worked: { src: 'S10 Ex 10.5 · BK p.172', q: 'Glass (n = 1.5) → air. θ_c?', steps: ['sin θ_c = 1/1.5 = 0.667', 'θ_c = 42°'], ans: '42°' },
       tryit: { src: 'BK p.174 Exercise 10', q: 'Water (n = 1.33) → air. θ_c?', ans: 48.75, tol: 0.01, unit: '°', hint: 'sin⁻¹(1/1.33)', sol: 'θ_c = 48.8°' },
