@@ -242,6 +242,19 @@ body.side-closed main{max-width:1180px}
 .stepbody>.addbox:only-child{margin:0}
 @media (max-width:860px){.stepbody{padding:12px 14px}}
 @media print{.stepbody{box-shadow:none}}
+/* side menu group headers: a distinct, clickable band per section; open groups are tinted and their items hang off a rule */
+nav.side button.grp{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;column-gap:8px;width:100%;margin:16px 0 6px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;text-align:left;cursor:pointer;text-transform:none;letter-spacing:0;transition:background .15s,border-color .15s}
+nav.side button.grp:hover{border-color:var(--brand)}
+nav.side button.grp:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+nav.side button.grp[aria-expanded="true"]{background:var(--brand-soft);border-color:transparent;color:var(--brand)}
+nav.side .grp .gi{font-size:16px;line-height:1}
+nav.side .grp .gt{font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+nav.side .grp .ga{direction:rtl;font-size:12.5px;font-weight:600;opacity:.85;white-space:nowrap}
+nav.side .grp .gn{font-size:11px;font-weight:700;min-width:20px;text-align:center;padding:1px 6px;border-radius:999px;background:var(--panel);color:var(--muted);font-variant-numeric:tabular-nums}
+nav.side .grp .caret{display:grid;place-items:center;width:16px;height:16px;color:var(--muted);transition:transform .15s}
+nav.side .grp[aria-expanded="true"] .caret{transform:rotate(90deg);color:var(--brand)}
+nav.side .grpbody{margin:0 0 4px 14px;padding-left:6px;border-left:2px solid var(--line)}
+@media (prefers-reduced-motion:reduce){nav.side button.grp,nav.side .grp .caret{transition:none}}
 </style>
 </head>
 <body>
@@ -291,7 +304,15 @@ body.side-closed main{max-width:1180px}
       while (run.length && run[run.length - 1].s && /\)$/.test(run[run.length - 1].s) && cnt(')') > cnt('(')) { const l = run[run.length - 1]; tail = ')' + tail; run[run.length - 1] = { t: 'L', s: l.s.slice(0, -1) }; if (!run[run.length - 1].s) run.pop(); }
       return tail;
     };
-    const close = () => { let tail = ''; if (run) tail = balance(); if (run && !run.length) run = null; if (run) { const b = document.createElement('bdi'); b.dir = 'ltr'; run.forEach(a => b.appendChild(node(a))); out.appendChild(b); run = null; } if (tail) out.appendChild(document.createTextNode(tail)); gap.forEach(a => out.appendChild(node(a))); gap = []; };
+    // an operator next to an Arabic word belongs to the Arabic sentence: "الإجهاد = F/A" keeps "=" between the word and the formula
+    const OPS = /^[=+−×÷≈∝→⟹<>≤≥·-]+$/;
+    const trimOps = () => {
+      let tail = '';
+      while (run.length && run[0].s && OPS.test(run[0].s)) { out.appendChild(document.createTextNode(run.shift().s)); while (run.length && run[0].t === 'S') out.appendChild(document.createTextNode(run.shift().s)); }
+      while (run.length && run[run.length - 1].s && OPS.test(run[run.length - 1].s)) { tail = run.pop().s + tail; while (run.length && run[run.length - 1].t === 'S') tail = run.pop().s + tail; }
+      return tail;
+    };
+    const close = () => { let tail = ''; if (run) { tail = balance(); const t2 = run.length ? trimOps() : ''; tail = t2 + tail; } if (run && !run.length) run = null; if (run) { const b = document.createElement('bdi'); b.dir = 'ltr'; run.forEach(a => b.appendChild(node(a))); out.appendChild(b); run = null; } if (tail) out.appendChild(document.createTextNode(tail)); gap.forEach(a => out.appendChild(node(a))); gap = []; };
     atoms.forEach(a => {
       if (a.t === 'L') { if (run) { gap.forEach(g => run.push(g)); gap = []; run.push(a); } else { gap.forEach(g => out.appendChild(node(g))); gap = []; run = [a]; } }
       else if (a.t === 'S') { if (run) gap.push(a); else out.appendChild(node(a)); }
@@ -320,10 +341,10 @@ COURSE.push({
       goalsAr: 'ستتعلم الفرق بين الكميات الأساسية والمشتقة، ووحدات النظام الدولي السبع، وبادئات الوحدات.',
       why: { en: 'Every number in physics is meaningless without a unit: "300" could be metres or kilometres (BK p.13: Bisha–Abha example).', ar: 'الرقم بلا وحدة لا معنى له؛ 300 قد تكون مترًا أو كيلومترًا، لذلك نبدأ بالوحدات قبل أي قانون.' },
       explain: [
-        { en: '<b>Fundamental quantities</b> "are not expressed in terms of other physical quantities": length, mass, time, electric current, temperature, luminous intensity, amount of substance.', ar: 'الكميات الأساسية لا تُعرَّف بدلالة كميات أخرى، وهي سبع.' },
-        { en: '<b>Derived quantities</b> "are defined in terms of the fundamental physical quantities": volume, velocity, density, acceleration, energy, power…', ar: 'الكميات المشتقة تُبنى من الأساسية، مثل السرعة = طول ÷ زمن.' },
-        { en: 'SI base units: metre (m), kilogram (kg), second (s), ampere (A), kelvin (K), candela (cd), mole (mol).', ar: 'وحدات النظام الدولي: المتر، الكيلوغرام، الثانية، الأمبير، الكلفن، الشمعة، المول.' },
-        { en: 'University level: each base unit has a precise definition, e.g. the metre is the distance light travels in vacuum in {{1 // 299 792 458}} s; the second is 9 192 631 770 periods of Cs‑133 radiation (BK p.14).', ar: 'في المستوى الجامعي: لكل وحدة تعريف دقيق، فالمتر مرتبط بسرعة الضوء والثانية بذرة السيزيوم.' }
+        { en: '<b>Fundamental quantities</b> "are not expressed in terms of other physical quantities": length, mass, time, electric current, temperature, luminous intensity, amount of substance.', ar: 'الكميات الأساسية (Fundamental quantities) هي «حجر البناء» في الفيزياء: لا نعرّفها بكميات أخرى، بل نقيسها مباشرة. وعددها سبع: الطول، والكتلة، والزمن، والتيار الكهربائي، ودرجة الحرارة، وشدة الإضاءة، وكمية المادة.' },
+        { en: '<b>Derived quantities</b> "are defined in terms of the fundamental physical quantities": volume, velocity, density, acceleration, energy, power…', ar: 'الكميات المشتقة (Derived quantities) نحصل عليها بتركيب الكميات الأساسية بالضرب أو القسمة. مثلًا: السرعة = طول ÷ زمن، والكثافة = كتلة ÷ حجم، والحجم = طول × طول × طول. فكل كمية في المقرر غير السبع الأساسية هي كمية مشتقة.' },
+        { en: 'SI base units: metre (m), kilogram (kg), second (s), ampere (A), kelvin (K), candela (cd), mole (mol).', ar: 'لكل كمية أساسية وحدة في النظام الدولي (SI): الطول بالمتر m، والكتلة بالكيلوغرام kg، والزمن بالثانية s، والتيار بالأمبير A، ودرجة الحرارة بالكلفن K، وشدة الإضاءة بالشمعة cd، وكمية المادة بالمول mol. انتبه: وحدة الكتلة الأساسية هي الكيلوغرام وليست الغرام.' },
+        { en: 'University level: each base unit has a precise definition, e.g. the metre is the distance light travels in vacuum in {{1 // 299 792 458}} s; the second is 9 192 631 770 periods of Cs‑133 radiation (BK p.14).', ar: 'في المستوى الجامعي تُعرَّف كل وحدة تعريفًا دقيقًا لا يتغير: فالمتر هو المسافة التي يقطعها الضوء في الفراغ خلال {{1 // 299 792 458}} من الثانية، والثانية مرتبطة بعدد محدد من اهتزازات ذرة السيزيوم. الفكرة المهمة أن الوحدات مبنية على ثوابت في الطبيعة، فهي واحدة في كل مكان.' }
       ],
       terms: [['Fundamental quantity', 'كمية أساسية', 'Not defined from other quantities'], ['Derived quantity', 'كمية مشتقة', 'Built from fundamental quantities'], ['Prefix', 'بادئة', 'Power of ten written before a unit (k, m, μ…)'], ['Amount of substance', 'كمية المادة', 'Measured in mole (mol)'], ['Luminous intensity', 'شدة الإضاءة', 'Measured in candela (cd)']],
       formulas: [{ f: 'n = 10⁻⁹, μ = 10⁻⁶, m = 10⁻³, c = 10⁻², d = 10⁻¹, da = 10¹, k = 10³, M = 10⁶, G = 10⁹', name: 'SI prefixes (Table 1.1)', sym: [['n', 'nano', '10⁻⁹', 'نانو'], ['μ', 'micro', '10⁻⁶', 'مايكرو'], ['m', 'milli', '10⁻³', 'ملّي'], ['k', 'kilo', '10³', 'كيلو'], ['M', 'mega', '10⁶', 'ميغا'], ['G', 'giga', '10⁹', 'جيجا']], cond: 'm (milli) ≠ M (mega): case matters.' }],
@@ -348,9 +369,9 @@ COURSE.push({
       goalsAr: 'ستتعلم كتابة معادلة التحويل وتحويل الوحدات المركبة مثل km/h إلى m/s.',
       why: { en: 'Laws such as F = ma only give correct numbers when every quantity is in SI units.', ar: 'القوانين تعطي نتيجة صحيحة فقط إذا كانت كل الكميات بوحدات SI.' },
       explain: [
-        { en: 'Start from an equality such as 1 min = 60 s. Multiply both sides by the same number to convert (3 min = 180 s).', ar: 'ابدأ بمساواة مثل 1 min = 60 s ثم اضرب الطرفين بالعدد نفسه.' },
-        { en: 'For compound units, replace each unit separately: km → 10³ m and h → 3600 s.', ar: 'في الوحدات المركبة استبدل كل وحدة على حدة.' },
-        { en: 'Powers apply to the prefix too: 1 cm³ = (10⁻² m)³ = 10⁻⁶ m³.', ar: 'الأس يُطبَّق على البادئة أيضًا: السنتيمتر المكعب = 10⁻⁶ m³.' }
+        { en: 'Start from an equality such as 1 min = 60 s. Multiply both sides by the same number to convert (3 min = 180 s).', ar: 'التحويل يبدأ دائمًا من مساواة صحيحة بين وحدتين، مثل 1 min = 60 s. ثم تضرب طرفيها في العدد نفسه: 3 min = 3 × 60 s = 180 s. وهكذا لا تحتاج أن تتذكر هل تضرب أو تقسم، لأن المساواة تقودك.' },
+        { en: 'For compound units, replace each unit separately: km → 10³ m and h → 3600 s.', ar: 'الوحدة المركبة مثل km/h فيها وحدتان، فتستبدل كل واحدة وحدها: الكيلومتر = 1000 m، والساعة = 3600 s. لذلك 1 km/h = {{1000 m // 3600 s}} = {{1 // 3.6}} m/s، أي أن التحويل من km/h إلى m/s يكون بالقسمة على 3.6.' },
+        { en: 'Powers apply to the prefix too: 1 cm³ = (10⁻² m)³ = 10⁻⁶ m³.', ar: 'إذا كانت الوحدة مربعة أو مكعبة فالأس يُطبَّق على معامل التحويل أيضًا. السنتيمتر = 10⁻² m، فالسنتيمتر المكعب = (10⁻² m)³ = 10⁻⁶ m³ وليس 10⁻² m³. وهذا من أكثر الأخطاء تكرارًا في المسائل.' }
       ],
       terms: [['Conversion factor', 'معامل التحويل', 'Number linking two units, e.g. 60 s/min'], ['Compound unit', 'وحدة مركبة', 'Unit made of several units, e.g. m/s']],
       formulas: [{ f: '1 km/h = {{10³ m // 3600 s}} = {{1 // 3.6}} m/s', name: 'Speed conversion', sym: [['km/h', 'kilometre per hour', '—', 'كيلومتر لكل ساعة'], ['m/s', 'metre per second (SI)', '—', 'متر لكل ثانية']], cond: 'Divide km/h by 3.6 to get m/s.' }, { f: '1 g/cm³ = {{10⁻³ kg // (10⁻²)³ m³}} = 10³ kg/m³', name: 'Density conversion', sym: [['ρ', 'density', 'kg/m³', 'الكثافة'], ['g/cm³', 'gram per cubic centimetre', '—', 'غرام لكل سنتيمتر مكعب']], cond: '—' }],
@@ -375,10 +396,10 @@ COURSE.push({
       goalsAr: 'ستتعلم كتابة أبعاد الكميات والتحقق من صحة القوانين واشتقاق علاقات بسيطة.',
       why: { en: 'Dimensional analysis is a free error‑check: if the two sides of your answer have different dimensions, it is wrong.', ar: 'تحليل الأبعاد فحص مجاني لأخطائك: إذا اختلفت أبعاد الطرفين فالجواب خاطئ.' },
       explain: [
-        { en: 'In classical mechanics everything is expressed with mass [M], length [L], time [T].', ar: 'في الميكانيكا الكلاسيكية نعبّر عن كل كمية بالكتلة والطول والزمن.' },
-        { en: 'The importance (S01): validation of physical laws, easily derive some physical laws, derive the units of physical constants.', ar: 'أهميته: التحقق من القوانين، واشتقاق بعضها، واستنتاج وحدات الثوابت.' },
-        { en: 'Table 1.2: [ρ]=ML⁻³, [v]=LT⁻¹, [a]=LT⁻², [F]=MLT⁻², [W]=ML²T⁻², [P]=ML²T⁻³.', ar: 'جدول الأبعاد في الكتاب صفحة 17.' },
-        { en: 'Limitation: numbers like 2π have no dimensions, so dimensional analysis cannot find them (BK p.19: "In practice, the constant C was equal to 2π").', ar: 'القيد: الثوابت العددية مثل 2π لا أبعاد لها فلا يمكن إيجادها بالأبعاد.' }
+        { en: 'In classical mechanics everything is expressed with mass [M], length [L], time [T].', ar: 'تحليل الأبعاد يعني أن نكتب كل كمية بدلالة ثلاث كميات فقط في الميكانيكا: الكتلة [M] والطول [L] والزمن [T]. مثلًا السرعة طول ÷ زمن، فبُعدها LT⁻¹.' },
+        { en: 'The importance (S01): validation of physical laws, easily derive some physical laws, derive the units of physical constants.', ar: 'فائدته ثلاثية (S01): نتحقق به من صحة القانون، ونستنتج به بعض القوانين البسيطة، ونعرف به وحدة أي ثابت فيزيائي. إذا خرجت أبعاد طرفي المعادلة مختلفة فالمعادلة خاطئة بالتأكيد.' },
+        { en: 'Table 1.2: [ρ]=ML⁻³, [v]=LT⁻¹, [a]=LT⁻², [F]=MLT⁻², [W]=ML²T⁻², [P]=ML²T⁻³.', ar: 'هذه أبعاد أهم الكميات (جدول 1.2 في الكتاب، صفحة 17): الكثافة ML⁻³، والسرعة LT⁻¹، والتسارع LT⁻²، والقوة MLT⁻²، والشغل ML²T⁻²، والقدرة ML²T⁻³. لاحظ أن كل واحدة تُبنى من التي قبلها: القوة = كتلة × تسارع، والشغل = قوة × مسافة، والقدرة = شغل ÷ زمن.' },
+        { en: 'Limitation: numbers like 2π have no dimensions, so dimensional analysis cannot find them (BK p.19: "In practice, the constant C was equal to 2π").', ar: 'حدود الطريقة: الأرقام المجردة مثل 2π و ½ ليس لها أبعاد، فتحليل الأبعاد لا يستطيع إيجادها. لذلك يعطينا شكل القانون ولا يعطينا الثابت العددي؛ ففي قانون البندول عرفنا أن T تتناسب مع √(L/g)، لكن العدد 2π جاء من التجربة (BK p.19).' }
       ],
       terms: [['Dimension', 'بُعد', 'Expression of a quantity in M, L, T'], ['Dimensionally homogeneous', 'متجانس بُعديًا', 'Both sides have equal dimensions'], ['Dimensionless', 'عديم الأبعاد', 'Pure number, e.g. strain, angle, 2π']],
       formulas: [{ f: '[F] = [m][a] = M·LT⁻² = MLT⁻²', name: 'Example of dimension algebra', sym: [['[ ]', 'dimension of', '—', 'بُعد الكمية'], ['M, L, T', 'mass, length, time', '—', 'الكتلة، الطول، الزمن']], cond: 'Add/subtract only terms with identical dimensions.' }],
@@ -409,9 +430,9 @@ COURSE.push({
       goalsAr: 'ستميّز بين الكمية القياسية والمتجهة وتتعرف خواص المتجهات.',
       why: { en: 'Displacement, velocity, force and fields are vectors; adding them like ordinary numbers gives wrong answers.', ar: 'الإزاحة والسرعة والقوة متجهات، وجمعها كأعداد عادية يعطي نتائج خاطئة.' },
       explain: [
-        { en: '<b>Scalar</b>: defined by magnitude only (distance, mass, time). <b>Vector</b>: magnitude and direction (displacement, velocity, acceleration, force).', ar: 'القياسية: مقدار فقط. المتجهة: مقدار واتجاه.' },
-        { en: 'BK p.25 example: going home→mosque (30 m east) and back: distance 60 m, but the displacement vectors are opposite.', ar: 'مثال المسجد: المسافة 60 م، لكن متجه الذهاب عكس متجه العودة.' },
-        { en: 'Properties: A = B (same magnitude and direction); A + B = B + A; (A + B) + C = A + (B + C); A + (−A) = 0; A − B = A + (−B); B = nA (n < 0 reverses direction).', ar: 'الخواص: التساوي، الإبدال، التجميع، المعكوس، الطرح، الضرب في عدد.' }
+        { en: '<b>Scalar</b>: defined by magnitude only (distance, mass, time). <b>Vector</b>: magnitude and direction (displacement, velocity, acceleration, force).', ar: 'الكمية القياسية (Scalar) يكفي لوصفها رقم ووحدة، مثل الكتلة 5 kg أو الزمن 10 s. أما الكمية المتجهة (Vector) فتحتاج رقمًا ووحدة واتجاهًا، مثل الإزاحة 30 m شرقًا أو القوة 20 N لأعلى. والسؤال الذي يفرّق بينهما: هل يتغير المعنى إذا تغير الاتجاه؟' },
+        { en: 'BK p.25 example: going home→mosque (30 m east) and back: distance 60 m, but the displacement vectors are opposite.', ar: 'مثال الكتاب (BK p.25): تمشي من البيت إلى المسجد 30 m شرقًا ثم ترجع. المسافة التي مشيتها 60 m، لكن متجه الذهاب نحو الشرق ومتجه العودة نحو الغرب، فهما متعاكسان ومجموعهما صفر، أي أنك رجعت إلى نقطة البداية.' },
+        { en: 'Properties: A = B (same magnitude and direction); A + B = B + A; (A + B) + C = A + (B + C); A + (−A) = 0; A − B = A + (−B); B = nA (n < 0 reverses direction).', ar: 'خواص المتجهات: يتساوى متجهان إذا تساويا في المقدار والاتجاه معًا. والجمع إبدالي (A + B = B + A) وتجميعي. ومعكوس المتجه −A له المقدار نفسه واتجاه معاكس، والطرح هو جمع المعكوس: A − B = A + (−B). وضرب المتجه في عدد سالب يعكس اتجاهه.' }
       ],
       terms: [['Scalar', 'كمية قياسية', 'Magnitude only'], ['Vector', 'متجه', 'Magnitude + direction'], ['Commutative', 'إبدالي', 'Order does not matter'], ['Associative', 'تجميعي', 'Grouping does not matter'], ['Inverse vector', 'المتجه المعكوس', 'Same magnitude, opposite direction']],
       formulas: [{ f: 'C = A − B = A + (−B)', name: 'Vector subtraction', sym: [['A, B', 'vectors', 'same unit', 'متجهان'], ['−B', 'inverse of B', 'same unit', 'معكوس المتجه B'], ['C', 'difference A − B', 'same unit', 'الفرق']], cond: '—' }],
@@ -435,9 +456,9 @@ COURSE.push({
       goalsAr: 'ستجمع متجهين متعامدين بفيثاغورس، وأي متجهين بقانوني جيب التمام والجيب.',
       why: { en: 'Two forces of 4 N each do not make 8 N unless they act in the same direction.', ar: 'قوتان كل منهما 4 نيوتن لا تعطيان 8 نيوتن إلا إذا كانتا في الاتجاه نفسه.' },
       explain: [
-        { en: 'Head‑to‑tail: draw B starting at the head of A; the resultant C goes from the tail of A to the head of B.', ar: 'ارسم ذيل المتجه الثاني عند رأس الأول؛ المحصلة من ذيل الأول إلى رأس الثاني.' },
-        { en: 'Right angle: C = √(A² + B²), θ = tan⁻¹( {{B // A}} ).', ar: 'إذا كانا متعامدين نستخدم فيثاغورس والظل.' },
-        { en: 'Any angle: C = √(A² + B² − 2AB cos θ) where θ is the angle <b>inside the triangle</b> (opposite C); direction by sine rule {{sin β // B}} = {{sin θ // C}}.', ar: 'لأي زاوية: قانون جيب التمام، حيث θ هي الزاوية داخل المثلث المقابلة للمحصلة.' }
+        { en: 'Head‑to‑tail: draw B starting at the head of A; the resultant C goes from the tail of A to the head of B.', ar: 'طريقة الرأس للذيل (Head‑to‑tail): ارسم المتجه الأول، ثم ابدأ رسم الثاني من رأس الأول. المحصلة هي السهم الذي يبدأ من ذيل الأول وينتهي عند رأس الثاني، أي أنها الطريق المختصر من البداية إلى النهاية.' },
+        { en: 'Right angle: C = √(A² + B²), θ = tan⁻¹( {{B // A}} ).', ar: 'إذا كان المتجهان متعامدين (بينهما 90°) فهما ضلعا مثلث قائم والمحصلة وتره. لذلك مقدارها C = √(A² + B²) من فيثاغورس، واتجاهها θ = tan⁻¹( {{B // A}} ) مقيسًا من المتجه A.' },
+        { en: 'Any angle: C = √(A² + B² − 2AB cos θ) where θ is the angle <b>inside the triangle</b> (opposite C); direction by sine rule {{sin β // B}} = {{sin θ // C}}.', ar: 'إذا كانت الزاوية بينهما غير قائمة نستخدم قانون جيب التمام: C = √(A² + B² − 2AB cos θ). المهم أن θ هنا هي الزاوية داخل المثلث المقابلة للمحصلة، وتساوي 180° ناقص الزاوية بين ذيلي المتجهين. ثم نجد الاتجاه بقانون الجيب.' }
       ],
       terms: [['Resultant', 'المحصلة', 'Single vector equal to the sum'], ['Head‑to‑tail', 'رأس لذيل', 'Graphical addition method'], ['Cosine rule', 'قانون جيب التمام', 'C² = A² + B² − 2AB cos θ']],
       formulas: [
@@ -464,9 +485,9 @@ COURSE.push({
       goalsAr: 'ستحلل المتجه إلى مركبتين وتكتبه بمتجهات الوحدة وتجمع بالمركبات.',
       why: { en: 'Components turn hard geometry into simple addition; every later chapter (forces, work, fields) uses them.', ar: 'المركبات تحول الهندسة الصعبة إلى جمع بسيط، وتُستخدم في كل الفصول التالية.' },
       explain: [
-        { en: 'A vector A at angle θ from +x: Aₓ = A cos θ, A_y = A sin θ, so A = A cos θ î + A sin θ ĵ.', ar: 'المركبة الأفقية = A cos θ والرأسية = A sin θ بشرط قياس θ من محور x الموجب.' },
-        { en: 'Unit vectors î, ĵ, k̂ point along x, y, z (right‑hand system).', ar: 'متجهات الوحدة طولها 1 وتشير لاتجاه المحاور.' },
-        { en: 'Sum: A + B = (Aₓ + Bₓ)î + (A_y + B_y)ĵ + (A_z + B_z)k̂; magnitude √(Rₓ² + R_y² + R_z²).', ar: 'نجمع المركبات المتناظرة ثم نحسب المقدار.' }
+        { en: 'A vector A at angle θ from +x: Aₓ = A cos θ, A_y = A sin θ, so A = A cos θ î + A sin θ ĵ.', ar: 'أي متجه مائل يمكن تفكيكه إلى جزأين متعامدين: جزء أفقي Aₓ = A cos θ وجزء رأسي A_y = A sin θ، بشرط أن تُقاس θ من محور x الموجب. تخيّل ظل المتجه على الأرض (الأفقي) وظله على الجدار (الرأسي).' },
+        { en: 'Unit vectors î, ĵ, k̂ point along x, y, z (right‑hand system).', ar: 'متجهات الوحدة î و ĵ و k̂ أسهم طول كل منها 1، وتشير في اتجاه المحاور x و y و z. فعندما نكتب 3î + 4ĵ نعني: 3 وحدات في اتجاه x و 4 وحدات في اتجاه y.' },
+        { en: 'Sum: A + B = (Aₓ + Bₓ)î + (A_y + B_y)ĵ + (A_z + B_z)k̂; magnitude √(Rₓ² + R_y² + R_z²).', ar: 'لجمع متجهات كثيرة: اجمع كل المركبات السينية معًا، وكل المركبات الصادية معًا، ولا تخلط بينهما. فتحصل على مركبتي المحصلة Rₓ و R_y، ثم مقدارها √(Rₓ² + R_y²). هذه أسهل طريقة وأدقها لأي عدد من المتجهات.' }
       ],
       terms: [['Component', 'مركبة', 'Projection on an axis'], ['Unit vector', 'متجه وحدة', 'Magnitude 1, shows direction'], ['Right‑hand system', 'نظام اليد اليمنى', 'Orientation of x, y, z']],
       formulas: [{ f: 'Aₓ = A cos θ ,  A_y = A sin θ', name: 'Components', sym: [['A', 'magnitude', '—', 'مقدار المتجه'], ['Aₓ, A_y', 'x‑ and y‑components', 'same as A', 'المركبتان السينية والصادية'], ['θ', 'angle from +x axis', '°', 'الزاوية من محور x الموجب']], cond: 'θ measured counter‑clockwise from +x.' }, { f: 'A + B = (Aₓ+Bₓ)î + (A_y+B_y)ĵ + (A_z+B_z)k̂', name: 'Component addition', sym: [['î ĵ k̂', 'unit vectors along x, y, z', '—', 'متجهات الوحدة'], ['Aₓ, A_y, A_z', 'components of A', 'same as A', 'مركبات المتجه']], cond: '—' }],
@@ -491,10 +512,10 @@ COURSE.push({
       goalsAr: 'ستحسب الضرب القياسي والاتجاهي وتجد الزاوية بين متجهين.',
       why: { en: 'Work is a dot product (W = F·Δr, Chapter 5); torque and magnetic force are cross products.', ar: 'الشغل ضرب قياسي (الفصل 5)، والعزم ضرب اتجاهي.' },
       explain: [
-        { en: '<b>Scalar product</b>: A·B = AB cos θ = AₓBₓ + A_yB_y + A_zB_z → a scalar; commutative. î·î = 1, î·ĵ = 0.', ar: 'الضرب القياسي ناتجه عدد، وهو إبدالي.' },
-        { en: 'Angle: cos θ = {{A·B // AB}}. If A·B = 0 the vectors are orthogonal.', ar: 'إذا كان الضرب القياسي صفرًا فالمتجهان متعامدان.' },
-        { en: '<b>Vector product</b>: A×B = AB sin θ n̂, perpendicular to both (right‑hand rule); A×B = −B×A. î×ĵ = k̂, ĵ×k̂ = î, k̂×î = ĵ, î×î = 0.', ar: 'الضرب الاتجاهي ناتجه متجه عمودي على الاثنين، وليس إبداليًا.' },
-        { en: 'Determinant form: A×B = î(A_yB_z − A_zB_y) − ĵ(AₓB_z − A_zBₓ) + k̂(AₓB_y − A_yBₓ).', ar: 'صيغة المحدد، انتبه لإشارة السالب أمام ĵ.' }
+        { en: '<b>Scalar product</b>: A·B = AB cos θ = AₓBₓ + A_yB_y + A_zB_z → a scalar; commutative. î·î = 1, î·ĵ = 0.', ar: 'الضرب القياسي (Dot product) يأخذ متجهين ويعطيك عددًا وليس متجهًا: A·B = AB cos θ، أو بالمركبات AₓBₓ + A_yB_y + A_zB_z. وترتيب الضرب لا يهم (A·B = B·A). ومنه î·î = 1 لأن الزاوية صفر، و î·ĵ = 0 لأنهما متعامدان.' },
+        { en: 'Angle: cos θ = {{A·B // AB}}. If A·B = 0 the vectors are orthogonal.', ar: 'من الضرب القياسي نجد الزاوية بين متجهين: cos θ = {{A·B // AB}}. فإذا كان الناتج صفرًا كان cos θ = 0 أي θ = 90°، فالمتجهان متعامدان. وهذه طريقة سريعة لاختبار التعامد.' },
+        { en: '<b>Vector product</b>: A×B = AB sin θ n̂, perpendicular to both (right‑hand rule); A×B = −B×A. î×ĵ = k̂, ĵ×k̂ = î, k̂×î = ĵ, î×î = 0.', ar: 'الضرب الاتجاهي (Cross product) يعطيك متجهًا جديدًا عموديًا على المتجهين معًا، مقداره AB sin θ واتجاهه بقاعدة اليد اليمنى. وهنا الترتيب مهم: A×B = −B×A. ومنه î×ĵ = k̂ و î×î = 0.' },
+        { en: 'Determinant form: A×B = î(A_yB_z − A_zB_y) − ĵ(AₓB_z − A_zBₓ) + k̂(AₓB_y − A_yBₓ).', ar: 'عندما يكون المتجهان بالمركبات نحسب الضرب الاتجاهي بالمحدد: نضع î ĵ k̂ في الصف الأول، ثم مركبات A، ثم مركبات B. انتبه للإشارة السالبة أمام حد ĵ؛ نسيانها هو الخطأ الشائع، وقد وقع فيه الكتاب نفسه في مثال 2.9 (G‑27).' }
       ],
       terms: [['Dot product', 'الضرب القياسي (النقطي)', 'Gives a scalar'], ['Cross product', 'الضرب الاتجاهي', 'Gives a vector'], ['Orthogonal', 'متعامد', 'θ = 90°'], ['Right‑hand rule', 'قاعدة اليد اليمنى', 'Direction of A×B']],
       formulas: [
@@ -529,9 +550,9 @@ COURSE.push({
       goalsAr: 'ستحسب الإزاحة (متجهة) والمسافة (قياسية) لمسار معطى.',
       why: { en: 'Velocity and acceleration are built on displacement, not distance.', ar: 'السرعة المتجهة والتسارع يُبنيان على الإزاحة وليس المسافة.' },
       explain: [
-        { en: 'Displacement is a vector that depends only on the starting and ending points: Δx = x₂ − x₁.', ar: 'الإزاحة تعتمد على نقطتي البداية والنهاية فقط.' },
-        { en: 'Distance is a scalar equal to the actual length of the path.', ar: 'المسافة هي الطول الفعلي للمسار.' },
-        { en: '|Δx| ≤ d always; they are equal only for motion in one direction without turning back.', ar: 'مقدار الإزاحة أقل من أو يساوي المسافة دائمًا.' }
+        { en: 'Displacement is a vector that depends only on the starting and ending points: Δx = x₂ − x₁.', ar: 'الإزاحة (Displacement) هي التغير في الموقع: Δx = x₂ − x₁، أي الموقع النهائي ناقص الموقع الابتدائي. لا يهمها الطريق الذي سلكته، فقط من أين بدأت وأين انتهيت، وإشارتها تخبرك بالاتجاه.' },
+        { en: 'Distance is a scalar equal to the actual length of the path.', ar: 'المسافة (Distance) هي طول الطريق الذي قطعته فعلًا، مهما تعرّج أو رجعت. وهي كمية قياسية موجبة دائمًا، مثل قراءة عداد المسافة في السيارة.' },
+        { en: '|Δx| ≤ d always; they are equal only for motion in one direction without turning back.', ar: 'لذلك مقدار الإزاحة إما أقل من المسافة أو يساويها، ولا يكون أكبر منها أبدًا. ويتساويان فقط إذا تحرك الجسم في خط مستقيم واتجاه واحد دون رجوع.' }
       ],
       terms: [['Displacement', 'الإزاحة', 'Δx = x₂ − x₁ (vector)'], ['Distance', 'المسافة', 'Path length (scalar)'], ['Position', 'الموقع', 'x relative to an origin']],
       formulas: [{ f: 'Δx = x₂ − x₁', name: 'Displacement (3.1)', sym: [['Δx', 'displacement', 'm', 'الإزاحة'], ['x₁, x₂', 'initial, final position', 'm', 'الموقع الابتدائي والنهائي']], cond: 'Sign shows direction.' }],
@@ -555,9 +576,9 @@ COURSE.push({
       goalsAr: 'ستحسب السرعة القياسية المتوسطة والسرعة المتجهة المتوسطة واللحظية بالاشتقاق.',
       why: { en: 'Speedometers show instantaneous speed; trip planners use average speed.', ar: 'عداد السرعة يعرض السرعة اللحظية، وتخطيط الرحلة يستخدم المتوسطة.' },
       explain: [
-        { en: 'Average speed s = {{d // Δt}} (scalar). Average velocity v_av = {{Δx // Δt}} = {{x₂ − x₁ // t₂ − t₁}} (vector).', ar: 'السرعة القياسية = المسافة ÷ الزمن، والمتجهة = الإزاحة ÷ الزمن.' },
-        { en: 'Instantaneous velocity is the limit as Δt → 0: v = {{dx // dt}} (3.3).', ar: 'السرعة اللحظية هي نهاية المتوسطة عندما يقترب الزمن من الصفر، أي المشتقة.' },
-        { en: 'Power rule: {{d // dt}}(tⁿ) = n tⁿ⁻¹, derivative of a constant = 0.', ar: 'قاعدة الاشتقاق: مشتقة tⁿ هي n tⁿ⁻¹.' }
+        { en: 'Average speed s = {{d // Δt}} (scalar). Average velocity v_av = {{Δx // Δt}} = {{x₂ − x₁ // t₂ − t₁}} (vector).', ar: 'السرعة القياسية المتوسطة (Average speed) = المسافة ÷ الزمن، وهي عدد موجب. أما السرعة المتجهة المتوسطة (Average velocity) = الإزاحة ÷ الزمن، ولها اتجاه. فإذا ركضت حول ملعب ورجعت إلى مكانك تكون سرعتك القياسية كبيرة، لكن سرعتك المتجهة المتوسطة صفر.' },
+        { en: 'Instantaneous velocity is the limit as Δt → 0: v = {{dx // dt}} (3.3).', ar: 'السرعة اللحظية (Instantaneous velocity) هي سرعتك عند لحظة معينة، مثل قراءة عداد السرعة الآن. رياضيًا نأخذ المتوسط على زمن صغير جدًا يقترب من الصفر، وهذا هو المشتقة: v = {{dx // dt}}.' },
+        { en: 'Power rule: {{d // dt}}(tⁿ) = n tⁿ⁻¹, derivative of a constant = 0.', ar: 'قاعدة الاشتقاق التي تحتاجها: مشتقة tⁿ هي n tⁿ⁻¹، أي ننزل الأس ونضربه ثم ننقص الأس واحدًا، ومشتقة العدد الثابت صفر. مثال: إذا كان x = 6t² − t + 1 فإن v = 12t − 1.' }
       ],
       terms: [['Average speed', 'السرعة القياسية المتوسطة', '{{d // Δt}}'], ['Average velocity', 'السرعة المتجهة المتوسطة', '{{Δx // Δt}}'], ['Instantaneous velocity', 'السرعة اللحظية', '{{dx // dt}}']],
       formulas: [{ f: 'v_av = {{Δx // Δt}} ,  v = {{dx // dt}}', name: 'Velocity (3.2, 3.3)', sym: [['v_av', 'average velocity', 'm/s', 'السرعة المتوسطة'], ['v', 'instantaneous velocity', 'm/s', 'السرعة اللحظية'], ['Δx', 'displacement', 'm', 'الإزاحة'], ['t', 'time', 's', 'الزمن']], cond: '—' }],
@@ -582,10 +603,10 @@ COURSE.push({
       goalsAr: 'ستحسب التسارع المتوسط واللحظي وتفهم معنى إشارته.',
       why: { en: 'Acceleration links motion to forces (Newton\'s 2nd law, Chapter 4).', ar: 'التسارع هو الجسر بين الحركة والقوة في الفصل الرابع.' },
       explain: [
-        { en: 'Average acceleration: "the rate of velocity change in time", a_av = {{Δv // Δt}} = {{v₂ − v₁ // t₂ − t₁}} (3.4).', ar: 'التسارع المتوسط = التغير في السرعة ÷ الزمن.' },
-        { en: '⚠ The slide S03 words it as "average velocity divided by the time interval"; the equation ({{Δv // Δt}}) and the book are the reference (gap G‑04).', ar: 'تنبيه: صياغة الشريحة غير دقيقة، المعتمد هو {{Δv // Δt}}.' },
-        { en: 'Instantaneous acceleration a = {{dv // dt}} = {{d²x // dt²}} (3.5).', ar: 'التسارع اللحظي هو مشتقة السرعة.' },
-        { en: 'Negative a does not necessarily mean slowing down: if a and v are both negative, the object speeds up (BK p.45).', ar: 'التسارع السالب لا يعني دائمًا التباطؤ؛ إذا كانت السرعة سالبة أيضًا فالجسم يتسارع.' }
+        { en: 'Average acceleration: "the rate of velocity change in time", a_av = {{Δv // Δt}} = {{v₂ − v₁ // t₂ − t₁}} (3.4).', ar: 'التسارع (Acceleration) يقيس سرعة تغير السرعة: كم تزيد السرعة أو تنقص في كل ثانية. التسارع المتوسط = (السرعة النهائية − السرعة الابتدائية) ÷ الزمن، ووحدته m/s². فتسارع 2 m/s² يعني أن السرعة تزيد 2 m/s كل ثانية.' },
+        { en: '⚠ The slide S03 words it as "average velocity divided by the time interval"; the equation ({{Δv // Δt}}) and the book are the reference (gap G‑04).', ar: 'تنبيه: شريحة المقرر S03 تقول «السرعة المتوسطة مقسومة على الزمن»، وهذه صياغة غير دقيقة. التعريف الصحيح في الكتاب والقانون هو تغير السرعة ÷ الزمن {{Δv // Δt}}، فاعتمده (G‑04).' },
+        { en: 'Instantaneous acceleration a = {{dv // dt}} = {{d²x // dt²}} (3.5).', ar: 'التسارع اللحظي هو التسارع عند لحظة معينة، ونحسبه بالاشتقاق: a = {{dv // dt}}. أي نشتق السرعة مرة، أو نشتق الموقع مرتين.' },
+        { en: 'Negative a does not necessarily mean slowing down: if a and v are both negative, the object speeds up (BK p.45).', ar: 'التسارع السالب لا يعني دائمًا أن الجسم يبطئ. الجسم يبطئ إذا كانت إشارة التسارع عكس إشارة السرعة، ويسرع إذا كانت إشارتاهما متشابهتين. فإذا كانت السرعة سالبة والتسارع سالبًا فالجسم تزداد سرعته (BK p.45).' }
       ],
       terms: [['Acceleration', 'التسارع', 'Rate of change of velocity'], ['Deceleration', 'التباطؤ', 'Speed decreasing (a opposite to v)']],
       formulas: [{ f: 'a_av = {{Δv // Δt}} ,  a = {{dv // dt}}', name: 'Acceleration (3.4, 3.5)', sym: [['a_av', 'average acceleration', 'm/s²', 'التسارع المتوسط'], ['a', 'instantaneous acceleration', 'm/s²', 'التسارع اللحظي'], ['Δv', 'change of velocity', 'm/s', 'تغير السرعة'], ['t', 'time', 's', 'الزمن']], cond: '—' }],
@@ -609,10 +630,10 @@ COURSE.push({
       goalsAr: 'ستختار المعادلة المناسبة من معادلات الحركة الثلاث، وتحل مسائل السقوط الحر.',
       why: { en: 'Most exam motion problems are solved with three equations; the skill is choosing the right one.', ar: 'أغلب مسائل الحركة تُحل بثلاث معادلات، والمهارة في اختيار المناسبة.' },
       explain: [
-        { en: 'If a is constant: (3.6) v_f = at + v_i · (3.7) x_f = ½at² + v_i t + x_i · (3.8) v_f² = v_i² + 2aΔx.', ar: 'المعادلات الثلاث صالحة فقط عندما يكون التسارع ثابتًا.' },
-        { en: 'Pick the equation that does not contain the quantity you neither know nor need (no t → use 3.8).', ar: 'اختر المعادلة التي لا تحتوي الكمية المجهولة غير المطلوبة.' },
-        { en: 'Free fall: a = g = 9.8 m/s² toward Earth\'s centre, independent of mass (air resistance neglected). Choose + direction first: Ex 3.5 takes down +, Ex 3.6 takes up +.', ar: 'السقوط الحر: التسارع g = 9.8 م/ث² نحو الأرض. حدد الاتجاه الموجب أولًا.' },
-        { en: 'Thrown up: y_max = {{v_i² // 2g}}, t_max = {{v_i // g}}, flight time back to the same level = 2 t_max.', ar: 'أقصى ارتفاع v²/2g وزمن الصعود v/g وزمن التحليق ضعفه.' }
+        { en: 'If a is constant: (3.6) v_f = at + v_i · (3.7) x_f = ½at² + v_i t + x_i · (3.8) v_f² = v_i² + 2aΔx.', ar: 'عندما يكون التسارع ثابتًا لدينا ثلاث معادلات: v_f = v_i + at لحساب السرعة بعد زمن، و x_f = x_i + v_i t + ½at² لحساب الموقع بعد زمن، و v_f² = v_i² + 2aΔx للعلاقة بين السرعة والمسافة بدون زمن. ولا تصلح هذه المعادلات إذا كان التسارع يتغير.' },
+        { en: 'Pick the equation that does not contain the quantity you neither know nor need (no t → use 3.8).', ar: 'كيف تختار المعادلة؟ اكتب المعطيات والمطلوب، ثم انظر إلى الكمية التي لا تعرفها ولا تحتاجها، واختر المعادلة التي لا تحتوي عليها. مثلًا: إذا لم يُذكر الزمن ولم يُطلب، فاستخدم v_f² = v_i² + 2aΔx.' },
+        { en: 'Free fall: a = g = 9.8 m/s² toward Earth\'s centre, independent of mass (air resistance neglected). Choose + direction first: Ex 3.5 takes down +, Ex 3.6 takes up +.', ar: 'السقوط الحر (Free fall) حركة بتسارع ثابت هو g = 9.8 m/s² نحو الأرض، ولا يعتمد على كتلة الجسم إذا أهملنا مقاومة الهواء. وقبل الحل حدد الاتجاه الموجب: مثال 3.5 يأخذ الأسفل موجبًا، ومثال 3.6 يأخذ الأعلى موجبًا، فتتغير إشارة g حسب اختيارك.' },
+        { en: 'Thrown up: y_max = {{v_i² // 2g}}, t_max = {{v_i // g}}, flight time back to the same level = 2 t_max.', ar: 'للجسم المقذوف لأعلى: عند أقصى ارتفاع تصبح سرعته صفرًا. لذلك أقصى ارتفاع y_max = {{v_i² // 2g}}، وزمن الصعود t_max = {{v_i // g}}، وزمن الرجوع إلى المستوى نفسه ضعف زمن الصعود.' }
       ],
       terms: [['Constant acceleration', 'تسارع ثابت', 'a does not change'], ['Free fall', 'السقوط الحر', 'Motion under gravity only'], ['Maximum height', 'أقصى ارتفاع', 'Where v = 0'], ['Flight time', 'زمن التحليق', 'Time to return']],
       formulas: [
@@ -650,10 +671,10 @@ COURSE.push({
       goalsAr: 'ستتعامل مع القوة كمتجه، وتفهم القانون الأول والقصور الذاتي، وتحل مسائل الاتزان.',
       why: { en: 'Bridges, shelves and hanging signs stay still because forces balance; engineers design them with ΣF = 0.', ar: 'الجسور والرفوف تبقى ساكنة لأن القوى متزنة.' },
       explain: [
-        { en: 'Force is a vector. Contact forces (kick, push, spring) vs field forces (gravity, no contact) (BK p.57).', ar: 'القوة متجه، ومنها قوى تلامس وقوى مجال.' },
-        { en: '<b>Newton\'s first law</b>: "In the absence of external forces, an object at rest remains at rest and an object in motion continues in motion with a constant velocity." ΣF = 0 (4.1).', ar: 'القانون الأول: الجسم الساكن يبقى ساكنًا والمتحرك يبقى متحركًا بسرعة ثابتة ما لم تؤثر عليه قوة محصلة.' },
-        { en: 'Inertia: resistance to change of motion; mass measures inertia (kg).', ar: 'القصور الذاتي ممانعة تغيير الحالة الحركية، والكتلة مقياسه.' },
-        { en: 'Equilibrium method: draw forces, resolve into x and y, set each sum to zero, solve.', ar: 'طريقة الاتزان: ارسم القوى، حللها، اجعل مجموع كل محور صفرًا.' }
+        { en: 'Force is a vector. Contact forces (kick, push, spring) vs field forces (gravity, no contact) (BK p.57).', ar: 'القوة (Force) هي ما يدفع الجسم أو يسحبه، وهي متجهة: لها مقدار واتجاه. بعض القوى تحتاج تلامسًا، مثل الركلة والدفع وشد النابض، وبعضها يؤثر عن بعد بدون تلامس، مثل الجاذبية، وتسمى قوى المجال.' },
+        { en: '<b>Newton\'s first law</b>: "In the absence of external forces, an object at rest remains at rest and an object in motion continues in motion with a constant velocity." ΣF = 0 (4.1).', ar: 'قانون نيوتن الأول: إذا كانت محصلة القوى على الجسم صفرًا (ΣF = 0)، فالجسم الساكن يبقى ساكنًا، والمتحرك يبقى متحركًا بالسرعة نفسها وفي خط مستقيم. يعني أن الحركة لا تحتاج قوة لتستمر، بل تحتاج قوة لتتغير.' },
+        { en: 'Inertia: resistance to change of motion; mass measures inertia (kg).', ar: 'القصور الذاتي (Inertia) هو ميل الجسم إلى مقاومة أي تغيير في حركته. والكتلة هي مقياس هذا القصور: الشاحنة كتلتها كبيرة، فيصعب تحريكها ويصعب إيقافها.' },
+        { en: 'Equilibrium method: draw forces, resolve into x and y, set each sum to zero, solve.', ar: 'خطوات حل مسائل الاتزان: ارسم كل القوى المؤثرة على الجسم، ثم حلّل كل قوة إلى مركبتين x و y، ثم اجعل مجموع مركبات x صفرًا ومجموع مركبات y صفرًا، ثم احسب المجهول من المعادلتين.' }
       ],
       terms: [['Net force', 'القوة المحصلة', 'Vector sum ΣF'], ['Inertia', 'القصور الذاتي', 'Resistance to change of motion'], ['Equilibrium', 'الاتزان', 'ΣF = 0'], ['Field force', 'قوة مجال', 'Acts without contact']],
       formulas: [{ f: 'ΣF = 0  ⇔  ΣFₓ = 0 and ΣF_y = 0', name: 'First law / equilibrium (4.1)', sym: [['ΣF', 'net force', 'N', 'القوة المحصلة'], ['ΣFₓ, ΣF_y', 'components of the net force', 'N', 'مركبتا القوة المحصلة']], cond: 'Body at rest or at constant velocity.' }],
@@ -677,10 +698,10 @@ COURSE.push({
       goalsAr: 'ستطبق ΣF = ma بالمركبات وتفرّق بين الكتلة والوزن.',
       why: { en: 'This single law predicts the motion of cars, rockets and elevators.', ar: 'هذا القانون وحده يتنبأ بحركة السيارات والصواريخ والمصاعد.' },
       explain: [
-        { en: '"The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass": ΣF = ma (4.2).', ar: 'التسارع يتناسب طرديًا مع القوة المحصلة وعكسيًا مع الكتلة.' },
-        { en: '1 N is the force that gives 1 kg an acceleration of 1 m/s²: 1 N = 1 kg·m/s².', ar: 'النيوتن هو القوة التي تكسب 1 كغ تسارعًا 1 م/ث².' },
-        { en: 'Weight F_w = mg; a 100 kg person weighs 980 N on Earth, 162 N on the Moon, 371 N on Mars (BK p.59). Mass stays 100 kg.', ar: 'الوزن قوة يتغير بتغير الجاذبية، والكتلة ثابتة.' },
-        { en: 'Use components: ΣFₓ = maₓ, ΣF_y = ma_y. a points in the direction of the net force.', ar: 'نطبق القانون على كل محور على حدة.' }
+        { en: '"The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass": ΣF = ma (4.2).', ar: 'قانون نيوتن الثاني: تسارع الجسم يزيد إذا زادت القوة المحصلة، ويقل إذا زادت كتلته، ويكون في اتجاه القوة المحصلة: ΣF = ma. فإذا دفعت عربة فارغة ثم عربة محمّلة بالقوة نفسها، تتسارع الفارغة أكثر.' },
+        { en: '1 N is the force that gives 1 kg an acceleration of 1 m/s²: 1 N = 1 kg·m/s².', ar: 'وحدة القوة النيوتن N: هو القوة التي تعطي جسمًا كتلته 1 kg تسارعًا قدره 1 m/s². لذلك N = kg·m/s².' },
+        { en: 'Weight F_w = mg; a 100 kg person weighs 980 N on Earth, 162 N on the Moon, 371 N on Mars (BK p.59). Mass stays 100 kg.', ar: 'الوزن (Weight) هو قوة جذب الأرض للجسم: F_w = mg، ويقاس بالنيوتن. الكتلة ثابتة في أي مكان، أما الوزن فيتغير بتغير g: شخص كتلته 100 kg وزنه 980 N على الأرض و 162 N على القمر، وكتلته تبقى 100 kg (BK p.59).' },
+        { en: 'Use components: ΣFₓ = maₓ, ΣF_y = ma_y. a points in the direction of the net force.', ar: 'إذا كانت القوى في اتجاهات مختلفة، طبّق القانون على كل محور وحده: ΣFₓ = maₓ و ΣF_y = ma_y، ثم اجمع مركبتي التسارع لتحصل على مقداره واتجاهه.' }
       ],
       terms: [['Mass', 'الكتلة', 'Amount of inertia (kg)'], ['Weight', 'الوزن', 'Gravitational force mg (N)'], ['Newton (N)', 'نيوتن', 'kg·m/s²'], ['Tension', 'الشد', 'Force in a string']],
       formulas: [{ f: 'ΣF = m a', name: 'Second law (4.2)', sym: [['ΣF', 'net force', 'N', 'القوة المحصلة'], ['m', 'mass', 'kg', 'الكتلة'], ['a', 'acceleration', 'm/s²', 'التسارع']], cond: 'Inertial frame; ΣF is the vector sum.' }, { f: 'F_w = m g', name: 'Weight', sym: [['F_w', 'weight', 'N', 'الوزن'], ['m', 'mass', 'kg', 'الكتلة'], ['g', '9.8 m/s²', 'm/s²', 'تسارع الجاذبية']], cond: 'Near Earth\'s surface' }],
@@ -706,9 +727,9 @@ COURSE.push({
       goalsAr: 'ستحدد أزواج الفعل ورد الفعل وتحسب القوة العمودية.',
       why: { en: 'Walking, swimming and rockets all work by pushing on something that pushes back.', ar: 'المشي والسباحة والصواريخ كلها تعمل بالفعل ورد الفعل.' },
       explain: [
-        { en: '"Every action has an equal and opposite reaction": F₁₂ = −F₂₁ (4.3).', ar: 'لكل فعل رد فعل مساوٍ له في المقدار ومعاكس في الاتجاه.' },
-        { en: 'The two forces act on <b>different bodies</b>, so they never cancel each other.', ar: 'القوتان تؤثران على جسمين مختلفين فلا تلغي إحداهما الأخرى.' },
-        { en: 'A book on a table: Earth pulls the book down (mg); the table pushes the book up (normal force n). For the book at rest n = mg (first law); the reaction to n is the book pushing the table.', ar: 'الكتاب على الطاولة: القوة العمودية تساوي الوزن هنا بسبب الاتزان.' }
+        { en: '"Every action has an equal and opposite reaction": F₁₂ = −F₂₁ (4.3).', ar: 'قانون نيوتن الثالث: إذا أثّر جسم على جسم آخر بقوة، أثّر الثاني على الأول بقوة مساوية لها في المقدار ومعاكسة في الاتجاه: F₁₂ = −F₂₁. فعندما تدفع الحائط يدفعك الحائط بالقوة نفسها.' },
+        { en: 'The two forces act on <b>different bodies</b>, so they never cancel each other.', ar: 'القوتان (الفعل ورد الفعل) تؤثر كل واحدة منهما على جسم مختلف، لذلك لا تلغي إحداهما الأخرى أبدًا. لا تجمعهما في معادلة جسم واحد؛ القوى المؤثرة على الجسم نفسه فقط هي التي تدخل في معادلته.' },
+        { en: 'A book on a table: Earth pulls the book down (mg); the table pushes the book up (normal force n). For the book at rest n = mg (first law); the reaction to n is the book pushing the table.', ar: 'مثال الكتاب على الطاولة: الأرض تسحب الكتاب لأسفل بقوة mg، والطاولة تدفعه لأعلى بالقوة العمودية n. تساويهما هنا سببه أن الكتاب ساكن (القانون الأول) وليس القانون الثالث. أما رد فعل n فهو دفع الكتاب للطاولة لأسفل.' }
       ],
       terms: [['Action–reaction pair', 'زوج الفعل ورد الفعل', 'Equal, opposite, on different bodies'], ['Normal force', 'القوة العمودية', 'Contact force ⟂ to surface']],
       formulas: [{ f: 'F₁₂ = −F₂₁', name: 'Third law (4.3)', sym: [['F₁₂', 'force by body 1 on body 2', 'N', 'قوة الجسم 1 على الجسم 2'], ['F₂₁', 'force by body 2 on body 1', 'N', 'قوة الجسم 2 على الجسم 1']], cond: 'Always, for any interaction.' }],
@@ -738,9 +759,9 @@ COURSE.push({
       goalsAr: 'ستحسب الشغل بالمقادير وبالمركبات، وتعرف متى يكون صفرًا أو سالبًا.',
       why: { en: 'Work measures energy transferred; it explains why carrying a bag horizontally does no work on it by the vertical lifting force.', ar: 'الشغل يقيس الطاقة المنقولة.' },
       explain: [
-        { en: 'Work is "the process of energy transfer to the motion of an object via application of a force": W = F·Δr = ΔrF cos θ (5.1).', ar: 'الشغل عملية نقل طاقة عبر قوة تسبب إزاحة.' },
-        { en: 'Unit: joule, J = N·m = kg·m²/s². Work is a scalar.', ar: 'وحدته الجول، وهو كمية قياسية.' },
-        { en: 'θ = 90° ⇒ W = 0; θ > 90° ⇒ W < 0 (energy taken from the system).', ar: 'إذا كانت القوة عمودية على الإزاحة فالشغل صفر، وإذا كانت الزاوية منفرجة فالشغل سالب.' }
+        { en: 'Work is "the process of energy transfer to the motion of an object via application of a force": W = F·Δr = ΔrF cos θ (5.1).', ar: 'الشغل (Work) في الفيزياء معناه نقل طاقة إلى جسم بقوة تحركه مسافة. فإذا لم يتحرك الجسم فلا شغل مهما كانت القوة كبيرة. ويُحسب بالقانون W = F Δr cos θ، حيث θ الزاوية بين اتجاه القوة واتجاه الحركة.' },
+        { en: 'Unit: joule, J = N·m = kg·m²/s². Work is a scalar.', ar: 'وحدة الشغل الجول J، ويساوي نيوتن × متر. والشغل كمية قياسية: له مقدار وإشارة، لكن ليس له اتجاه.' },
+        { en: 'θ = 90° ⇒ W = 0; θ > 90° ⇒ W < 0 (energy taken from the system).', ar: 'الزاوية تحدد إشارة الشغل: إذا كانت القوة في اتجاه الحركة (θ = 0°) فالشغل موجب وأكبر ما يمكن، وإذا كانت عمودية على الحركة (θ = 90°) فالشغل صفر، وإذا كانت عكس الحركة، مثل الاحتكاك، فالشغل سالب ويأخذ طاقة من الجسم.' }
       ],
       terms: [['Work', 'الشغل', 'W = F·Δr'], ['Joule', 'الجول', 'N·m'], ['Displacement', 'الإزاحة', 'Δr']],
       formulas: [{ f: 'W = F·Δr = F Δr cos θ', name: 'Work (5.1)', sym: [['W', 'work', 'J', 'الشغل'], ['F', 'force', 'N', 'القوة'], ['Δr', 'displacement', 'm', 'الإزاحة'], ['θ', 'angle between F and Δr', '°', 'الزاوية بين القوة والإزاحة']], cond: 'Constant force.' }],
@@ -765,9 +786,9 @@ COURSE.push({
       goalsAr: 'ستحسب الطاقة الحركية وتطبق أن الشغل يساوي التغير فيها.',
       why: { en: 'Braking distance grows with v² because KE grows with v².', ar: 'مسافة الكبح تتضاعف أربع مرات عند مضاعفة السرعة لأن الطاقة الحركية تتناسب مع v².' },
       explain: [
-        { en: 'A body that moves at velocity v has KE = ½mv² (5.2).', ar: 'الجسم المتحرك يملك طاقة حركية ½mv².' },
-        { en: 'From v_f² = v_i² + 2ax and W = max: W = ½mv_f² − ½mv_i² = ΔKE.', ar: 'اشتقاق المبرهنة من معادلات الحركة.' },
-        { en: 'Negative work (brakes) reduces KE.', ar: 'الشغل السالب يقلل الطاقة الحركية.' }
+        { en: 'A body that moves at velocity v has KE = ½mv² (5.2).', ar: 'الطاقة الحركية (Kinetic energy) طاقة يملكها الجسم بسبب حركته: KE = ½mv². لاحظ أن السرعة مربعة، فإذا تضاعفت السرعة تضاعفت الطاقة الحركية أربع مرات.' },
+        { en: 'From v_f² = v_i² + 2ax and W = max: W = ½mv_f² − ½mv_i² = ΔKE.', ar: 'مبرهنة الشغل والطاقة: الشغل الكلي المبذول على جسم يساوي التغير في طاقته الحركية: W = ½mv_f² − ½mv_i² = ΔKE. وتخرج من الجمع بين ΣF = ma ومعادلة الحركة v_f² = v_i² + 2ax.' },
+        { en: 'Negative work (brakes) reduces KE.', ar: 'إذا كان الشغل سالبًا، مثل شغل الفرامل، تنقص الطاقة الحركية فيبطئ الجسم. وإذا كان موجبًا تزيد الطاقة فيسرع.' }
       ],
       terms: [['Kinetic energy', 'الطاقة الحركية', '½mv²'], ['Work–energy theorem', 'مبرهنة الشغل–الطاقة', 'W_net = ΔKE']],
       formulas: [{ f: 'KE = ½ m v² ,  W = KE_f − KE_i', name: '(5.2)', sym: [['KE', 'kinetic energy', 'J', 'الطاقة الحركية'], ['m', 'mass', 'kg', 'الكتلة'], ['v', 'speed', 'm/s', 'السرعة'], ['W', 'net work', 'J', 'الشغل الكلي']], cond: 'W is the net work.' }],
@@ -791,9 +812,9 @@ COURSE.push({
       goalsAr: 'ستحسب التغير في طاقة الوضع وتطبق W = ΔKE + ΔPE.',
       why: { en: 'Energy conservation solves problems that would be very long with forces.', ar: 'حفظ الطاقة يختصر مسائل طويلة جدًا بالقوى.' },
       explain: [
-        { en: 'A body has PE "if it is able to produce a work due to the change of its position". ΔPE = mgΔh (5.3).', ar: 'طاقة الوضع ناتجة عن موضع الجسم.' },
-        { en: 'Only the change ΔPE is physical; PE itself depends on the reference level (BK p.77).', ar: 'التغير في طاقة الوضع هو المهم، والقيمة المطلقة تعتمد على مستوى الإسناد.' },
-        { en: 'Work and energy theory: "The work done of any system is equal to the sum of the change in the kinetic and potential energy": W = ΔKE + ΔPE (5.4).', ar: 'الشغل = التغير في الطاقة الحركية + التغير في طاقة الوضع.' }
+        { en: 'A body has PE "if it is able to produce a work due to the change of its position". ΔPE = mgΔh (5.3).', ar: 'طاقة الوضع (Potential energy) طاقة مخزنة في الجسم بسبب موضعه، فالجسم المرفوع يستطيع أن يبذل شغلًا عندما يسقط. والتغير فيها عند تغير الارتفاع ΔPE = mgΔh.' },
+        { en: 'Only the change ΔPE is physical; PE itself depends on the reference level (BK p.77).', ar: 'قيمة طاقة الوضع نفسها تعتمد على المستوى الذي تختاره صفرًا (أرض الغرفة أو سطح الطاولة)، لكن التغير فيها لا يعتمد على هذا الاختيار. لذلك نحسب دائمًا التغير ΔPE (BK p.77).' },
+        { en: 'Work and energy theory: "The work done of any system is equal to the sum of the change in the kinetic and potential energy": W = ΔKE + ΔPE (5.4).', ar: 'نظرية الشغل والطاقة في المقرر: شغل القوة المؤثرة يساوي مجموع التغير في الطاقة الحركية والتغير في طاقة الوضع: W = ΔKE + ΔPE. فإذا رفعت صندوقًا بسرعة ثابتة يذهب كل شغلك إلى طاقة الوضع.' }
       ],
       terms: [['Potential energy', 'طاقة الوضع', 'Energy of position'], ['Reference level', 'مستوى الإسناد', 'Where PE = 0'], ['Conservation of energy', 'حفظ الطاقة', 'Energy is not created or destroyed']],
       formulas: [{ f: 'ΔPE = m g Δh', name: '(5.3)', sym: [['ΔPE', 'change of potential energy', 'J', 'تغير طاقة الوضع'], ['m', 'mass', 'kg', 'الكتلة'], ['g', '9.8 m/s²', 'm/s²', 'تسارع الجاذبية'], ['Δh', 'height change', 'm', 'تغير الارتفاع']], cond: 'Near Earth\'s surface.' }, { f: 'W = ΔKE + ΔPE', name: '(5.4)', sym: [['W', 'work by the applied force', 'J', 'شغل القوة المؤثرة'], ['ΔKE', 'change of kinetic energy', 'J', 'تغير الطاقة الحركية'], ['ΔPE', 'change of potential energy', 'J', 'تغير طاقة الوضع']], cond: '—' }],
@@ -818,8 +839,8 @@ COURSE.push({
       goalsAr: 'ستحسب القدرة كمعدل لبذل الشغل.',
       why: { en: 'Two cranes may do the same work; the more powerful one does it faster.', ar: 'رافعتان تبذلان الشغل نفسه، والأقوى تنجزه أسرع.' },
       explain: [
-        { en: '"Power is defined as the rate of work done": P = {{dW // dt}} (5.5); average P = {{W // t}}.', ar: 'القدرة معدل بذل الشغل.' },
-        { en: 'Unit: watt W = J/s = kg·m²/s³. Do not confuse W (watt) with W (work).', ar: 'وحدتها الواط، لا تخلط بين رمز الواط ورمز الشغل.' }
+        { en: '"Power is defined as the rate of work done": P = {{dW // dt}} (5.5); average P = {{W // t}}.', ar: 'القدرة (Power) تقيس سرعة إنجاز الشغل: القدرة = الشغل ÷ الزمن، P = {{W // t}}. شخصان يرفعان الحمل نفسه إلى الارتفاع نفسه يبذلان الشغل نفسه، لكن الأسرع منهما قدرته أكبر.' },
+        { en: 'Unit: watt W = J/s = kg·m²/s³. Do not confuse W (watt) with W (work).', ar: 'وحدة القدرة الواط W، ويساوي جولًا لكل ثانية. انتبه أن الحرف W يُستخدم للواط (وحدة القدرة) وللشغل (الكمية)، فميّز بينهما من سياق المسألة.' }
       ],
       terms: [['Power', 'القدرة', 'Rate of work'], ['Watt', 'الواط', 'J/s']],
       formulas: [{ f: 'P = {{dW // dt}}  (average: P = {{W // t}})', name: '(5.5)', sym: [['P', 'power', 'W', 'القدرة'], ['W', 'work', 'J', 'الشغل'], ['t', 'time', 's', 'الزمن']], cond: '—' }],
@@ -843,10 +864,10 @@ COURSE.push({
       goalsAr: 'ستحسب الإجهاد والانفعال ومعاملات المرونة الثلاثة.',
       why: { en: 'Cable, bridge and bone design depend on how materials stretch.', ar: 'تصميم الكابلات والجسور يعتمد على استطالة المواد.' },
       explain: [
-        { en: 'Stress = {{F // A}} (N/m²): "the force affecting on the unit of areas". Strain = {{ΔL // L}} (unitless).', ar: 'الإجهاد قوة لكل وحدة مساحة، والانفعال تغير الطول النسبي بلا وحدة.' },
-        { en: 'Young\'s modulus Y = {{stress // strain}} → {{F // A}} = Y {{ΔL // L}} (6.1). Bulk: {{F // A}} = −B {{ΔV // V}} (6.2). Shear: {{F // A}} = S {{x // L}} (6.3).', ar: 'ثلاثة معاملات: للطول وللحجم وللشكل.' },
-        { en: 'Stress–strain curve (Fig 6.2): elastic limit → yield point → breaking point. The formulas hold below the elastic limit.', ar: 'القوانين صحيحة تحت حد المرونة فقط.' },
-        { en: 'Area of a wire: A = πr² with r = {{diameter // 2}}.', ar: 'مساحة مقطع السلك πr² ونصف القطر = القطر/2.' }
+        { en: 'Stress = {{F // A}} (N/m²): "the force affecting on the unit of areas". Strain = {{ΔL // L}} (unitless).', ar: 'الإجهاد (Stress) هو القوة المؤثرة على كل متر مربع من مقطع الجسم: الإجهاد = {{F // A}}، ووحدته N/m². فإذا شُدّ سلكان بالقوة نفسها، يكون إجهاد الأرفع أكبر لأن القوة موزعة على مساحة أصغر. أما الانفعال (Strain) فهو مقدار الاستطالة نسبةً إلى الطول الأصلي: الانفعال = {{ΔL // L}}. ولأنه طول ÷ طول فليس له وحدة؛ فانفعال 0.001 يعني أن السلك زاد بمقدار جزء من ألف من طوله.' },
+        { en: 'Young\'s modulus Y = {{stress // strain}} → {{F // A}} = Y {{ΔL // L}} (6.1). Bulk: {{F // A}} = −B {{ΔV // V}} (6.2). Shear: {{F // A}} = S {{x // L}} (6.3).', ar: 'معامل المرونة يربط الإجهاد بالانفعال: كلما كان المعامل أكبر كانت المادة أصلب وأقل تأثرًا بالقوة. وفي المقرر ثلاثة معاملات: معامل يونغ Y لتغير الطول (شد سلك)، ومعامل المرونة الحجمي B لتغير الحجم (ضغط من كل الجهات)، ومعامل القص S لتغير الشكل (قوة مماسية تُميل الوجه العلوي).' },
+        { en: 'Stress–strain curve (Fig 6.2): elastic limit → yield point → breaking point. The formulas hold below the elastic limit.', ar: 'منحنى الإجهاد والانفعال (شكل 6.2): في البداية يرجع الجسم إلى طوله إذا أزلنا القوة، وذلك حتى حد المرونة. بعده تحدث استطالة دائمة عند نقطة الخضوع، ثم ينقطع الجسم عند نقطة الكسر. والقوانين الثلاثة صحيحة فقط قبل حد المرونة.' },
+        { en: 'Area of a wire: A = πr² with r = {{diameter // 2}}.', ar: 'مقطع السلك دائرة، فمساحته A = πr². إذا أعطتك المسألة القطر d فاقسمه على 2 أولًا لتحصل على نصف القطر r، ثم حوّله إلى متر قبل التربيع.' }
       ],
       terms: [['Stress', 'الإجهاد', 'F/A'], ['Strain', 'الانفعال', 'ΔL/L'], ['Young\'s modulus', 'معامل يونغ', 'Elasticity of length'], ['Bulk modulus', 'معامل المرونة الحجمي', 'Elasticity of volume'], ['Shear modulus', 'معامل القص', 'Elasticity of shape'], ['Elastic limit', 'حد المرونة', 'Max stress with full recovery']],
       formulas: [
@@ -874,10 +895,10 @@ COURSE.push({
       goalsAr: 'ستحسب الكثافة والضغط والضغط عند عمق في سائل.',
       why: { en: 'Divers and dam engineers need pressure at depth.', ar: 'الغواصون ومهندسو السدود يحتاجون حساب الضغط على عمق.' },
       explain: [
-        { en: 'Density "is defined as mass per unit volume": ρ = {{m // V}} (kg/m³) (6.4). Density mostly decreases as temperature increases.', ar: 'الكثافة = الكتلة ÷ الحجم.' },
-        { en: 'Pressure is the perpendicular force per unit area: P = {{F // A}}, unit pascal Pa = N/m² (6.5).', ar: 'الضغط = القوة العمودية ÷ المساحة.' },
-        { en: 'Liquid column: F = mg = ρAhg ⇒ P = ρgh (6.6). With the atmosphere on top: P = P₀ + ρgh.', ar: 'ضغط عمود السائل ρgh، ويضاف الضغط الجوي إذا كان السطح مكشوفًا.' },
-        { en: 'Pressure depends on depth, not on the shape of the container (BK p.93).', ar: 'الضغط يعتمد على العمق لا على شكل الإناء.' }
+        { en: 'Density "is defined as mass per unit volume": ρ = {{m // V}} (kg/m³) (6.4). Density mostly decreases as temperature increases.', ar: 'الكثافة (Density) هي كتلة المتر المكعب الواحد من المادة: ρ = {{m // V}}، ووحدتها kg/m³. الحديد أكثف من الخشب لأن المتر المكعب منه أثقل. ومعظم المواد تقل كثافتها عندما تسخن لأنها تتمدد.' },
+        { en: 'Pressure is the perpendicular force per unit area: P = {{F // A}}, unit pascal Pa = N/m² (6.5).', ar: 'الضغط (Pressure) هو القوة العمودية الموزعة على كل متر مربع: P = {{F // A}}، ووحدته الباسكال Pa = N/m². لذلك يخترق المسمار المدبب الخشب بسهولة: القوة نفسها، لكن على مساحة صغيرة جدًا، فيكون الضغط كبيرًا.' },
+        { en: 'Liquid column: F = mg = ρAhg ⇒ P = ρgh (6.6). With the atmosphere on top: P = P₀ + ρgh.', ar: 'ضغط السائل على عمق h سببه وزن عمود السائل الذي فوقك: P = ρgh. وإذا كان سطح السائل مكشوفًا للهواء نضيف الضغط الجوي فوقه: P = P₀ + ρgh، وهذا هو الضغط الكلي.' },
+        { en: 'Pressure depends on depth, not on the shape of the container (BK p.93).', ar: 'الضغط في السائل يعتمد على العمق فقط، لا على شكل الإناء ولا على كمية الماء فيه. فعند العمق نفسه يكون الضغط واحدًا في كوب ضيق وفي حوض سباحة (BK p.93).' }
       ],
       terms: [['Density', 'الكثافة', 'm/V'], ['Pressure', 'الضغط', 'F/A'], ['Pascal', 'باسكال', 'N/m²'], ['Atmospheric pressure', 'الضغط الجوي', '≈ 1×10⁵ Pa']],
       formulas: [{ f: 'ρ = {{m // V}}', name: '(6.4)', sym: [['ρ', 'density', 'kg/m³', 'الكثافة'], ['m', 'mass', 'kg', 'الكتلة'], ['V', 'volume', 'm³', 'الحجم']], cond: '—' }, { f: 'P = {{F // A}} ,  P = P₀ + ρgh', name: '(6.5–6.6)', sym: [['P', 'pressure', 'Pa', 'الضغط'], ['F', 'force', 'N', 'القوة'], ['A', 'area', 'm²', 'المساحة'], ['P₀', 'atmospheric pressure', 'Pa', 'الضغط الجوي'], ['ρ', 'liquid density', 'kg/m³', 'كثافة السائل'], ['h', 'depth', 'm', 'العمق']], cond: 'Fluid at rest.' }],
@@ -902,9 +923,9 @@ COURSE.push({
       goalsAr: 'ستطبق قاعدة باسكال وتحسب الضغط بالبارومتر والمانومتر.',
       why: { en: 'Car brakes and hydraulic lifts multiply force using Pascal\'s law.', ar: 'فرامل السيارة والرافعة الهيدروليكية تضاعف القوة بقاعدة باسكال.' },
       explain: [
-        { en: 'Pascal\'s law: "A change in pressure at any point in an enclosed fluid at rest is transmitted undiminished to all points in the fluid." Hydraulic press: {{f // a}} = {{F // A}}.', ar: 'الضغط ينتقل كاملًا في المائع المحصور.' },
-        { en: 'Areas scale with r² (or d²): {{F // f}} = ( {{R // r}} )².', ar: 'النسبة بين القوتين تساوي مربع نسبة نصفي القطرين.' },
-        { en: 'Barometer: P₀ = ρgh (mercury column 0.76 m). Manometer: P = P₀ + ρgh.', ar: 'البارومتر يقيس الضغط الجوي، والمانومتر يقيس ضغط غاز محصور.' }
+        { en: 'Pascal\'s law: "A change in pressure at any point in an enclosed fluid at rest is transmitted undiminished to all points in the fluid." Hydraulic press: {{f // a}} = {{F // A}}.', ar: 'قاعدة باسكال: إذا زاد الضغط في نقطة من سائل محصور، انتقلت الزيادة كاملة إلى كل نقاط السائل. وعليها تعمل المكابس الهيدروليكية: الضغط متساوٍ على المكبسين، أي {{f // a}} = {{F // A}}، فقوة صغيرة على مكبس صغير تعطي قوة كبيرة على مكبس كبير.' },
+        { en: 'Areas scale with r² (or d²): {{F // f}} = ( {{R // r}} )².', ar: 'المساحة تتناسب مع مربع نصف القطر، لذلك نسبة القوتين تساوي مربع نسبة نصفي القطرين: {{F // f}} = ( {{R // r}} )². فإذا كان نصف قطر المكبس الكبير أكبر بعشر مرات تكون قوته أكبر بمئة مرة.' },
+        { en: 'Barometer: P₀ = ρgh (mercury column 0.76 m). Manometer: P = P₀ + ρgh.', ar: 'البارومتر يقيس الضغط الجوي بارتفاع عمود زئبق: P₀ = ρgh، وعند سطح البحر يكون العمود 0.76 m تقريبًا. أما المانومتر فيقيس ضغط غاز محصور بفرق ارتفاع السائل في أنبوب على شكل حرف U: P = P₀ + ρgh.' }
       ],
       terms: [['Pascal\'s law', 'قاعدة باسكال', 'Pressure transmitted undiminished'], ['Hydraulic press', 'المكبس الهيدروليكي', 'Force multiplier'], ['Barometer', 'البارومتر', 'Measures P₀'], ['Manometer', 'المانومتر', 'Measures gas pressure']],
       formulas: [{ f: '{{f // a}} = {{F // A}}', name: 'Hydraulic press', sym: [['f, F', 'small/large piston force', 'N', 'قوة المكبس الصغير والكبير'], ['a, A', 'small/large piston area', 'm²', 'مساحة المكبس الصغير والكبير']], cond: 'Same level, fluid at rest.' }, { f: 'P₀ = ρgh ,  P = P₀ + ρgh', name: 'Barometer / manometer', sym: [['P₀', 'atmospheric pressure', 'Pa', 'الضغط الجوي'], ['ρ', 'liquid density', 'kg/m³', 'كثافة السائل'], ['h', 'column height difference', 'm', 'فرق ارتفاع عمود السائل']], cond: '—' }],
@@ -928,10 +949,10 @@ COURSE.push({
       goalsAr: 'ستطبق معادلة الاستمرارية ومعادلة برنولي بافتراضات المائع المثالي.',
       why: { en: 'It explains garden‑hose jets, aircraft lift and perfume sprays (BK p.99).', ar: 'تفسر اندفاع ماء الخرطوم ورفع الطائرة وبخاخ العطر.' },
       explain: [
-        { en: 'Ideal fluid: incompressible, non‑viscous, steady (regular) flow, irrotational (BK p.96).', ar: 'المائع المثالي: غير قابل للانضغاط، عديم اللزوجة، جريان منتظم، غير دوّامي.' },
-        { en: 'Flow rate R = Av (m³/s). Continuity: A₁v₁ = A₂v₂ (6.7): narrower pipe → faster flow.', ar: 'معدل التدفق ثابت: الأنبوب الأضيق سرعته أكبر.' },
-        { en: 'Bernoulli (energy conservation): P + hρg + ½ρv² is constant along a flow line (6.8).', ar: 'برنولي: مجموع الضغط وطاقة الوضع والحركة لكل وحدة حجم ثابت.' },
-        { en: 'Horizontal tube: P₁ − P₂ = ½ρ(v₂² − v₁²) → faster flow, lower pressure. Static fluid: P₁ − P₂ = (h₂ − h₁)ρg.', ar: 'في الأنبوب الأفقي: السرعة الأكبر تعني ضغطًا أقل.' }
+        { en: 'Ideal fluid: incompressible, non‑viscous, steady (regular) flow, irrotational (BK p.96).', ar: 'لتبسيط دراسة السوائل المتحركة نفترض مائعًا مثاليًا: لا ينضغط فحجمه ثابت، ولا لزوجة فيه أي لا احتكاك داخلي، وجريانه منتظم فلا تتغير سرعته عند كل نقطة مع الزمن، ولا تكون فيه دوامات (BK p.96).' },
+        { en: 'Flow rate R = Av (m³/s). Continuity: A₁v₁ = A₂v₂ (6.7): narrower pipe → faster flow.', ar: 'معدل التدفق R = Av هو حجم السائل الذي يمر كل ثانية (m³/s). ولأن السائل لا ينضغط يبقى هذا المعدل ثابتًا على طول الأنبوب: A₁v₁ = A₂v₂. فعندما يضيق الأنبوب تزيد السرعة، كما يحدث عندما تضغط فوهة خرطوم الماء.' },
+        { en: 'Bernoulli (energy conservation): P + hρg + ½ρv² is constant along a flow line (6.8).', ar: 'معادلة برنولي هي حفظ الطاقة للسائل المتحرك: مجموع الضغط P، وطاقة الوضع لكل وحدة حجم hρg، والطاقة الحركية لكل وحدة حجم ½ρv²، ثابت على طول خط الجريان.' },
+        { en: 'Horizontal tube: P₁ − P₂ = ½ρ(v₂² − v₁²) → faster flow, lower pressure. Static fluid: P₁ − P₂ = (h₂ − h₁)ρg.', ar: 'في أنبوب أفقي يتساوى الارتفاع، فتبقى المعادلة P₁ − P₂ = ½ρ(v₂² − v₁²): حيث تكون السرعة أكبر يكون الضغط أقل. وإذا كان السائل ساكنًا تعود المعادلة إلى قانون الضغط في السوائل: P₁ − P₂ = (h₂ − h₁)ρg.' }
       ],
       terms: [['Flow rate', 'معدل التدفق', 'R = Av'], ['Continuity equation', 'معادلة الاستمرارية', 'A₁v₁ = A₂v₂'], ['Streamline', 'خط الانسياب', 'Path of fluid particles'], ['Viscosity', 'اللزوجة', 'Internal friction']],
       formulas: [{ f: 'A₁v₁ = A₂v₂', name: 'Continuity (6.7)', sym: [['A', 'cross‑section area', 'm²', 'مساحة المقطع'], ['v', 'flow speed', 'm/s', 'سرعة السائل']], cond: 'Incompressible fluid.' }, { f: 'P₁ + h₁ρg + ½ρv₁² = P₂ + h₂ρg + ½ρv₂²', name: 'Bernoulli (6.8)', sym: [['P', 'pressure', 'Pa', 'الضغط'], ['h', 'height', 'm', 'الارتفاع'], ['ρ', 'density', 'kg/m³', 'الكثافة'], ['v', 'flow speed', 'm/s', 'سرعة السائل']], cond: 'Ideal fluid, along one streamline.' }],
@@ -962,10 +983,10 @@ COURSE.push({
       goalsAr: 'ستعرف الخواص التي تعتمد عليها الترمومترات وتحوّل بين المقاييس الثلاثة.',
       why: { en: 'Gas laws and radiation need kelvin; weather reports use °C or °F.', ar: 'قوانين الغازات والإشعاع تحتاج الكلفن.' },
       explain: [
-        { en: 'Thermometers use a property that changes with temperature: liquid volume, gas volume (constant P), gas pressure (constant V), solid dimensions, electrical resistance, emitted wavelength.', ar: 'الترمومتر يعتمد على خاصية فيزيائية تتغير بالحرارة.' },
-        { en: 'Fixed points: Celsius 0–100, Fahrenheit 32–212 (180 divisions), Kelvin 273.15–373.15.', ar: 'نقاط التجمد والغليان في المقاييس الثلاثة.' },
-        { en: '{{T_C // 100}} = {{T_K − 273 // 100}} = {{T_F − 32 // 180}} → T_C = {{5 // 9}} (T_F − 32), T_K = T_C + 273 (7.1, 7.2).', ar: 'العلاقة العامة بين المقاييس.' },
-        { en: 'Absolute zero −273.15 °C = 0 K (gas pressure → 0, Fig 7.2). Write K, not °K (G‑17).', ar: 'الصفر المطلق −273.15 °C.' }
+        { en: 'Thermometers use a property that changes with temperature: liquid volume, gas volume (constant P), gas pressure (constant V), solid dimensions, electrical resistance, emitted wavelength.', ar: 'الترمومتر يقيس درجة الحرارة باستخدام خاصية تتغير بانتظام مع الحرارة، مثل تمدد السائل في الأنبوب، أو حجم غاز عند ضغط ثابت، أو ضغط غاز عند حجم ثابت، أو أبعاد جسم صلب، أو المقاومة الكهربائية، أو لون الضوء المنبعث.' },
+        { en: 'Fixed points: Celsius 0–100, Fahrenheit 32–212 (180 divisions), Kelvin 273.15–373.15.', ar: 'لكل مقياس نقطتان ثابتتان هما تجمد الماء وغليانه: في السيليزي 0 و 100، وفي الفهرنهايت 32 و 212 (أي 180 قسمًا بينهما)، وفي الكلفن 273.15 و 373.15.' },
+        { en: '{{T_C // 100}} = {{T_K − 273 // 100}} = {{T_F − 32 // 180}} → T_C = {{5 // 9}} (T_F − 32), T_K = T_C + 273 (7.1, 7.2).', ar: 'لأن المسافة بين التجمد والغليان واحدة في كل المقاييس، نساوي الكسور: {{T_C // 100}} = {{T_K − 273 // 100}} = {{T_F − 32 // 180}}. ومنها T_C = {{5 // 9}} (T_F − 32) و T_K = T_C + 273. ولاحظ أن تغير درجة سيليزية واحدة يساوي تغير كلفن واحد.' },
+        { en: 'Absolute zero −273.15 °C = 0 K (gas pressure → 0, Fig 7.2). Write K, not °K (G‑17).', ar: 'الصفر المطلق −273.15 °C = 0 K هو أدنى درجة حرارة ممكنة، وعندها يصل ضغط الغاز نظريًا إلى الصفر (شكل 7.2). ونكتب وحدة الكلفن K بدون علامة الدرجة ° (G‑17).' }
       ],
       terms: [['Temperature', 'درجة الحرارة', 'Measure of hotness'], ['Thermometer', 'مقياس الحرارة', 'Uses a thermometric property'], ['Absolute zero', 'الصفر المطلق', '0 K']],
       formulas: [{ f: 'T_C = {{5 // 9}} (T_F − 32) ,  T_K = T_C + 273', name: '(7.1–7.2)', sym: [['T_C', 'Celsius temperature', '°C', 'درجة الحرارة السيليزية'], ['T_F', 'Fahrenheit temperature', '°F', 'درجة الحرارة الفهرنهايتية'], ['T_K', 'absolute temperature', 'K', 'درجة الحرارة المطلقة']], cond: 'ΔT in °C equals ΔT in K.' }],
@@ -989,11 +1010,11 @@ COURSE.push({
       goalsAr: 'ستحسب التمدد الطولي والسطحي والحجمي وتفهم شذوذ الماء.',
       why: { en: 'Rails, bridges and pipelines need expansion gaps (Fig 7.4).', ar: 'السكك والجسور تحتاج فواصل تمدد.' },
       explain: [
-        { en: 'Atoms vibrate more at higher temperature, so distances between them grow.', ar: 'تزداد اهتزازات الذرات فتتباعد.' },
-        { en: 'Linear: Δℓ = αℓ₁ΔT, ℓ₂ = ℓ₁(1 + αΔT) (7.3). Area: S₂ = S₁(1 + γΔT), γ = 2α (7.4). Volume: V₂ = V₁(1 + βΔT), β = 3α (7.5).', ar: 'التمدد الطولي والسطحي والحجمي.' },
-        { en: 'α "defined as the amount of change in length for each temperature change of one‑degree Kelvin" (relative change).', ar: 'معامل التمدد الطولي هو التغير النسبي في الطول لكل درجة.' },
-        { en: 'Water anomaly: from 0 °C to 4 °C water contracts; its volume is minimal (density maximal) at 4 °C, so lakes freeze from the top (BK p.111–112).', ar: 'شذوذ الماء: أعلى كثافة عند 4 °C فتتجمد البحيرات من الأعلى.' },
-        { en: 'A hole in a plate expands as if it were made of the plate material (Ex 7.4).', ar: 'الثقب في صفيحة يتمدد كأنه من مادة الصفيحة.' }
+        { en: 'Atoms vibrate more at higher temperature, so distances between them grow.', ar: 'لماذا تتمدد الأجسام عند التسخين؟ لأن الذرات تهتز أكثر عندما تسخن، فتحتاج كل ذرة حيزًا أكبر، وتزيد المسافات بينها، فيكبر الجسم كله.' },
+        { en: 'Linear: Δℓ = αℓ₁ΔT, ℓ₂ = ℓ₁(1 + αΔT) (7.3). Area: S₂ = S₁(1 + γΔT), γ = 2α (7.4). Volume: V₂ = V₁(1 + βΔT), β = 3α (7.5).', ar: 'التمدد يكون في الطول أو المساحة أو الحجم: الطول Δℓ = αℓ₁ΔT أي ℓ₂ = ℓ₁(1 + αΔT)، والمساحة S₂ = S₁(1 + γΔT) حيث γ = 2α، والحجم V₂ = V₁(1 + βΔT) حيث β = 3α. فيكفي أن تعرف α لتحسب الثلاثة.' },
+        { en: 'α "defined as the amount of change in length for each temperature change of one‑degree Kelvin" (relative change).', ar: 'معامل التمدد الطولي α هو مقدار الزيادة في كل متر من الطول عندما ترتفع الحرارة درجة واحدة. فإذا كان α = 1.2×10⁻⁵ يزيد كل متر 0.000012 m لكل درجة، ولهذا نترك فواصل بين قضبان السكة الحديدية.' },
+        { en: 'Water anomaly: from 0 °C to 4 °C water contracts; its volume is minimal (density maximal) at 4 °C, so lakes freeze from the top (BK p.111–112).', ar: 'الماء شاذ: عندما يبرد من 4 °C إلى 0 °C يتمدد بدل أن ينكمش، فتكون كثافته أكبر ما يمكن عند 4 °C. لذلك ينزل الماء الذي حرارته 4 °C إلى القاع، ويتجمد السطح أولًا، وتبقى الأسماك حية تحت الجليد (BK p.111–112).' },
+        { en: 'A hole in a plate expands as if it were made of the plate material (Ex 7.4).', ar: 'الثقب في صفيحة معدنية يتسع عند التسخين ولا يضيق، كأنه مصنوع من مادة الصفيحة نفسها، لأن كل أبعاد الصفيحة تكبر بالنسبة نفسها (مثال 7.4).' }
       ],
       terms: [['Linear expansion coefficient α', 'معامل التمدد الطولي', '°C⁻¹'], ['Surface coefficient γ', 'معامل التمدد السطحي', '2α'], ['Volume coefficient β', 'معامل التمدد الحجمي', '3α'], ['Anomaly of water', 'شذوذ الماء', 'Max density at 4 °C']],
       formulas: [{ f: 'Δℓ = α ℓ ΔT ,  ΔS = γ S ΔT ,  ΔV = β V ΔT', name: '(7.3–7.5)', sym: [['Δℓ, ΔS, ΔV', 'change of length, area, volume', 'm, m², m³', 'تغير الطول والمساحة والحجم'], ['α', 'linear coefficient', '°C⁻¹ or K⁻¹', 'معامل التمدد الطولي'], ['γ, β', 'area / volume coefficient', '°C⁻¹', 'معاملا التمدد السطحي والحجمي'], ['ΔT', 'temperature change', '°C or K', 'تغير درجة الحرارة']], cond: 'γ = 2α, β = 3α (small αΔT).' }],
@@ -1017,10 +1038,10 @@ COURSE.push({
       goalsAr: 'ستحسب كمية الحرارة وتحل مسائل الاتزان الحراري (المسعر).',
       why: { en: 'Cooking, air‑conditioning and engine cooling all rely on heat capacity.', ar: 'الطبخ والتكييف وتبريد المحركات تعتمد على السعة الحرارية.' },
       explain: [
-        { en: 'Heat is energy. Q acquired or lost is proportional to m and ΔT: Q = cmΔT (7.6). Heat capacity C: Q = CΔT (7.7).', ar: 'الحرارة طاقة، وتتناسب مع الكتلة وتغير درجة الحرارة.' },
-        { en: 'Latent heat L: heat to change phase at constant temperature: Q = mL (7.8).', ar: 'الحرارة الكامنة لتغيير الحالة عند درجة ثابتة.' },
-        { en: 'Units: calorie (heat to raise 1 g of water by 1 °C); 1 cal = 4.18 J (Joule\'s mechanical equivalent). c_water = 1 cal/g·°C = 4186 J/kg·K (🧩 conversion).', ar: 'السعر الحراري = 4.18 جول تقريبًا.' },
-        { en: 'Heat balance in an insulated system: heat lost by hot bodies = heat gained by cold bodies (Ex 7.8).', ar: 'في نظام معزول: الحرارة المفقودة = الحرارة المكتسبة.' }
+        { en: 'Heat is energy. Q acquired or lost is proportional to m and ΔT: Q = cmΔT (7.6). Heat capacity C: Q = CΔT (7.7).', ar: 'الحرارة (Heat) طاقة تنتقل من الجسم الساخن إلى البارد. وكمية الحرارة اللازمة لتسخين جسم تزيد بزيادة كتلته وبزيادة التغير في درجة حرارته: Q = cmΔT، حيث c الحرارة النوعية، وهي خاصية للمادة. والسعة الحرارية للجسم كله C = cm، فيكون Q = CΔT.' },
+        { en: 'Latent heat L: heat to change phase at constant temperature: Q = mL (7.8).', ar: 'الحرارة الكامنة (Latent heat) هي الحرارة اللازمة لتغيير حالة المادة، كالانصهار أو الغليان، دون أن تتغير درجة حرارتها: Q = mL. فالثلج عند 0 °C يمتص حرارة وهو يذوب، ودرجته تبقى 0 °C حتى يذوب كله.' },
+        { en: 'Units: calorie (heat to raise 1 g of water by 1 °C); 1 cal = 4.18 J (Joule\'s mechanical equivalent). c_water = 1 cal/g·°C = 4186 J/kg·K (🧩 conversion).', ar: 'السعر الحراري (calorie) هو الحرارة اللازمة لرفع حرارة 1 g من الماء درجة واحدة، و 1 cal ≈ 4.18 J. لذلك الحرارة النوعية للماء 1 cal/g·°C، وتساوي 4186 J/kg·K. انتبه أن تستخدم نظام وحدات واحدًا في المسألة كلها.' },
+        { en: 'Heat balance in an insulated system: heat lost by hot bodies = heat gained by cold bodies (Ex 7.8).', ar: 'ميزان الحرارة: في وعاء معزول لا تضيع الحرارة، فما يفقده الجسم الساخن يكتسبه الجسم البارد بالضبط، حتى يصلا إلى درجة حرارة واحدة. نكتب الحرارة المفقودة = الحرارة المكتسبة، ثم نحسب المجهول (مثال 7.8).' }
       ],
       terms: [['Specific heat c', 'الحرارة النوعية', 'J/kg·K or cal/g·°C'], ['Heat capacity C', 'السعة الحرارية', 'J/K'], ['Latent heat L', 'الحرارة الكامنة', 'J/kg'], ['Calorimeter', 'المسعر', 'Insulated container']],
       formulas: [
@@ -1050,9 +1071,9 @@ COURSE.push({
       goalsAr: 'ستتعرف طرق انتقال الحرارة الثلاث وتحسب التوصيل والإشعاع.',
       why: { en: 'Insulation, cooking pots and the Sun warming Earth are the three modes in action.', ar: 'العزل وأواني الطبخ وتسخين الشمس للأرض أمثلة على الطرق الثلاث.' },
       explain: [
-        { en: 'Conduction: heat Q through a slab is ∝ A, (T₁ − T₂), t and ∝ {{1 // x}}. Rate H = {{Q // t}} = {{k_c A (T₁ − T₂) // x}} (7.9).', ar: 'التوصيل يعتمد على المساحة وفرق الحرارة والسمك.' },
-        { en: 'Convection: movement of the fluid itself; hot water rises because its density decreases (Fig 7.8).', ar: 'الحمل: انتقال المادة الساخنة نفسها.' },
-        { en: 'Radiation: electromagnetic waves, no medium needed. Stefan–Boltzmann: Q = σAT⁴, σ = 5.67×10⁻⁸ W/m²K⁴, T in kelvin; Q here is energy per second of a black body (G‑16).', ar: 'الإشعاع لا يحتاج وسطًا، ويتناسب مع T⁴ بالكلفن.' }
+        { en: 'Conduction: heat Q through a slab is ∝ A, (T₁ − T₂), t and ∝ {{1 // x}}. Rate H = {{Q // t}} = {{k_c A (T₁ − T₂) // x}} (7.9).', ar: 'التوصيل (Conduction): تنتقل الحرارة خلال المادة من ذرة إلى ذرة دون أن تتحرك المادة نفسها، كما تسخن ملعقة معدنية في كوب الشاي. ومعدل انتقالها H = {{k_c A (T₁ − T₂) // x}} يزيد بزيادة المساحة وفرق درجتي الحرارة، ويقل بزيادة السمك x.' },
+        { en: 'Convection: movement of the fluid itself; hot water rises because its density decreases (Fig 7.8).', ar: 'الحمل (Convection): تنتقل الحرارة بحركة السائل أو الغاز نفسه. الماء الساخن تقل كثافته فيصعد، والبارد ينزل مكانه، فتتكوّن تيارات تنقل الحرارة (شكل 7.8).' },
+        { en: 'Radiation: electromagnetic waves, no medium needed. Stefan–Boltzmann: Q = σAT⁴, σ = 5.67×10⁻⁸ W/m²K⁴, T in kelvin; Q here is energy per second of a black body (G‑16).', ar: 'الإشعاع (Radiation): تنتقل الحرارة بموجات كهرومغناطيسية لا تحتاج وسطًا، ولهذا تصلنا حرارة الشمس عبر الفراغ. والطاقة المشعة في الثانية من جسم أسود Q = σAT⁴، ويجب أن تكون T بالكلفن لأنها مرفوعة للأس الرابع (G‑16).' }
       ],
       terms: [['Thermal conductivity k_c', 'معامل التوصيل الحراري', 'W/m·K'], ['Temperature gradient', 'الميل الحراري', '(T₁ − T₂)/x'], ['Convection', 'الحمل', 'Fluid motion'], ['Radiation', 'الإشعاع', 'EM waves'], ['Black body', 'الجسم الأسود', 'Ideal emitter']],
       formulas: [{ f: 'H = {{k_c A (T₁ − T₂) // x}}', name: 'Conduction (7.9)', sym: [['H', 'heat rate', 'W or cal/s', 'معدل انتقال الحرارة'], ['k_c', 'thermal conductivity', 'W/m·K', 'معامل التوصيل الحراري'], ['A', 'area', 'm²', 'المساحة'], ['T₁ − T₂', 'temperature difference', 'K or °C', 'فرق درجتي الحرارة'], ['x', 'thickness', 'm', 'السمك']], cond: 'Steady state.' }, { f: 'Q = σ A T⁴', name: 'Stefan–Boltzmann (7.10)', sym: [['Q', 'energy radiated per second', 'W', 'الطاقة المشعة في الثانية'], ['σ', '5.67×10⁻⁸', 'W/m²K⁴', 'ثابت ستيفان-بولتزمان'], ['A', 'surface area', 'm²', 'مساحة السطح'], ['T', 'absolute temperature', 'K', 'درجة الحرارة المطلقة']], cond: 'Ideal black body; per second.' }],
@@ -1079,10 +1100,10 @@ COURSE.push({
       goalsAr: 'ستتعرف طرق الشحن وتحسب القوة الكهربائية بين شحنتين ومحصلة عدة قوى.',
       why: { en: 'Laser printers and paint sprayers use electrostatic forces (BK p.125).', ar: 'الطابعات الليزرية وبخاخات الطلاء تستخدم القوى الكهروستاتيكية.' },
       explain: [
-        { en: 'Two kinds of charge: negative (electron) and positive (proton). e = 1.6×10⁻¹⁹ C. Like charges repel, unlike attract.', ar: 'نوعان من الشحنات؛ المتشابهة تتنافر والمختلفة تتجاذب.' },
-        { en: 'Charging: friction (electrons transfer), contact (charge shared), induction without contact.', ar: 'الشحن بالدلك والتلامس والحث.' },
-        { en: 'Coulomb\'s law: "the magnitude of electrical force between two charged particles is directly proportional to the product … (q₁q₂) and inversely with the square of the distance (r²)": F = {{k_e q₁q₂ // r²}}, k_e = {{1 // 4πε₀}} ≈ 9×10⁹ N·m²/C² (8.1).', ar: 'قانون كولوم: القوة تتناسب مع حاصل ضرب الشحنتين وعكسيًا مع مربع المسافة.' },
-        { en: 'Several charges: compute each force separately, then add as vectors (BK Ex 8.4).', ar: 'مع عدة شحنات نجمع القوى جمعًا اتجاهيًا.' }
+        { en: 'Two kinds of charge: negative (electron) and positive (proton). e = 1.6×10⁻¹⁹ C. Like charges repel, unlike attract.', ar: 'هناك نوعان من الشحنة: سالبة يحملها الإلكترون، وموجبة يحملها البروتون، ومقدار شحنة كل منهما e = 1.6×10⁻¹⁹ C. والقاعدة: الشحنات المتشابهة تتنافر، والمختلفة تتجاذب.' },
+        { en: 'Charging: friction (electrons transfer), contact (charge shared), induction without contact.', ar: 'طرق الشحن ثلاث: الدلك، حيث تنتقل إلكترونات من جسم إلى آخر بالاحتكاك. والتلامس، حيث تتوزع الشحنة بين الجسمين عندما يتلامسان. والحث، حيث نقرّب جسمًا مشحونًا فيعيد ترتيب الشحنات في جسم آخر دون أن يلمسه.' },
+        { en: 'Coulomb\'s law: "the magnitude of electrical force between two charged particles is directly proportional to the product … (q₁q₂) and inversely with the square of the distance (r²)": F = {{k_e q₁q₂ // r²}}, k_e = {{1 // 4πε₀}} ≈ 9×10⁹ N·m²/C² (8.1).', ar: 'قانون كولوم: القوة بين شحنتين تزيد بزيادة حاصل ضربهما، وتقل كثيرًا بزيادة المسافة لأنها تتناسب عكسيًا مع مربعها: F = {{k_e q₁q₂ // r²}}، حيث k_e ≈ 9×10⁹ N·m²/C². فإذا تضاعفت المسافة تصبح القوة ربع ما كانت.' },
+        { en: 'Several charges: compute each force separately, then add as vectors (BK Ex 8.4).', ar: 'إذا كانت هناك عدة شحنات، احسب القوة من كل شحنة على حدة، وحدد اتجاهها (تجاذب أو تنافر)، ثم اجمع القوى جمعًا اتجاهيًا لا جبريًا، كما في مثال 8.4.' }
       ],
       terms: [['Coulomb (C)', 'كولوم', 'Unit of charge'], ['Elementary charge e', 'الشحنة الأولية', '1.6×10⁻¹⁹ C'], ['Induction', 'الحث', 'Charging without contact'], ['Permittivity ε₀', 'السماحية', '8.85×10⁻¹² C²/N·m²']],
       formulas: [{ f: 'F = {{k_e |q₁ q₂| // r²}}', name: 'Coulomb (8.1)', sym: [['F', 'electric force', 'N', 'القوة الكهربائية'], ['k_e', 'Coulomb constant = {{1 // 4πε₀}} ≈ 9×10⁹', 'N·m²/C²', 'ثابت كولوم'], ['q₁, q₂', 'the two charges', 'C', 'الشحنتان'], ['r', 'distance between the charges', 'm', 'المسافة بين الشحنتين']], cond: 'Point charges. Use the sizes of the charges, then get the direction from their signs: like charges repel, unlike attract.' }],
@@ -1106,8 +1127,8 @@ COURSE.push({
       goalsAr: 'ستحسب شدة المجال الكهربائي وترسم خطوطه.',
       why: { en: 'The field tells the force on any charge placed at a point, without knowing that charge first.', ar: 'المجال يحدد القوة على أي شحنة توضع في النقطة.' },
       explain: [
-        { en: '"The electrical field at a point is defined as the electrical force affecting a positive point‑test charge of the unit placed at that point": E = {{F // q_t}} = {{k_e q // r²}} (8.2). Unit N/C.', ar: 'المجال = القوة على وحدة الشحنات الموجبة.' },
-        { en: 'Direction: away from + charges, toward − charges. Field lines: density ∝ field strength (Faraday) (Fig 8.6).', ar: 'خطوط المجال تخرج من الموجب وتدخل السالب، وكثافتها تدل على الشدة.' }
+        { en: '"The electrical field at a point is defined as the electrical force affecting a positive point‑test charge of the unit placed at that point": E = {{F // q_t}} = {{k_e q // r²}} (8.2). Unit N/C.', ar: 'المجال الكهربائي (Electric field) عند نقطة هو القوة التي تؤثر على شحنة موجبة مقدارها 1 C لو وُضعت هناك: E = {{F // q_t}}. ومجال الشحنة النقطية E = {{k_e q // r²}}، ووحدته N/C. فهو يخبرك بالقوة على أي شحنة توضع في تلك النقطة قبل أن تضعها: F = qE.' },
+        { en: 'Direction: away from + charges, toward − charges. Field lines: density ∝ field strength (Faraday) (Fig 8.6).', ar: 'اتجاه المجال يخرج من الشحنة الموجبة ويدخل في السالبة. ونرسمه بخطوط المجال: كلما تقاربت الخطوط كان المجال أقوى، كما رسمها فاراداي (شكل 8.6).' }
       ],
       terms: [['Electric field', 'المجال الكهربائي', 'Force per unit positive charge'], ['Test charge', 'شحنة الاختبار', 'Small positive charge'], ['Field lines', 'خطوط المجال', 'Visual representation']],
       formulas: [{ f: 'E = {{F // q_t}} = {{k_e q // r²}}', name: '(8.2)', sym: [['E', 'electric field', 'N/C', 'المجال الكهربائي'], ['F', 'force on the test charge', 'N', 'القوة على شحنة الاختبار'], ['q_t', 'test charge', 'C', 'شحنة الاختبار'], ['q', 'charge that makes the field', 'C', 'الشحنة المولّدة للمجال'], ['r', 'distance from q', 'm', 'البعد عن الشحنة']], cond: 'kq/r² is for a point charge. E points away from + charges and toward − charges.' }],
@@ -1125,9 +1146,9 @@ COURSE.push({
       goalsAr: 'ستحسب فرق الجهد في مجال منتظم وجهد شحنة نقطية ومجموع الجهود.',
       why: { en: 'Batteries and sockets are rated in volts: potential is how electric energy is delivered.', ar: 'البطاريات تُقاس بالفولت، والجهد هو طريقة نقل الطاقة الكهربائية.' },
       explain: [
-        { en: 'ΔV = V_A − V_B = {{W // q_t}}: work per unit positive charge moved against the field (8.3). 1 V = 1 J/C.', ar: 'فرق الجهد = الشغل لكل وحدة شحنة.' },
-        { en: 'Uniform field (between plates): ΔV = Ed (8.4).', ar: 'في المجال المنتظم ΔV = Ed.' },
-        { en: 'Point charge: V = {{k_e q // r}} (8.5), a scalar with sign. Several charges: add algebraically.', ar: 'جهد الشحنة النقطية كمية قياسية بإشارة، وتُجمع جبريًا.' }
+        { en: 'ΔV = V_A − V_B = {{W // q_t}}: work per unit positive charge moved against the field (8.3). 1 V = 1 J/C.', ar: 'فرق الجهد (Potential difference) بين نقطتين هو الشغل اللازم لنقل شحنة موجبة مقدارها 1 C من نقطة إلى أخرى عكس المجال: ΔV = {{W // q_t}}، ووحدته الفولت V = J/C. فبطارية 12 V تعطي كل كولوم يمر فيها 12 J.' },
+        { en: 'Uniform field (between plates): ΔV = Ed (8.4).', ar: 'بين لوحين متوازيين يكون المجال منتظمًا، أي متساويًا في كل نقطة، وعندها فرق الجهد = المجال × المسافة بين اللوحين: ΔV = Ed.' },
+        { en: 'Point charge: V = {{k_e q // r}} (8.5), a scalar with sign. Several charges: add algebraically.', ar: 'جهد الشحنة النقطية V = {{k_e q // r}}، وهو كمية قياسية نكتب معها إشارة الشحنة. فإذا كانت هناك عدة شحنات نجمع جهودها جمعًا عاديًا بالإشارات، بلا زوايا ولا مركبات، وهذا أسهل من جمع القوى.' }
       ],
       terms: [['Potential difference', 'فرق الجهد', 'Volt'], ['Electric potential', 'الجهد الكهربائي', 'Work per unit charge from infinity'], ['Volt', 'الفولت', 'J/C']],
       formulas: [{ f: 'ΔV = {{W // q_t}} = E d', name: '(8.3–8.4)', sym: [['ΔV', 'potential difference', 'V', 'فرق الجهد'], ['W', 'work to move the charge', 'J', 'الشغل'], ['q_t', 'test charge', 'C', 'شحنة الاختبار'], ['E', 'uniform field', 'N/C = V/m', 'المجال المنتظم'], ['d', 'distance along the field', 'm', 'المسافة باتجاه المجال']], cond: 'Ed for a uniform field.' }, { f: 'V = {{k_e q // r}}', name: '(8.5)', sym: [['V', 'potential', 'V', 'الجهد'], ['q', 'point charge, with its sign', 'C', 'الشحنة بإشارتها'], ['r', 'distance from the charge', 'm', 'البعد عن الشحنة']], cond: 'Point charge, V(∞) = 0.' }],
@@ -1148,10 +1169,10 @@ COURSE.push({
       goalsAr: 'ستحسب السعة وتوصيل المكثفات والطاقة المخزنة.',
       why: { en: 'Camera flashes and defibrillators store energy in capacitors.', ar: 'فلاش الكاميرا وجهاز إنعاش القلب يخزنان الطاقة في مكثفات.' },
       explain: [
-        { en: 'Q ∝ V → Q = CV (8.6). Capacitance C (farad, F = C/V): "the amount of electrical charge accumulated on the capacitor plate when a unit difference of voltage is applied".', ar: 'السعة = الشحنة لكل وحدة جهد.' },
-        { en: 'Parallel plates: C = {{ε₀A // d}} (8.7), ε₀ = 8.85×10⁻¹² C²/N·m².', ar: 'سعة المكثف المستوي تزيد بالمساحة وتقل بالمسافة.' },
-        { en: 'Series: same Q, V adds → {{1 // C_eq}} = Σ{{1 // Cᵢ}} (8.8). Parallel: same V, Q adds → C_eq = ΣCᵢ (8.9). (Opposite to resistors!)', ar: 'التوالي: نفس الشحنة. التوازي: نفس الجهد. عكس المقاومات.' },
-        { en: 'Energy: U = {{Q² // 2C}} = ½CV² = ½QV (8.10).', ar: 'الطاقة المخزنة ½CV².' }
+        { en: 'Q ∝ V → Q = CV (8.6). Capacitance C (farad, F = C/V): "the amount of electrical charge accumulated on the capacitor plate when a unit difference of voltage is applied".', ar: 'المكثف (Capacitor) لوحان يخزنان الشحنة. كلما زاد الجهد بينهما زادت الشحنة المخزنة: Q = CV. والسعة C هي مقدار الشحنة التي يخزنها المكثف لكل فولت، ووحدتها الفاراد F = C/V.' },
+        { en: 'Parallel plates: C = {{ε₀A // d}} (8.7), ε₀ = 8.85×10⁻¹² C²/N·m².', ar: 'سعة المكثف ذي اللوحين المتوازيين C = {{ε₀A // d}}: تزيد بزيادة مساحة اللوحين A، وتقل بزيادة المسافة بينهما d. والثابت ε₀ = 8.85×10⁻¹² هو سماحية الفراغ.' },
+        { en: 'Series: same Q, V adds → {{1 // C_eq}} = Σ{{1 // Cᵢ}} (8.8). Parallel: same V, Q adds → C_eq = ΣCᵢ (8.9). (Opposite to resistors!)', ar: 'التوصيل على التوالي: كل المكثفات عليها الشحنة نفسها، ونجمع مقلوبات السعات {{1 // C_eq}} = {{1 // C₁}} + {{1 // C₂}}، فتكون السعة المكافئة أصغر من أصغر مكثف. وعلى التوازي: كلها على الجهد نفسه، ونجمع السعات مباشرة. وهذا عكس قواعد المقاومات، فانتبه.' },
+        { en: 'Energy: U = {{Q² // 2C}} = ½CV² = ½QV (8.10).', ar: 'الطاقة المخزنة في المكثف لها ثلاث صيغ متكافئة: U = ½CV² = {{Q² // 2C}} = ½QV. اختر الصيغة التي معطياتها موجودة في المسألة.' }
       ],
       terms: [['Capacitance', 'السعة', 'C = Q/V'], ['Farad', 'الفاراد', 'C/V'], ['Dielectric', 'العازل', 'Insulator between plates'], ['Series / parallel', 'توالي / توازي', 'Connection types']],
       formulas: [
@@ -1186,9 +1207,9 @@ COURSE.push({
       goalsAr: 'ستحسب شدة التيار وكثافته وسرعة الانجراف.',
       why: { en: 'Choosing wire thickness for a home appliance depends on current density.', ar: 'اختيار سمك سلك الجهاز يعتمد على كثافة التيار.' },
       explain: [
-        { en: 'S09U: "The electric current is defined as the rate of flow of electric charge through the conductor. The direction of the current is opposite the direction of flow of electrons." I = {{dq // dt}}; 1 A = 1 C/s (9.1).', ar: 'التيار معدل تدفق الشحنة، واتجاهه عكس حركة الإلكترونات.' },
-        { en: '⚠ The older S09 says "rate of flow of negative charges"; use S09U (gap G‑13).', ar: 'تنبيه: اعتمد تعريف الملف المحدَّث.' },
-        { en: 'Microscopic: Δq = nevAΔt → I = nevA (9.2); J = {{I // A}} = nev (9.3) in A/m²; n = {{ρN_A // A_mass}} for one free electron per atom.', ar: 'الصيغة المجهرية للتيار وكثافته.' }
+        { en: 'S09U: "The electric current is defined as the rate of flow of electric charge through the conductor. The direction of the current is opposite the direction of flow of electrons." I = {{dq // dt}}; 1 A = 1 C/s (9.1).', ar: 'التيار الكهربائي (Electric current) هو كمية الشحنة التي تمر في مقطع السلك كل ثانية: I = {{Δq // Δt}}، ووحدته الأمبير A = C/s. واتجاهه المتفق عليه عكس اتجاه حركة الإلكترونات (ملف S09U).' },
+        { en: '⚠ The older S09 says "rate of flow of negative charges"; use S09U (gap G‑13).', ar: 'تنبيه: الملف القديم S09 يعرّف التيار بأنه «معدل تدفق الشحنات السالبة»، والتعريف المعتمد هو الملف المحدَّث S09U: معدل تدفق الشحنة الكهربائية، واتجاهه عكس اتجاه الإلكترونات (G‑13).' },
+        { en: 'Microscopic: Δq = nevAΔt → I = nevA (9.2); J = {{I // A}} = nev (9.3) in A/m²; n = {{ρN_A // A_mass}} for one free electron per atom.', ar: 'داخل السلك يعتمد التيار على عدد الإلكترونات الحرة في كل متر مكعب n، وشحنة الإلكترون e، وسرعة انجرافها v، ومساحة المقطع A: I = nevA. وكثافة التيار هي التيار لكل متر مربع من المقطع: J = {{I // A}} = nev.' }
       ],
       terms: [['Current', 'التيار', 'Ampere'], ['Current density', 'كثافة التيار', 'A/m²'], ['Drift speed', 'سرعة الانجراف', 'v of carriers'], ['Charge carriers', 'حاملات الشحنة', 'Free electrons']],
       formulas: [{ f: 'I = {{dq // dt}} = n e v A', name: '(9.1–9.2)', sym: [['I', 'current', 'A', 'التيار'], ['q', 'charge', 'C', 'الشحنة'], ['t', 'time', 's', 'الزمن'], ['n', 'free electrons per m³', 'm⁻³', 'عدد الإلكترونات الحرة في المتر المكعب'], ['e', 'electron charge 1.6×10⁻¹⁹', 'C', 'شحنة الإلكترون'], ['v', 'drift speed', 'm/s', 'سرعة الانجراف'], ['A', 'cross‑section area', 'm²', 'مساحة المقطع']], cond: 'Average current: I = {{Δq // Δt}}.' }, { f: 'J = {{I // A}} = n e v', name: '(9.3)', sym: [['J', 'current density', 'A/m²', 'كثافة التيار'], ['I', 'current', 'A', 'التيار'], ['A', 'cross‑section area', 'm²', 'مساحة المقطع']], cond: '—' }],
@@ -1209,9 +1230,9 @@ COURSE.push({
       goalsAr: 'ستطبق قانون أوم وتحسب المقاومة من أبعاد السلك.',
       why: { en: 'Every circuit calculation starts from V = RI.', ar: 'كل حسابات الدوائر تبدأ من V = RI.' },
       explain: [
-        { en: 'Ohm\'s law: "the voltage difference between the two ends of a conductor is proportional to the intensity of the electrical current passing through it, when its temperature is constant": V = RI (9.5). 1 Ω = 1 V/A.', ar: 'قانون أوم عند ثبوت درجة الحرارة.' },
-        { en: 'Microscopic form J = σE. Resistivity ρ = {{1 // σ}} (Ω·m).', ar: 'المقاومية مقلوب الموصلية.' },
-        { en: 'R = {{ρℓ // A}} (9.4): ∝ length, ∝ {{1 // area}}. Doubling both length and radius halves R (Ex 9.4).', ar: 'المقاومة تزيد بالطول وتقل بالمساحة.' }
+        { en: 'Ohm\'s law: "the voltage difference between the two ends of a conductor is proportional to the intensity of the electrical current passing through it, when its temperature is constant": V = RI (9.5). 1 Ω = 1 V/A.', ar: 'قانون أوم: إذا بقيت درجة حرارة الموصل ثابتة، فإن فرق الجهد بين طرفيه يتناسب طرديًا مع التيار المار فيه: V = RI. والمقاومة R هي ثابت التناسب، أي مقدار ممانعة الموصل لمرور التيار، ووحدتها الأوم Ω = V/A.' },
+        { en: 'Microscopic form J = σE. Resistivity ρ = {{1 // σ}} (Ω·m).', ar: 'المقاومية ρ (Resistivity) خاصية للمادة نفسها لا لشكل السلك، فالنحاس مقاوميته صغيرة والنيكروم مقاوميته كبيرة. والموصلية σ هي مقلوبها: ρ = {{1 // σ}}. والصيغة المجهرية لقانون أوم J = σE.' },
+        { en: 'R = {{ρℓ // A}} (9.4): ∝ length, ∝ {{1 // area}}. Doubling both length and radius halves R (Ex 9.4).', ar: 'مقاومة السلك R = {{ρℓ // A}}: تزيد كلما طال السلك، لأن الإلكترونات تقطع طريقًا أطول، وتقل كلما زادت مساحة مقطعه، لأن الطريق أعرض. فإذا ضاعفنا الطول ونصف القطر معًا تصبح المقاومة النصف، لأن المساحة تصبح أربعة أضعاف (مثال 9.4).' }
       ],
       terms: [['Resistance', 'المقاومة', 'Ω'], ['Resistivity ρ', 'المقاومة النوعية', 'Ω·m'], ['Conductivity σ', 'الموصلية', '1/(Ω·m)'], ['Ohmic', 'أومي', 'Obeys V ∝ I']],
       formulas: [{ f: 'V = R I', name: '(9.5)', sym: [['V', 'voltage', 'V', 'فرق الجهد'], ['R', 'resistance', 'Ω', 'المقاومة'], ['I', 'current', 'A', 'التيار']], cond: 'Constant temperature.' }, { f: 'R = {{ρ ℓ // A}} ,  ρ = {{1 // σ}}', name: '(9.4)', sym: [['R', 'resistance', 'Ω', 'المقاومة'], ['ρ', 'resistivity', 'Ω·m', 'المقاومية'], ['ℓ', 'length', 'm', 'الطول'], ['A', 'cross‑section area = πr²', 'm²', 'مساحة المقطع'], ['σ', 'conductivity', '(Ω·m)⁻¹', 'الموصلية']], cond: 'A uses the radius: r = d/2.' }],
@@ -1232,8 +1253,8 @@ COURSE.push({
       goalsAr: 'ستحسب القدرة الكهربائية بالصيغ الثلاث.',
       why: { en: 'Electricity bills charge for energy = power × time.', ar: 'فاتورة الكهرباء تحسب الطاقة = القدرة × الزمن.' },
       explain: [
-        { en: 'Power: energy per unit time to move charges: P = {{W // Δt}} = {{QV // Δt}} = VI (9.6).', ar: 'القدرة الكهربائية = VI.' },
-        { en: 'With Ohm\'s law: P = RI² = {{V² // R}}. Choose the form that uses the known quantities.', ar: 'اختر الصيغة حسب المعطيات.' }
+        { en: 'Power: energy per unit time to move charges: P = {{W // Δt}} = {{QV // Δt}} = VI (9.6).', ar: 'القدرة الكهربائية (Electric power) هي الطاقة التي يستهلكها الجهاز كل ثانية: P = VI، أي الجهد × التيار، ووحدتها الواط W. فغلاية قدرتها 2000 W تستهلك 2000 J كل ثانية.' },
+        { en: 'With Ohm\'s law: P = RI² = {{V² // R}}. Choose the form that uses the known quantities.', ar: 'باستخدام قانون أوم نحصل على صيغتين أخريين للقدرة: P = RI² إذا عرفت المقاومة والتيار، و P = {{V² // R}} إذا عرفت الجهد والمقاومة. الصيغ الثلاث تعطي الجواب نفسه، فاختر التي معطياتها عندك.' }
       ],
       terms: [['Electric power', 'القدرة الكهربائية', 'Watt'], ['Kilowatt‑hour', 'كيلوواط ساعة', '3.6×10⁶ J (Appendix)']],
       formulas: [{ f: 'P = V I = R I² = {{V² // R}}', name: '(9.6)', sym: [['P', 'power', 'W', 'القدرة'], ['V', 'voltage', 'V', 'الجهد'], ['I', 'current', 'A', 'التيار'], ['R', 'resistance', 'Ω', 'المقاومة']], cond: 'Use the V and I of the same device.' }],
@@ -1251,9 +1272,9 @@ COURSE.push({
       goalsAr: 'ستحسب المقاومة المكافئة لدوائر التوالي والتوازي والمختلطة.',
       why: { en: 'House outlets are in parallel so each device gets the full voltage.', ar: 'مقابس المنزل على التوازي ليحصل كل جهاز على الجهد كاملًا.' },
       explain: [
-        { en: 'Series: same current; ΔV = IR₁ + IR₂ → R_eq = R₁ + R₂ + … (9.7).', ar: 'التوالي: نفس التيار، والمقاومات تُجمع.' },
-        { en: 'Parallel: same voltage; I = I₁ + I₂ → {{1 // R_eq}} = {{1 // R₁}} + {{1 // R₂}} + … (9.8).', ar: 'التوازي: نفس الجهد، ونجمع المقلوبات.' },
-        { en: 'Mixed: simplify step by step from the innermost group (Ex 9.9).', ar: 'المختلطة: بسّط خطوة خطوة.' }
+        { en: 'Series: same current; ΔV = IR₁ + IR₂ → R_eq = R₁ + R₂ + … (9.7).', ar: 'التوصيل على التوالي: المقاومات في مسار واحد، فيمر فيها التيار نفسه، ويتوزع الجهد عليها. والمقاومة المكافئة مجموعها: R_eq = R₁ + R₂ + …، فتكون أكبر من أي مقاومة منها.' },
+        { en: 'Parallel: same voltage; I = I₁ + I₂ → {{1 // R_eq}} = {{1 // R₁}} + {{1 // R₂}} + … (9.8).', ar: 'التوصيل على التوازي: كل مقاومة في فرع مستقل، فيكون عليها الجهد نفسه، ويتوزع التيار على الفروع. ونجمع المقلوبات: {{1 // R_eq}} = {{1 // R₁}} + {{1 // R₂}} + …، فتكون المقاومة المكافئة أصغر من أصغر مقاومة. ولهذا تُوصَّل أجهزة المنزل على التوازي.' },
+        { en: 'Mixed: simplify step by step from the innermost group (Ex 9.9).', ar: 'الدائرة المختلطة: ابدأ بأصغر مجموعة واضحة، توالي أو توازي، واستبدلها بمقاومة واحدة. ثم أعد الرسم وكرر حتى تبقى مقاومة واحدة (مثال 9.9).' }
       ],
       terms: [['Series', 'توالي', 'One path'], ['Parallel', 'توازي', 'Several branches'], ['Equivalent resistance', 'المقاومة المكافئة', 'R_eq']],
       formulas: [{ f: 'Series: R_eq = R₁ + R₂ + …   ·   Parallel: {{1 // R_eq}} = {{1 // R₁}} + {{1 // R₂}} + …', name: '(9.7–9.8)', sym: [['R_eq', 'equivalent resistance', 'Ω', 'المقاومة المكافئة'], ['R₁, R₂', 'each resistor', 'Ω', 'كل مقاومة']], cond: 'Series: same I in each. Parallel: same V on each.' }],
@@ -1280,10 +1301,10 @@ COURSE.push({
       goalsAr: 'ستتعرف تاريخ طبيعة الضوء وقانوني الانعكاس.',
       why: { en: 'Mirrors in cars, periscopes and road signs (retro‑reflection) use reflection.', ar: 'المرايا وإشارات الطريق العاكسة تستخدم الانعكاس.' },
       explain: [
-        { en: 'Newton: particles; Huygens (1678): waves; Young (1801): interference; Hertz (1887): EM waves; Planck (1900) & Einstein (1905): photons → light has a dual nature.', ar: 'الضوء له طبيعة مزدوجة: موجية وجسيمية.' },
-        { en: 'Laws of reflection: (1) incident ray, reflected ray and normal lie in one plane; (2) θ₁ = θ₂ (10.1), angles measured from the normal.', ar: 'زاوية السقوط = زاوية الانعكاس، وتُقاس من العمود المقام.' },
-        { en: 'Regular reflection (smooth mirror) vs diffuse reflection (rough surface).', ar: 'الانعكاس المنتظم والانعكاس المنتشر.' },
-        { en: 'Two mirrors at angle Φ: total deviation = 360° − 2Φ; at 90° the ray returns (retro‑reflection) (BK p.164–165).', ar: 'مرآتان بزاوية Φ: الانحراف 360 − 2Φ.' }
+        { en: 'Newton: particles; Huygens (1678): waves; Young (1801): interference; Hertz (1887): EM waves; Planck (1900) & Einstein (1905): photons → light has a dual nature.', ar: 'اختلف العلماء في طبيعة الضوء: نيوتن قال إنه جسيمات، وهويغنز (1678) قال إنه موجات، ثم أثبت يونغ (1801) التداخل، وهيرتز (1887) الموجات الكهرومغناطيسية، ثم بيّن بلانك (1900) وأينشتاين (1905) أنه فوتونات. والنتيجة أن للضوء طبيعة مزدوجة: يتصرف كموجة أحيانًا وكجسيم أحيانًا.' },
+        { en: 'Laws of reflection: (1) incident ray, reflected ray and normal lie in one plane; (2) θ₁ = θ₂ (10.1), angles measured from the normal.', ar: 'قانونا الانعكاس: الشعاع الساقط والشعاع المنعكس والعمود المقام على السطح تقع كلها في مستوى واحد، وزاوية السقوط تساوي زاوية الانعكاس θ₁ = θ₂. والزاويتان تُقاسان دائمًا من العمود المقام، لا من سطح المرآة.' },
+        { en: 'Regular reflection (smooth mirror) vs diffuse reflection (rough surface).', ar: 'الانعكاس المنتظم يحدث على سطح أملس كالمرآة، فتنعكس الأشعة المتوازية متوازية وترى صورتك. والانعكاس المنتشر يحدث على سطح خشن كالورق، فتتبعثر الأشعة في كل اتجاه، ولهذا ترى الورقة من أي مكان دون أن ترى صورتك فيها.' },
+        { en: 'Two mirrors at angle Φ: total deviation = 360° − 2Φ; at 90° the ray returns (retro‑reflection) (BK p.164–165).', ar: 'إذا انعكس الشعاع على مرآتين بينهما زاوية Φ يكون انحرافه الكلي 360° − 2Φ. وعندما تكون الزاوية 90° يرجع الشعاع في عكس اتجاهه تمامًا، وهذه فكرة العاكسات على الطرق (BK p.164–165).' }
       ],
       terms: [['Normal', 'العمود المقام', 'Line ⟂ to surface'], ['Angle of incidence', 'زاوية السقوط', 'θ₁'], ['Diffuse reflection', 'الانعكاس المنتشر', 'From rough surfaces'], ['Photon', 'الفوتون', 'Light quantum']],
       formulas: [{ f: 'θ₁ = θ₂', name: 'Law of reflection (10.1)', sym: [['θ₁', 'angle of incidence, from the normal', '°', 'زاوية السقوط مع العمود'], ['θ₂', 'angle of reflection, from the normal', '°', 'زاوية الانعكاس مع العمود']], cond: '—' }],
@@ -1301,10 +1322,10 @@ COURSE.push({
       goalsAr: 'ستطبق قانون سنل وتحسب سرعة الضوء وطوله الموجي في الوسط.',
       why: { en: 'Glasses, cameras and the apparent depth of pools come from refraction.', ar: 'النظارات والكاميرات وظاهرة العمق الظاهري سببها الانكسار.' },
       explain: [
-        { en: 'Refraction laws: incident, reflected, refracted rays and the normal lie in one plane; {{sin θ₁ // sin θ₂}} = {{v₁ // v₂}} (10.2).', ar: 'نسبة الجيبين = نسبة السرعتين.' },
-        { en: 'Refractive index n = {{c // v}} (> 1). Snell: n₁ sin θ₁ = n₂ sin θ₂ (10.3). Vacuum n = 1.', ar: 'معامل الانكسار وقانون سنل.' },
-        { en: 'Frequency does not change between media; therefore n = {{λ // λₙ}} and n₁λ₁ = n₂λ₂.', ar: 'التردد لا يتغير، فيتغير الطول الموجي.' },
-        { en: 'Into a denser medium the ray bends toward the normal; the path is reversible (Fig 10.6).', ar: 'عند الدخول لوسط أكبر معاملًا ينكسر مقتربًا من العمود.' }
+        { en: 'Refraction laws: incident, reflected, refracted rays and the normal lie in one plane; {{sin θ₁ // sin θ₂}} = {{v₁ // v₂}} (10.2).', ar: 'الانكسار (Refraction) هو انحراف الضوء عندما ينتقل من وسط إلى آخر، لأن سرعته تتغير. والشعاع الساقط والمنكسر والعمود في مستوى واحد، ونسبة جيبي الزاويتين تساوي نسبة السرعتين: {{sin θ₁ // sin θ₂}} = {{v₁ // v₂}}.' },
+        { en: 'Refractive index n = {{c // v}} (> 1). Snell: n₁ sin θ₁ = n₂ sin θ₂ (10.3). Vacuum n = 1.', ar: 'معامل الانكسار n = {{c // v}} يخبرك كم مرة تقل سرعة الضوء في الوسط مقارنة بالفراغ، لذلك هو دائمًا أكبر من 1، وفي الفراغ يساوي 1. وقانون سنل يربط الوسطين: n₁ sin θ₁ = n₂ sin θ₂.' },
+        { en: 'Frequency does not change between media; therefore n = {{λ // λₙ}} and n₁λ₁ = n₂λ₂.', ar: 'عند انتقال الضوء بين وسطين لا يتغير تردده لأن المصدر نفسه، لكن سرعته تتغير فيتغير طوله الموجي: n = {{λ // λₙ}}، أي أن الطول الموجي داخل الوسط أقصر منه في الفراغ.' },
+        { en: 'Into a denser medium the ray bends toward the normal; the path is reversible (Fig 10.6).', ar: 'إذا دخل الضوء وسطًا معامل انكساره أكبر، كأن ينتقل من الهواء إلى الماء، يبطئ وينكسر مقتربًا من العمود. وإذا خرج إلى وسط معامله أصغر ينكسر مبتعدًا عنه. ومسار الشعاع قابل للانعكاس: يمكن أن يسلك الطريق نفسه بالعكس (شكل 10.6).' }
       ],
       terms: [['Refraction', 'الانكسار', 'Change of direction at a boundary'], ['Refractive index', 'معامل الانكسار', 'n = {{c // v}}'], ['Snell\'s law', 'قانون سنل', 'n₁ sin θ₁ = n₂ sin θ₂']],
       formulas: [{ f: 'n = {{c // v}} = {{λ // λₙ}}', name: 'Refractive index', sym: [['n', 'refractive index', '—', 'معامل الانكسار'], ['c', '3×10⁸ m/s', 'm/s', 'سرعة الضوء في الفراغ'], ['v', 'speed in the medium', 'm/s', 'سرعة الضوء في الوسط'], ['λ, λₙ', 'wavelength in vacuum / in the medium', 'm', 'الطول الموجي في الفراغ وفي الوسط']], cond: 'f constant.' }, { f: 'n₁ sin θ₁ = n₂ sin θ₂', name: 'Snell (10.3)', sym: [['n₁, n₂', 'refractive indices', '—', 'معاملا الانكسار'], ['θ₁, θ₂', 'angles from the normal', '°', 'الزاويتان مع العمود']], cond: '—' }],
@@ -1330,9 +1351,9 @@ COURSE.push({
       goalsAr: 'ستفسر تحلل الضوء وتحسب الزاوية الحرجة.',
       why: { en: 'Fibre‑optic internet relies on total internal reflection.', ar: 'الإنترنت بالألياف البصرية يعتمد على الانعكاس الكلي الداخلي.' },
       explain: [
-        { en: 'Dispersion: n depends on λ; red has a smaller n than violet, so each colour refracts at a different angle (prism, rainbow).', ar: 'التشتت: معامل الانكسار يقل بزيادة الطول الموجي.' },
-        { en: 'From larger n to smaller n the ray bends away from the normal. At θ₂ = 90° the incident angle is the critical angle: sin θ_c = {{n₂ // n₁}} (10.4).', ar: 'الزاوية الحرجة عند انكسار الشعاع موازيًا للسطح.' },
-        { en: 'If θ₁ > θ_c, all light is reflected back: total internal reflection (only when n₁ > n₂).', ar: 'إذا زادت زاوية السقوط عن الحرجة يحدث انعكاس كلي.' }
+        { en: 'Dispersion: n depends on λ; red has a smaller n than violet, so each colour refracts at a different angle (prism, rainbow).', ar: 'التشتت (Dispersion): معامل الانكسار يختلف قليلًا باختلاف لون الضوء، فالأحمر طوله الموجي أطول ومعامل انكساره أصغر، فينكسر أقل من البنفسجي. لذلك يفصل المنشور الضوء الأبيض إلى ألوان، وبه يتكوّن قوس قزح.' },
+        { en: 'From larger n to smaller n the ray bends away from the normal. At θ₂ = 90° the incident angle is the critical angle: sin θ_c = {{n₂ // n₁}} (10.4).', ar: 'عندما يخرج الضوء من وسط معامله أكبر إلى وسط معامله أصغر، كأن ينتقل من الزجاج إلى الهواء، ينكسر مبتعدًا عن العمود. وكلما زادت زاوية السقوط اقترب الشعاع المنكسر من السطح، حتى يصير موازيًا له عند الزاوية الحرجة: sin θ_c = {{n₂ // n₁}}.' },
+        { en: 'If θ₁ > θ_c, all light is reflected back: total internal reflection (only when n₁ > n₂).', ar: 'إذا زادت زاوية السقوط عن الزاوية الحرجة لا يخرج أي ضوء، وينعكس كله داخل الوسط. وهذا الانعكاس الكلي الداخلي يحدث فقط عند الانتقال من الوسط الأكثف إلى الأقل كثافة، وعليه تعمل الألياف البصرية.' }
       ],
       terms: [['Dispersion', 'التشتت (التحلل)', 'n depends on λ'], ['Critical angle', 'الزاوية الحرجة', 'sin θ_c = {{n₂ // n₁}}'], ['Total internal reflection', 'الانعكاس الكلي الداخلي', 'θ₁ > θ_c']],
       formulas: [{ f: 'sin θ_c = {{n₂ // n₁}}', name: '(10.4)', sym: [['θ_c', 'critical angle', '°', 'الزاوية الحرجة'], ['n₁', 'denser medium', '—', 'الوسط الأكثف'], ['n₂', 'less dense medium', '—', 'الوسط الأقل كثافة']], cond: 'n₁ > n₂ only.' }],
@@ -4342,10 +4363,10 @@ window.SERWAY = {
     const link = n => `<a href="#${n[0]}" class="nl ${on(n) ? 'active' : ''}" title="${n[1].replace(/^\S+\s/, '')} · ${n[2]}"><span>${n[1]}</span><small>${n[2]}</small></a>`;
     // collapsible groups; the group holding the open page always stays open
     const g = S.prefs.groups || {};
-    const group = (id, title, html, has) => { const open = has || g[id] !== false; return `<button class="sec grp" data-g="${id}" aria-expanded="${open}"><span>${title}</span><span class="caret">${open ? '▾' : '▸'}</span></button><div class="grpbody${open ? '' : ' closed'}">${html}</div>`; };
-    return link(NAV[0]) + group('tools', 'Study tools · أدوات المذاكرة', NAV.slice(1).map(link).join(''), NAV.slice(1).some(on))
-      + group('found', 'Foundation · التأسيس', FNAV.map(link).join(''), FNAV.some(on))
-      + group('chapters', 'Chapters · الفصول', chs, active.startsWith('chapter/') || active.startsWith('lesson/'));
+    const group = (id, icon, en, ar, n, html, has) => { const open = has || g[id] !== false; return `<button class="grp" data-g="${id}" aria-expanded="${open}"><span class="gi" aria-hidden="true">${icon}</span><span class="gt">${en}</span><span class="ga">${ar}</span><span class="caret" aria-hidden="true"><svg viewBox="0 0 10 10" width="10" height="10"><path d="M3.5 1.5 7 5l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button><div class="grpbody${open ? '' : ' closed'}">${html}</div>`; };
+    return link(NAV[0]) + group('tools', '🧰', 'Study tools', 'أدوات المذاكرة', NAV.length - 1, NAV.slice(1).map(link).join(''), NAV.slice(1).some(on))
+      + group('found', '🧱', 'Foundation', 'التأسيس', FNAV.length, FNAV.map(link).join(''), FNAV.some(on))
+      + group('chapters', '📚', 'Chapters', 'الفصول', COURSE.length, chs, active.startsWith('chapter/') || active.startsWith('lesson/'));
   }
   function route() {
     const h = (location.hash || '#home').slice(1); const [v, arg] = h.split('/');
@@ -4384,7 +4405,7 @@ window.SERWAY = {
     const applySide = () => { document.body.classList.toggle('side-closed', S.prefs.side === false); $('#menu').setAttribute('aria-expanded', String(wide.matches ? S.prefs.side !== false : $('#side').classList.contains('open'))); };
     $('#menu').onclick = () => { if (wide.matches) { S.prefs.side = S.prefs.side === false; save(); } else $('#side').classList.toggle('open'); applySide(); };
     $('#side').addEventListener('click', e => { const b = e.target.closest('.grp'); if (!b) return; const body = b.nextElementSibling, open = body.classList.toggle('closed') === false;
-      b.setAttribute('aria-expanded', String(open)); b.querySelector('.caret').textContent = open ? '▾' : '▸'; S.prefs.groups = Object.assign({}, S.prefs.groups, { [b.dataset.g]: open }); save(); });
+      b.setAttribute('aria-expanded', String(open)); S.prefs.groups = Object.assign({}, S.prefs.groups, { [b.dataset.g]: open }); save(); });
     applySide();
     const sr = $('#search'), res = $('#results');
     sr.oninput = () => { const r = search(sr.value); res.innerHTML = r.length ? `<div class="card results">${r.join('')}</div>` : ''; };

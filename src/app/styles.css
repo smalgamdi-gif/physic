@@ -235,3 +235,16 @@ body.side-closed main{max-width:1180px}
 .stepbody>.addbox:only-child{margin:0}
 @media (max-width:860px){.stepbody{padding:12px 14px}}
 @media print{.stepbody{box-shadow:none}}
+/* side menu group headers: a distinct, clickable band per section; open groups are tinted and their items hang off a rule */
+nav.side button.grp{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;column-gap:8px;width:100%;margin:16px 0 6px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;text-align:left;cursor:pointer;text-transform:none;letter-spacing:0;transition:background .15s,border-color .15s}
+nav.side button.grp:hover{border-color:var(--brand)}
+nav.side button.grp:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+nav.side button.grp[aria-expanded="true"]{background:var(--brand-soft);border-color:transparent;color:var(--brand)}
+nav.side .grp .gi{font-size:16px;line-height:1}
+nav.side .grp .gt{font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+nav.side .grp .ga{direction:rtl;font-size:12.5px;font-weight:600;opacity:.85;white-space:nowrap}
+nav.side .grp .gn{font-size:11px;font-weight:700;min-width:20px;text-align:center;padding:1px 6px;border-radius:999px;background:var(--panel);color:var(--muted);font-variant-numeric:tabular-nums}
+nav.side .grp .caret{display:grid;place-items:center;width:16px;height:16px;color:var(--muted);transition:transform .15s}
+nav.side .grp[aria-expanded="true"] .caret{transform:rotate(90deg);color:var(--brand)}
+nav.side .grpbody{margin:0 0 4px 14px;padding-left:6px;border-left:2px solid var(--line)}
+@media (prefers-reduced-motion:reduce){nav.side button.grp,nav.side .grp .caret{transition:none}}
