@@ -1001,12 +1001,17 @@
   let scrollT = 0;
   window.addEventListener('scroll', () => { clearTimeout(scrollT); scrollT = setTimeout(() => { if (EXAM) return; S.prefs.scroll = { h: location.hash, y: Math.round(window.scrollY) }; save(); }, 400); }, { passive: true });
 
+  const ICON = {
+    sun: '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+    moon: '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 13.4A8.5 8.5 0 1 1 10.6 3.5a6.6 6.6 0 0 0 9.9 9.9z"/></svg>' };
+  // the theme button shows the mode it switches to
+  const themeBtn = (b, dark) => { b.innerHTML = `<span class="ti">${dark ? ICON.sun : ICON.moon}</span><span class="tl">${dark ? 'Light' : 'Dark'}</span>`; b.title = dark ? 'Switch to light mode' : 'Switch to dark mode'; };
   const effTheme = () => document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   function applyPrefs() {
     document.body.classList.toggle('hide-ar', !S.prefs.ar);
     // no saved choice: follow the device (or the viewer's) setting
     if (S.prefs.theme) document.documentElement.dataset.theme = S.prefs.theme;
-    $('#tar').classList.toggle('on', S.prefs.ar); $('#tth').textContent = effTheme() === 'dark' ? '☀️ Light' : '🌙 Dark';
+    $('#tar').classList.toggle('on', S.prefs.ar); $('#tar').setAttribute('aria-pressed', String(S.prefs.ar)); themeBtn($('#tth'), effTheme() === 'dark');
   }
   document.addEventListener('DOMContentLoaded', () => {
     $('#tar').onclick = () => { S.prefs.ar = !S.prefs.ar; save(); applyPrefs(); };
@@ -1021,6 +1026,9 @@
     $('#side').addEventListener('click', e => { const b = e.target.closest('.grp'); if (!b) return; const body = b.nextElementSibling, open = body.classList.toggle('closed') === false;
       b.setAttribute('aria-expanded', String(open)); S.prefs.groups = Object.assign({}, S.prefs.groups, { [b.dataset.g]: open }); save(); });
     applySide();
+    // the side menu and sticky bars sit just under the header, whose height changes when it wraps on phones
+    const hdr = () => document.documentElement.style.setProperty('--hdr', $('.top').offsetHeight + 'px');
+    hdr(); if (window.ResizeObserver) new ResizeObserver(hdr).observe($('.top')); else window.addEventListener('resize', hdr);
     const sr = $('#search'), res = $('#results');
     sr.oninput = () => { const r = search(sr.value); res.innerHTML = r.length ? `<div class="card results">${r.join('')}</div>` : ''; };
     res.onclick = () => { res.innerHTML = ''; sr.value = ''; };

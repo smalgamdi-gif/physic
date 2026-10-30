@@ -68,7 +68,7 @@ main{min-width:0;overflow-wrap:anywhere}
   /* one-row header on phones */
   .top{flex-wrap:nowrap}
   .top .lgw{display:none}
-  .top .labbtn{padding:6px 10px 6px 7px}
+  .top .labbtn{padding:0 12px 0 5px}
   .ltitle{font-size:22px;margin-top:4px}
   .sub .pill{white-space:normal}
 }

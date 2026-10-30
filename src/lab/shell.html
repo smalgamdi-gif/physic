@@ -7,11 +7,11 @@
 </head>
 <body>
 <header class="top">
-  <button class="tog menu-btn" id="menu" aria-label="Menu">☰</button>
-  <div class="logo"><span class="atom">⚗</span><span class="lgw">Physics </span>Virtual Lab <span class="muted" style="font-weight:400;font-size:13px">· المعمل الافتراضي</span></div>
+  <button class="hbtn menu-btn" id="menu" aria-label="Menu" title="Show or hide the experiments list"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <div class="logo"><span class="atom" aria-hidden="true">⚗</span><span class="lgt"><b><span class="lgw">Physics </span>Virtual Lab</b><small dir="rtl">المعمل الافتراضي</small></span></div>
   <div class="grow"></div>
   <a class="labbtn" href="index.html" title="Back to the lessons"><span class="lbi" aria-hidden="true">📚</span><span class="lbt"><span class="lgw">Back to lessons</span><span class="lgs">Lessons</span></span><span class="lba">الدروس</span></a>
-  <button class="tog" id="theme" title="Light or dark theme">🌓<span class="lgw"> Theme</span></button>
+  <div class="htools" role="group" aria-label="Display"><button class="htool" id="theme"><span class="ti"></span><span class="tl">Dark</span></button></div>
 </header>
 <div class="layout">
   <nav class="side" id="side"><div class="sec">Experiments · التجارب</div><div id="exlist"></div>
