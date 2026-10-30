@@ -16,10 +16,10 @@ Open either HTML file in a browser. Both work offline, and progress is saved in 
 ## Live links
 | | Claude link | GitHub Pages |
 |---|---|---|
-| Tutor | https://claude.ai/artifact/UNT2rrfNa1NrVedgyr6cEv (also https://claude.ai/artifact/NZrJxE6v5SGksyYkyKtK6Y) | https://smalgamdi-gif.github.io/physic/ |
+| Tutor | https://claude.ai/artifact/UNT2rrfNa1NrVedgyr6cEv | https://smalgamdi-gif.github.io/physic/ |
 | Virtual lab | opened from the ⚗ Lab button in the tutor | https://smalgamdi-gif.github.io/physic/Virtual_Lab.html |
 
-Both Claude links and GitHub Pages show the version on `main`, and they are updated together.
+The Claude link and GitHub Pages both show the version on `main` and are updated together. An older Claude link (https://claude.ai/artifact/NZrJxE6v5SGksyYkyKtK6Y) was published from another account and is not kept in sync, so it may be out of date.
 
 ## Sources
 - 📘 = taken from the course files (slides S01–S10, the "Ch 9 Updated" deck, and the textbook as BK p.N).
