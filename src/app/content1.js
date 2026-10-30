@@ -183,14 +183,14 @@ COURSE.push({
       goalsAr: 'ستحسب الضرب القياسي والاتجاهي وتجد الزاوية بين متجهين.',
       why: { en: 'Work is a dot product (W = F·Δr, Chapter 5); torque and magnetic force are cross products.', ar: 'الشغل ضرب قياسي (الفصل 5)، والعزم ضرب اتجاهي.' },
       explain: [
-        { en: '<b>Scalar product</b>: A·B = AB cos θ = AₓBₓ + A_yB_y + A_zB_z → a scalar; commutative. î·î = 1, î·ĵ = 0.', ar: 'الضرب القياسي (Dot product) يأخذ متجهين ويعطيك عددًا وليس متجهًا: A·B = AB cos θ، أو بالمركبات AₓBₓ + A_yB_y + A_zB_z. وترتيب الضرب لا يهم (A·B = B·A). ومنه î·î = 1 لأن الزاوية صفر، و î·ĵ = 0 لأنهما متعامدان.' },
+        { en: '<b>Scalar product</b>: A·B = AB cos θ = AₓBₓ + A_y B_y + A_z B_z → a scalar; commutative. î·î = 1, î·ĵ = 0.', ar: 'الضرب القياسي (Dot product) يأخذ متجهين ويعطيك عددًا وليس متجهًا: A·B = AB cos θ، أو بالمركبات AₓBₓ + A_y B_y + A_z B_z. وترتيب الضرب لا يهم (A·B = B·A). ومنه î·î = 1 لأن الزاوية صفر، و î·ĵ = 0 لأنهما متعامدان.' },
         { en: 'Angle: cos θ = {{A·B // AB}}. If A·B = 0 the vectors are orthogonal.', ar: 'من الضرب القياسي نجد الزاوية بين متجهين: cos θ = {{A·B // AB}}. فإذا كان الناتج صفرًا كان cos θ = 0 أي θ = 90°، فالمتجهان متعامدان. وهذه طريقة سريعة لاختبار التعامد.' },
         { en: '<b>Vector product</b>: A×B = AB sin θ n̂, perpendicular to both (right‑hand rule); A×B = −B×A. î×ĵ = k̂, ĵ×k̂ = î, k̂×î = ĵ, î×î = 0.', ar: 'الضرب الاتجاهي (Cross product) يعطيك متجهًا جديدًا عموديًا على المتجهين معًا، مقداره AB sin θ واتجاهه بقاعدة اليد اليمنى. وهنا الترتيب مهم: A×B = −B×A. ومنه î×ĵ = k̂ و î×î = 0.' },
         { en: 'Determinant form: A×B = î(A_yB_z − A_zB_y) − ĵ(AₓB_z − A_zBₓ) + k̂(AₓB_y − A_yBₓ).', ar: 'عندما يكون المتجهان بالمركبات نحسب الضرب الاتجاهي بالمحدد: نضع î ĵ k̂ في الصف الأول، ثم مركبات A، ثم مركبات B. انتبه للإشارة السالبة أمام حد ĵ؛ نسيانها هو الخطأ الشائع، وقد وقع فيه الكتاب نفسه في مثال 2.9 (G‑27).' }
       ],
       terms: [['Dot product', 'الضرب القياسي (النقطي)', 'Gives a scalar'], ['Cross product', 'الضرب الاتجاهي', 'Gives a vector'], ['Orthogonal', 'متعامد', 'θ = 90°'], ['Right‑hand rule', 'قاعدة اليد اليمنى', 'Direction of A×B']],
       formulas: [
-        { f: 'A·B = AB cos θ = AₓBₓ + A_yB_y + A_zB_z', name: 'Scalar product', sym: [['A·B', 'scalar product (a number)', 'product of units', 'الضرب القياسي'], ['θ', 'angle between A and B', '°', 'الزاوية بين المتجهين']], cond: 'Result is a scalar.' },
+        { f: 'A·B = AB cos θ = AₓBₓ + A_y B_y + A_z B_z', name: 'Scalar product', sym: [['A·B', 'scalar product (a number)', 'product of units', 'الضرب القياسي'], ['θ', 'angle between A and B', '°', 'الزاوية بين المتجهين']], cond: 'Result is a scalar.' },
         { f: '|A×B| = AB sin θ', name: 'Vector product magnitude', sym: [['|A×B|', 'size of the vector product', 'product of units', 'مقدار الضرب الاتجاهي'], ['θ', 'angle between A and B', '°', 'الزاوية بين المتجهين'], ['n̂', 'unit vector ⟂ to A and B', '—', 'متجه وحدة عمودي على A و B']], cond: 'A×B = −B×A' }
       ],
       life: { en: 'Pushing a trolley with a handle at an angle: only F cos θ moves it forward (dot product idea).', ar: 'عند دفع عربة بزاوية، الجزء المفيد من القوة هو F cos θ.' },

@@ -42,7 +42,7 @@
         ['tan θ = {{R_y // Rₓ}}'], 'Same as for a single vector.', 'كما في المتجه الواحد.')
     ],
     'ch2-l4#0': [
-      B('A·B', 'A·B = AB cos θ = AₓBₓ + A_yB_y + A_zB_z', 'the scalar product (a number)', 'لحساب الضرب القياسي، والنتيجة عدد'),
+      B('A·B', 'A·B = AB cos θ = AₓBₓ + A_y B_y + A_z B_z', 'the scalar product (a number)', 'لحساب الضرب القياسي، والنتيجة عدد'),
       D('θ', 'cos θ = {{A·B // AB}}', 'the angle between two vectors (get A·B from the components first)', 'لحساب الزاوية بين متجهين: احسب A·B من المركبات أولًا، ثم احسب المقدارين A و B',
         ['A·B = AB cos θ', 'cos θ = {{A·B // AB}}'], 'Divide both sides by AB.', 'اقسم الطرفين على AB.')
     ],

@@ -586,6 +586,21 @@
   // ---------- formula sheet ----------
   // formula in words: Arabic line, then the same in English
   const words = (l, i) => { const w = (window.WORDS || {})[l.id + '#' + i]; return w ? `<div class="words"><div class="ar"><bdi>🗣 ${w[0]}</bdi></div><div class="en">🗣 <b>In words:</b> ${w[1]}</div></div>` : ''; };
+  // one-page A4 sheet of every course law with the units of its symbols (for the night before the exam)
+  const SKIPU = new Set(['—', 'same unit', 'same as A', 'product of units', 'units', 'same unit as A']);
+  const CONSTS = [['g', '9.8 m/s²'], ['k', '9×10⁹ N·m²/C²'], ['ε₀', '8.85×10⁻¹² C²/N·m²'], ['e', '1.6×10⁻¹⁹ C'], ['c', '3×10⁸ m/s'], ['σ', '5.67×10⁻⁸ W/m²K⁴'], ['1 cal', '4.186 J'], ['P₀', '1.013×10⁵ Pa'], ['T_K', 'T_C + 273']];
+  views.a4 = () => `<div class="noprint"><h1>A4 formula sheet <span class="muted" style="font-size:18px;font-weight:400">· ورقة القوانين للطباعة</span></h1>
+    <p class="sub">All ${COURSE.reduce((n, c) => n + c.lessons.reduce((m, l) => m + l.formulas.length, 0), 0)} laws of the course with the unit of every symbol, on one A4 page. <span class="pill src">📘 course files</span></p>
+    <div class="row" style="margin-bottom:12px">${FRAMED ? `<span class="note">Printing is blocked inside the Claude link. Print the PDF sheet from your folder, or open this page from your own copy or GitHub. · الطباعة لا تعمل داخل رابط Claude؛ اطبع ملف PDF من مجلدك أو افتح الموقع من نسختك أو من GitHub.</span>` : `<button class="btn" onclick="window.print()">🖨 Print / save as PDF</button><span class="muted">Choose A4, portrait, scale 100%, margins "None" or "Minimum".</span>`}</div></div>
+    <div class="a4sheet">
+      <div class="a4head"><b>General Physics · Formula & unit sheet</b><span>${CONSTS.map(c => `${c[0]} = ${c[1]}`).join(' · ')}</span></div>
+      <div class="a4cols">${COURSE.map(c => `<section class="a4ch"><h4>${c.n}. ${esc(c.title)} <bdi>${c.ar}</bdi></h4>${c.lessons.map(l => l.formulas.map(f => {
+        const us = []; const seen = new Set();
+        f.sym.forEach(x => { const u = String(x[2] || '').trim(); if (!u || SKIPU.has(u) || seen.has(x[0])) return; seen.add(x[0]); us.push(`<i>${x[0]}</i> ${u}`); });
+        return `<div class="a4f"><div class="a4eq">${f.f}</div>${us.length ? `<div class="a4u">${us.join(' · ')}</div>` : ''}</div>`;
+      }).join('')).join('')}</section>`).join('')}</div>
+      <div class="a4foot">Units: SI unless stated. Δ = final − initial. Angles in Snell's law and work are measured as defined in each lesson. Physics Learning Lab · smalgamdi-gif.github.io/physic</div>
+    </div>`;
   views.formulas = (chId) => `<h1>Formula & unit sheet</h1><p class="sub">Every law in the course with symbols, units and conditions. Print it for revision. <span class="pill src">📘 course files</span></p>
     <div class="row noprint"><button class="btn small printbtn" onclick="window.print()">Print / save as PDF</button>${COURSE.map(c => `<a class="btn small ghost" href="#formulas/${c.id}">Ch ${c.n}</a>`).join('')}<a class="btn small ghost" href="#formulas">All</a></div>
     <div class="card noprint">🔀 Under each law you see all its forms: the <b>bold symbol</b> is what that form finds. Open a lesson to see how each form comes from the course law, or read <a href="#rearrange">Rearranging a law</a>.<div class="ar">تحت كل قانون تجد كل أشكاله، والرمز العريض هو ما يحسبه ذلك الشكل. وطريقة الوصول لكل شكل موجودة داخل الدرس وفي صفحة «ترتيب القوانين».</div></div>
@@ -775,7 +790,7 @@
   function subs(html) { return html.split(/(<[^>]*>)/).map(p => p.startsWith('<') ? p : p.replace(/([A-Za-zθρΔσεμλαΣ])_([A-Za-z0-9]{1,6})/g, '$1<sub>$2</sub>')).join(''); }
 
   // ---------- router ----------
-  const NAV = [['home', '🏠 Home', 'الرئيسية'], ['course', '📚 Course map', 'خريطة المقرر'], ['practice', '♾️ Practice', 'تدريب'], ['exam', '⏱️ Exam', 'الاختبار'], ['flashcards', '🃏 Flashcards', 'البطاقات'], ['mistakes', '📓 Mistakes', 'دفتر الأخطاء'], ['formulas', '∑ Formulas', 'القوانين'], ['rearrange', '🔀 Law forms', 'أشكال القانون'], ['tools', '🧰 Tools', 'أدوات'], ['plan', '🗓️ Planner', 'مخطط المذاكرة'], ['report', '📈 Progress', 'تقرير الإنجاز'], ['sources', '📘 Sources', 'المصادر']];
+  const NAV = [['home', '🏠 Home', 'الرئيسية'], ['course', '📚 Course map', 'خريطة المقرر'], ['practice', '♾️ Practice', 'تدريب'], ['exam', '⏱️ Exam', 'الاختبار'], ['flashcards', '🃏 Flashcards', 'البطاقات'], ['mistakes', '📓 Mistakes', 'دفتر الأخطاء'], ['formulas', '∑ Formulas', 'القوانين'], ['a4', '🖨 A4 sheet', 'ورقة A4'], ['rearrange', '🔀 Law forms', 'أشكال القانون'], ['tools', '🧰 Tools', 'أدوات'], ['plan', '🗓️ Planner', 'مخطط المذاكرة'], ['report', '📈 Progress', 'تقرير الإنجاز'], ['sources', '📘 Sources', 'المصادر']];
   // ---------- Unit 0: foundation skills, placement test, readiness checks (content_found.js) ----------
   const SKILLS = () => window.FOUND || [];
   const skillById = id => SKILLS().find(k => k.id === id);
