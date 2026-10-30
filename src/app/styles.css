@@ -284,3 +284,5 @@ nav.side a.sidelab small{color:inherit;opacity:.85;font-weight:600}
 .revans small,.revwhy small{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:2px}
 .okv{color:var(--ok);font-weight:600} .badv{color:var(--bad);font-weight:600}
 .revwhy{margin-top:8px;border-left:3px solid var(--brand)}
+.expal button.skip{background:var(--bad-soft);border:1.5px dashed var(--bad);color:var(--bad)}
+.exkey .k.skip{background:var(--bad-soft);border:1.5px dashed var(--bad)}

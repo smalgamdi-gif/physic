@@ -291,6 +291,8 @@ nav.side a.sidelab small{color:inherit;opacity:.85;font-weight:600}
 .revans small,.revwhy small{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:2px}
 .okv{color:var(--ok);font-weight:600} .badv{color:var(--bad);font-weight:600}
 .revwhy{margin-top:8px;border-left:3px solid var(--brand)}
+.expal button.skip{background:var(--bad-soft);border:1.5px dashed var(--bad);color:var(--bad)}
+.exkey .k.skip{background:var(--bad-soft);border:1.5px dashed var(--bad)}
 </style>
 </head>
 <body>
@@ -3922,7 +3924,7 @@ window.SERWAY = {
   // test has a time limit, otherwise the time used), answers can be changed until submitting, nothing graded before.
   function openTest(cfg) {
     const qs = cfg.qs;
-    EXAM = Object.assign({ ans: {}, start: Date.now(), end: cfg.mins ? Date.now() + cfg.mins * 60000 : null, cur: 0, flags: {} }, cfg);
+    EXAM = Object.assign({ ans: {}, start: Date.now(), end: cfg.mins ? Date.now() + cfg.mins * 60000 : null, cur: 0, flags: {}, seen: {} }, cfg);
     const ov = document.createElement('div'); ov.className = 'exam-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', cfg.noun);
     ov.innerHTML = subs(`<header class="exhead">
         <div class="extitle"><span>${cfg.title}</span><small class="muted">${cfg.sub}</small></div>
@@ -3931,7 +3933,7 @@ window.SERWAY = {
       </header>
       <div class="extime"><i id="etbar"></i></div>
       <div class="exbody">
-        <nav class="expal" aria-label="Questions">${qs.map((q, i) => `<button data-go="${i}">${i + 1}</button>`).join('')}<div class="exkey"><span><i class="k ans"></i>answered</span><span><i class="k flag"></i>flagged</span><span><i class="k"></i>not yet</span></div></nav>
+        <nav class="expal" aria-label="Questions">${qs.map((q, i) => `<button data-go="${i}">${i + 1}</button>`).join('')}<div class="exkey"><span><i class="k ans"></i>answered · أجبت</span><span><i class="k skip"></i>skipped · تخطيته</span><span><i class="k flag"></i>flagged · للمراجعة</span><span><i class="k"></i>not opened yet · لم تفتحه</span></div></nav>
         <section class="exmain">${qs.map((q, i) => `<div class="exq" data-e="${i}" hidden><div class="row" style="justify-content:space-between"><div class="muted" style="font-size:13px">Question ${i + 1} of ${qs.length} · ${cfg.label(q, i)}</div><button class="tog eflag" data-flag="${i}">⚑ Flag for review</button></div>${qHTML(q, 'e' + i)}</div>`).join('')}
           <div class="row exnav"><button class="btn ghost" id="eprev">← Previous</button><button class="btn" id="enext">Next →</button></div>
           <div id="econfirm"></div></section>
@@ -3941,12 +3943,13 @@ window.SERWAY = {
     EXAM.h = qs.map((q, i) => wireQ(ov.querySelector(`[data-e="${i}"]`), q, (ok, given) => { EXAM.ans[i] = { ok, given }; }, { silent: true, hideSol: true, deferred: true }));
     const answered = i => { const b = ov.querySelector(`[data-e="${i}"]`); return qs[i].o ? !!b.querySelector('.opt.sel') : b.querySelector('input').value.trim() !== ''; };
     const paint = () => {
-      ov.querySelectorAll('[data-go]').forEach(b => { const i = +b.dataset.go; b.classList.toggle('ans', answered(i)); b.classList.toggle('flag', !!EXAM.flags[i]); b.classList.toggle('cur', i === EXAM.cur); });
+      // a question you opened and left without an answer is marked "skipped"
+      ov.querySelectorAll('[data-go]').forEach(b => { const i = +b.dataset.go, a = answered(i); b.classList.toggle('ans', a); b.classList.toggle('skip', !a && !!EXAM.seen[i] && i !== EXAM.cur); b.classList.toggle('flag', !!EXAM.flags[i]); b.classList.toggle('cur', i === EXAM.cur); b.title = a ? 'answered' : EXAM.seen[i] && i !== EXAM.cur ? 'skipped: not answered yet' : i === EXAM.cur ? 'current question' : 'not opened yet'; });
       ov.querySelectorAll('[data-flag]').forEach(b => b.classList.toggle('on', !!EXAM.flags[+b.dataset.flag]));
       const n = qs.filter((q, i) => answered(i)).length; $('#eprog').textContent = `${n} / ${qs.length} answered`;
       if (!EXAM.end) $('#etbar').style.width = (n / qs.length * 100) + '%';
     };
-    const go = i => { EXAM.cur = Math.max(0, Math.min(qs.length - 1, i)); ov.querySelectorAll('.exq').forEach(d => d.hidden = +d.dataset.e !== EXAM.cur); $('#eprev').disabled = EXAM.cur === 0; $('#enext').textContent = EXAM.cur === qs.length - 1 ? 'Review & submit' : 'Next →'; paint(); const inp = ov.querySelector(`[data-e="${EXAM.cur}"] input`); if (inp) inp.focus(); ov.querySelector('.exmain').scrollTop = 0; };
+    const go = i => { EXAM.seen[EXAM.cur] = true; EXAM.cur = Math.max(0, Math.min(qs.length - 1, i)); EXAM.seen[EXAM.cur] = true; ov.querySelectorAll('.exq').forEach(d => d.hidden = +d.dataset.e !== EXAM.cur); $('#eprev').disabled = EXAM.cur === 0; $('#enext').textContent = EXAM.cur === qs.length - 1 ? 'Review & submit' : 'Next →'; paint(); const inp = ov.querySelector(`[data-e="${EXAM.cur}"] input`); if (inp) inp.focus(); ov.querySelector('.exmain').scrollTop = 0; };
     EXAM.go = go;
     ov.addEventListener('click', e => {
       const t = e.target.closest('button'); if (!t) return;
@@ -3963,8 +3966,10 @@ window.SERWAY = {
     $('#efs').onclick = () => { try { const r = document.fullscreenElement ? document.exitFullscreen() : ov.requestFullscreen(); if (r && r.catch) r.catch(() => {}); } catch (err) { /* full screen not allowed here */ } };
     function askSubmit() {
       const open = qs.map((q, i) => i).filter(i => !answered(i)), fl = Object.keys(EXAM.flags).filter(k => EXAM.flags[k]).map(Number);
+      const skipped = open.filter(i => EXAM.seen[i]), unseen = open.filter(i => !EXAM.seen[i]);
+      const links = a => a.map(i => `<a href="#" data-jump="${i}">${i + 1}</a>`).join(', ');
       $('#econfirm').innerHTML = `<div class="card exconf"><b>Submit the ${cfg.noun}? · تسليم ${cfg.nounAr}؟</b>
-        ${open.length ? `<p>⚠ ${open.length} question(s) not answered: ${open.map(i => `<a href="#" data-jump="${i}">${i + 1}</a>`).join(', ')}. They count as wrong.</p><div class="ar">لم تجب عن ${open.length} سؤال، وستُحسب خاطئة.</div>` : '<p>All questions answered.</p>'}
+        ${open.length ? `<p>⚠ ${open.length} question(s) not answered. They count as wrong.</p>${skipped.length ? `<p>Skipped · تخطيتها: ${links(skipped)}</p>` : ''}${unseen.length ? `<p>Not opened yet · لم تفتحها: ${links(unseen)}</p>` : ''}<div class="ar">لم تجب عن ${open.length} سؤال، وستُحسب خاطئة.</div>` : '<p>All questions answered.</p>'}
         ${fl.length ? `<p>⚑ Flagged for review: ${fl.map(i => `<a href="#" data-jump="${i}">${i + 1}</a>`).join(', ')}</p>` : ''}
         <div class="row"><button class="btn" id="eyes">Yes, submit · نعم، سلّم</button><button class="btn ghost" id="eno">Back to the ${cfg.noun}</button></div></div>`;
       $('#econfirm').querySelectorAll('[data-jump]').forEach(a => a.onclick = e => { e.preventDefault(); $('#econfirm').innerHTML = ''; go(+a.dataset.jump); });
