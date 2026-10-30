@@ -409,7 +409,13 @@
   window.addEventListener('hashchange', route);
   let rz = 0; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { measure(); if (!$('#plot').closest('[hidden]')) analyse(); }, 150); });
   document.addEventListener('DOMContentLoaded', () => {
-    $('#theme').onclick = () => { const r = document.documentElement, cur = r.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); r.dataset.theme = cur === 'dark' ? 'light' : 'dark'; analyse(); };
+    // light/dark is one setting shared with the lessons (key "pll-theme"); a change in one open tab reaches the other
+    const eff = () => document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const label = () => { $('#theme').innerHTML = eff() === 'dark' ? '☀️<span class="lgw"> Light</span>' : '🌙<span class="lgw"> Dark</span>'; };
+    const setTheme = t => { if (t) document.documentElement.dataset.theme = t; label(); if ($('#plot')) analyse(); };
+    try { setTheme(localStorage.getItem('pll-theme')); } catch (e) { label(); }
+    $('#theme').onclick = () => { const t = eff() === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('pll-theme', t); } catch (e) { /* no storage */ } setTheme(t); };
+    window.addEventListener('storage', e => { if (e.key === 'pll-theme' && e.newValue) setTheme(e.newValue); });
     route(); requestAnimationFrame(loop);
   });
   window.__LAB = { EX, fit, state, data };

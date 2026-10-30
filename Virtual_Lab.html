@@ -291,6 +291,13 @@ nav.side a.sidelab small{color:inherit;opacity:.85;font-weight:600}
 .revwhy{margin-top:8px;border-left:3px solid var(--brand)}
 .expal button.skip{background:var(--bad-soft);border:1.5px dashed var(--bad);color:var(--bad)}
 .exkey .k.skip{background:var(--bad-soft);border:1.5px dashed var(--bad)}
+/* real-life examples: one row per example, icon on the side */
+.lifelist{display:flex;flex-direction:column;margin-top:6px}
+.life{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+.life:first-child{border-top:0;padding-top:6px}
+.life .lic{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--bg);font-size:21px}
+.life .lbody{flex:1;min-width:0}
+.life p{margin:2px 0 6px}
 :root{--accent:#e0742b}
 :root[data-theme="dark"]{--accent:#ffa45c}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--accent:#ffa45c}}
@@ -848,7 +855,13 @@ main{min-width:0;overflow-wrap:anywhere}
   window.addEventListener('hashchange', route);
   let rz = 0; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { measure(); if (!$('#plot').closest('[hidden]')) analyse(); }, 150); });
   document.addEventListener('DOMContentLoaded', () => {
-    $('#theme').onclick = () => { const r = document.documentElement, cur = r.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); r.dataset.theme = cur === 'dark' ? 'light' : 'dark'; analyse(); };
+    // light/dark is one setting shared with the lessons (key "pll-theme"); a change in one open tab reaches the other
+    const eff = () => document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const label = () => { $('#theme').innerHTML = eff() === 'dark' ? '☀️<span class="lgw"> Light</span>' : '🌙<span class="lgw"> Dark</span>'; };
+    const setTheme = t => { if (t) document.documentElement.dataset.theme = t; label(); if ($('#plot')) analyse(); };
+    try { setTheme(localStorage.getItem('pll-theme')); } catch (e) { label(); }
+    $('#theme').onclick = () => { const t = eff() === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('pll-theme', t); } catch (e) { /* no storage */ } setTheme(t); };
+    window.addEventListener('storage', e => { if (e.key === 'pll-theme' && e.newValue) setTheme(e.newValue); });
     route(); requestAnimationFrame(loop);
   });
   window.__LAB = { EX, fit, state, data };

@@ -4720,7 +4720,10 @@ window.SERWAY = {
   }
   document.addEventListener('DOMContentLoaded', () => {
     $('#tar').onclick = () => { S.prefs.ar = !S.prefs.ar; save(); applyPrefs(); };
-    $('#tth').onclick = () => { S.prefs.theme = effTheme() === 'dark' ? 'light' : 'dark'; save(); applyPrefs(); };
+    // light/dark is one setting shared with the lab (key "pll-theme"); a change in one open tab reaches the other
+    $('#tth').onclick = () => { S.prefs.theme = effTheme() === 'dark' ? 'light' : 'dark'; save(); try { localStorage.setItem('pll-theme', S.prefs.theme); } catch (e) { /* no storage */ } applyPrefs(); };
+    try { const t = localStorage.getItem('pll-theme'); if (t) S.prefs.theme = t; else if (S.prefs.theme) localStorage.setItem('pll-theme', S.prefs.theme); } catch (e) { /* no storage */ }
+    window.addEventListener('storage', e => { if (e.key !== 'pll-theme' || !e.newValue) return; S.prefs.theme = e.newValue; save(); applyPrefs(); });
     // ☰ hides or shows the side menu: a slide-in panel on phones, a collapsible column on wider screens (remembered)
     const wide = matchMedia('(min-width: 861px)');
     const applySide = () => { document.body.classList.toggle('side-closed', S.prefs.side === false); $('#menu').setAttribute('aria-expanded', String(wide.matches ? S.prefs.side !== false : $('#side').classList.contains('open'))); };
