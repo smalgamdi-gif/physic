@@ -8,10 +8,10 @@ COURSE.push({
       goalsAr: 'ستتعامل مع القوة كمتجه، وتفهم القانون الأول والقصور الذاتي، وتحل مسائل الاتزان.',
       why: { en: 'Bridges, shelves and hanging signs stay still because forces balance; engineers design them with ΣF = 0.', ar: 'الجسور والرفوف تبقى ساكنة لأن القوى متزنة.' },
       explain: [
-        { en: 'Force is a vector. Contact forces (kick, push, spring) vs field forces (gravity, no contact) (BK p.57).', ar: 'القوة متجه، ومنها قوى تلامس وقوى مجال.' },
-        { en: '<b>Newton\'s first law</b>: "In the absence of external forces, an object at rest remains at rest and an object in motion continues in motion with a constant velocity." ΣF = 0 (4.1).', ar: 'القانون الأول: الجسم الساكن يبقى ساكنًا والمتحرك يبقى متحركًا بسرعة ثابتة ما لم تؤثر عليه قوة محصلة.' },
-        { en: 'Inertia: resistance to change of motion; mass measures inertia (kg).', ar: 'القصور الذاتي ممانعة تغيير الحالة الحركية، والكتلة مقياسه.' },
-        { en: 'Equilibrium method: draw forces, resolve into x and y, set each sum to zero, solve.', ar: 'طريقة الاتزان: ارسم القوى، حللها، اجعل مجموع كل محور صفرًا.' }
+        { en: 'Force is a vector. Contact forces (kick, push, spring) vs field forces (gravity, no contact) (BK p.57).', ar: 'القوة (Force) هي ما يدفع الجسم أو يسحبه، وهي متجهة: لها مقدار واتجاه. بعض القوى تحتاج تلامسًا، مثل الركلة والدفع وشد النابض، وبعضها يؤثر عن بعد بدون تلامس، مثل الجاذبية، وتسمى قوى المجال.' },
+        { en: '<b>Newton\'s first law</b>: "In the absence of external forces, an object at rest remains at rest and an object in motion continues in motion with a constant velocity." ΣF = 0 (4.1).', ar: 'قانون نيوتن الأول: إذا كانت محصلة القوى على الجسم صفرًا (ΣF = 0)، فالجسم الساكن يبقى ساكنًا، والمتحرك يبقى متحركًا بالسرعة نفسها وفي خط مستقيم. يعني أن الحركة لا تحتاج قوة لتستمر، بل تحتاج قوة لتتغير.' },
+        { en: 'Inertia: resistance to change of motion; mass measures inertia (kg).', ar: 'القصور الذاتي (Inertia) هو ميل الجسم إلى مقاومة أي تغيير في حركته. والكتلة هي مقياس هذا القصور: الشاحنة كتلتها كبيرة، فيصعب تحريكها ويصعب إيقافها.' },
+        { en: 'Equilibrium method: draw forces, resolve into x and y, set each sum to zero, solve.', ar: 'خطوات حل مسائل الاتزان: ارسم كل القوى المؤثرة على الجسم، ثم حلّل كل قوة إلى مركبتين x و y، ثم اجعل مجموع مركبات x صفرًا ومجموع مركبات y صفرًا، ثم احسب المجهول من المعادلتين.' }
       ],
       terms: [['Net force', 'القوة المحصلة', 'Vector sum ΣF'], ['Inertia', 'القصور الذاتي', 'Resistance to change of motion'], ['Equilibrium', 'الاتزان', 'ΣF = 0'], ['Field force', 'قوة مجال', 'Acts without contact']],
       formulas: [{ f: 'ΣF = 0  ⇔  ΣFₓ = 0 and ΣF_y = 0', name: 'First law / equilibrium (4.1)', sym: [['ΣF', 'net force', 'N', 'القوة المحصلة'], ['ΣFₓ, ΣF_y', 'components of the net force', 'N', 'مركبتا القوة المحصلة']], cond: 'Body at rest or at constant velocity.' }],
@@ -35,10 +35,10 @@ COURSE.push({
       goalsAr: 'ستطبق ΣF = ma بالمركبات وتفرّق بين الكتلة والوزن.',
       why: { en: 'This single law predicts the motion of cars, rockets and elevators.', ar: 'هذا القانون وحده يتنبأ بحركة السيارات والصواريخ والمصاعد.' },
       explain: [
-        { en: '"The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass": ΣF = ma (4.2).', ar: 'التسارع يتناسب طرديًا مع القوة المحصلة وعكسيًا مع الكتلة.' },
-        { en: '1 N is the force that gives 1 kg an acceleration of 1 m/s²: 1 N = 1 kg·m/s².', ar: 'النيوتن هو القوة التي تكسب 1 كغ تسارعًا 1 م/ث².' },
-        { en: 'Weight F_w = mg; a 100 kg person weighs 980 N on Earth, 162 N on the Moon, 371 N on Mars (BK p.59). Mass stays 100 kg.', ar: 'الوزن قوة يتغير بتغير الجاذبية، والكتلة ثابتة.' },
-        { en: 'Use components: ΣFₓ = maₓ, ΣF_y = ma_y. a points in the direction of the net force.', ar: 'نطبق القانون على كل محور على حدة.' }
+        { en: '"The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass": ΣF = ma (4.2).', ar: 'قانون نيوتن الثاني: تسارع الجسم يزيد إذا زادت القوة المحصلة، ويقل إذا زادت كتلته، ويكون في اتجاه القوة المحصلة: ΣF = ma. فإذا دفعت عربة فارغة ثم عربة محمّلة بالقوة نفسها، تتسارع الفارغة أكثر.' },
+        { en: '1 N is the force that gives 1 kg an acceleration of 1 m/s²: 1 N = 1 kg·m/s².', ar: 'وحدة القوة النيوتن N: هو القوة التي تعطي جسمًا كتلته 1 kg تسارعًا قدره 1 m/s². لذلك N = kg·m/s².' },
+        { en: 'Weight F_w = mg; a 100 kg person weighs 980 N on Earth, 162 N on the Moon, 371 N on Mars (BK p.59). Mass stays 100 kg.', ar: 'الوزن (Weight) هو قوة جذب الأرض للجسم: F_w = mg، ويقاس بالنيوتن. الكتلة ثابتة في أي مكان، أما الوزن فيتغير بتغير g: شخص كتلته 100 kg وزنه 980 N على الأرض و 162 N على القمر، وكتلته تبقى 100 kg (BK p.59).' },
+        { en: 'Use components: ΣFₓ = maₓ, ΣF_y = ma_y. a points in the direction of the net force.', ar: 'إذا كانت القوى في اتجاهات مختلفة، طبّق القانون على كل محور وحده: ΣFₓ = maₓ و ΣF_y = ma_y، ثم اجمع مركبتي التسارع لتحصل على مقداره واتجاهه.' }
       ],
       terms: [['Mass', 'الكتلة', 'Amount of inertia (kg)'], ['Weight', 'الوزن', 'Gravitational force mg (N)'], ['Newton (N)', 'نيوتن', 'kg·m/s²'], ['Tension', 'الشد', 'Force in a string']],
       formulas: [{ f: 'ΣF = m a', name: 'Second law (4.2)', sym: [['ΣF', 'net force', 'N', 'القوة المحصلة'], ['m', 'mass', 'kg', 'الكتلة'], ['a', 'acceleration', 'm/s²', 'التسارع']], cond: 'Inertial frame; ΣF is the vector sum.' }, { f: 'F_w = m g', name: 'Weight', sym: [['F_w', 'weight', 'N', 'الوزن'], ['m', 'mass', 'kg', 'الكتلة'], ['g', '9.8 m/s²', 'm/s²', 'تسارع الجاذبية']], cond: 'Near Earth\'s surface' }],
@@ -64,9 +64,9 @@ COURSE.push({
       goalsAr: 'ستحدد أزواج الفعل ورد الفعل وتحسب القوة العمودية.',
       why: { en: 'Walking, swimming and rockets all work by pushing on something that pushes back.', ar: 'المشي والسباحة والصواريخ كلها تعمل بالفعل ورد الفعل.' },
       explain: [
-        { en: '"Every action has an equal and opposite reaction": F₁₂ = −F₂₁ (4.3).', ar: 'لكل فعل رد فعل مساوٍ له في المقدار ومعاكس في الاتجاه.' },
-        { en: 'The two forces act on <b>different bodies</b>, so they never cancel each other.', ar: 'القوتان تؤثران على جسمين مختلفين فلا تلغي إحداهما الأخرى.' },
-        { en: 'A book on a table: Earth pulls the book down (mg); the table pushes the book up (normal force n). For the book at rest n = mg (first law); the reaction to n is the book pushing the table.', ar: 'الكتاب على الطاولة: القوة العمودية تساوي الوزن هنا بسبب الاتزان.' }
+        { en: '"Every action has an equal and opposite reaction": F₁₂ = −F₂₁ (4.3).', ar: 'قانون نيوتن الثالث: إذا أثّر جسم على جسم آخر بقوة، أثّر الثاني على الأول بقوة مساوية لها في المقدار ومعاكسة في الاتجاه: F₁₂ = −F₂₁. فعندما تدفع الحائط يدفعك الحائط بالقوة نفسها.' },
+        { en: 'The two forces act on <b>different bodies</b>, so they never cancel each other.', ar: 'القوتان (الفعل ورد الفعل) تؤثر كل واحدة منهما على جسم مختلف، لذلك لا تلغي إحداهما الأخرى أبدًا. لا تجمعهما في معادلة جسم واحد؛ القوى المؤثرة على الجسم نفسه فقط هي التي تدخل في معادلته.' },
+        { en: 'A book on a table: Earth pulls the book down (mg); the table pushes the book up (normal force n). For the book at rest n = mg (first law); the reaction to n is the book pushing the table.', ar: 'مثال الكتاب على الطاولة: الأرض تسحب الكتاب لأسفل بقوة mg، والطاولة تدفعه لأعلى بالقوة العمودية n. تساويهما هنا سببه أن الكتاب ساكن (القانون الأول) وليس القانون الثالث. أما رد فعل n فهو دفع الكتاب للطاولة لأسفل.' }
       ],
       terms: [['Action–reaction pair', 'زوج الفعل ورد الفعل', 'Equal, opposite, on different bodies'], ['Normal force', 'القوة العمودية', 'Contact force ⟂ to surface']],
       formulas: [{ f: 'F₁₂ = −F₂₁', name: 'Third law (4.3)', sym: [['F₁₂', 'force by body 1 on body 2', 'N', 'قوة الجسم 1 على الجسم 2'], ['F₂₁', 'force by body 2 on body 1', 'N', 'قوة الجسم 2 على الجسم 1']], cond: 'Always, for any interaction.' }],
@@ -96,9 +96,9 @@ COURSE.push({
       goalsAr: 'ستحسب الشغل بالمقادير وبالمركبات، وتعرف متى يكون صفرًا أو سالبًا.',
       why: { en: 'Work measures energy transferred; it explains why carrying a bag horizontally does no work on it by the vertical lifting force.', ar: 'الشغل يقيس الطاقة المنقولة.' },
       explain: [
-        { en: 'Work is "the process of energy transfer to the motion of an object via application of a force": W = F·Δr = ΔrF cos θ (5.1).', ar: 'الشغل عملية نقل طاقة عبر قوة تسبب إزاحة.' },
-        { en: 'Unit: joule, J = N·m = kg·m²/s². Work is a scalar.', ar: 'وحدته الجول، وهو كمية قياسية.' },
-        { en: 'θ = 90° ⇒ W = 0; θ > 90° ⇒ W < 0 (energy taken from the system).', ar: 'إذا كانت القوة عمودية على الإزاحة فالشغل صفر، وإذا كانت الزاوية منفرجة فالشغل سالب.' }
+        { en: 'Work is "the process of energy transfer to the motion of an object via application of a force": W = F·Δr = ΔrF cos θ (5.1).', ar: 'الشغل (Work) في الفيزياء معناه نقل طاقة إلى جسم بقوة تحركه مسافة. فإذا لم يتحرك الجسم فلا شغل مهما كانت القوة كبيرة. ويُحسب بالقانون W = F Δr cos θ، حيث θ الزاوية بين اتجاه القوة واتجاه الحركة.' },
+        { en: 'Unit: joule, J = N·m = kg·m²/s². Work is a scalar.', ar: 'وحدة الشغل الجول J، ويساوي نيوتن × متر. والشغل كمية قياسية: له مقدار وإشارة، لكن ليس له اتجاه.' },
+        { en: 'θ = 90° ⇒ W = 0; θ > 90° ⇒ W < 0 (energy taken from the system).', ar: 'الزاوية تحدد إشارة الشغل: إذا كانت القوة في اتجاه الحركة (θ = 0°) فالشغل موجب وأكبر ما يمكن، وإذا كانت عمودية على الحركة (θ = 90°) فالشغل صفر، وإذا كانت عكس الحركة، مثل الاحتكاك، فالشغل سالب ويأخذ طاقة من الجسم.' }
       ],
       terms: [['Work', 'الشغل', 'W = F·Δr'], ['Joule', 'الجول', 'N·m'], ['Displacement', 'الإزاحة', 'Δr']],
       formulas: [{ f: 'W = F·Δr = F Δr cos θ', name: 'Work (5.1)', sym: [['W', 'work', 'J', 'الشغل'], ['F', 'force', 'N', 'القوة'], ['Δr', 'displacement', 'm', 'الإزاحة'], ['θ', 'angle between F and Δr', '°', 'الزاوية بين القوة والإزاحة']], cond: 'Constant force.' }],
@@ -123,9 +123,9 @@ COURSE.push({
       goalsAr: 'ستحسب الطاقة الحركية وتطبق أن الشغل يساوي التغير فيها.',
       why: { en: 'Braking distance grows with v² because KE grows with v².', ar: 'مسافة الكبح تتضاعف أربع مرات عند مضاعفة السرعة لأن الطاقة الحركية تتناسب مع v².' },
       explain: [
-        { en: 'A body that moves at velocity v has KE = ½mv² (5.2).', ar: 'الجسم المتحرك يملك طاقة حركية ½mv².' },
-        { en: 'From v_f² = v_i² + 2ax and W = max: W = ½mv_f² − ½mv_i² = ΔKE.', ar: 'اشتقاق المبرهنة من معادلات الحركة.' },
-        { en: 'Negative work (brakes) reduces KE.', ar: 'الشغل السالب يقلل الطاقة الحركية.' }
+        { en: 'A body that moves at velocity v has KE = ½mv² (5.2).', ar: 'الطاقة الحركية (Kinetic energy) طاقة يملكها الجسم بسبب حركته: KE = ½mv². لاحظ أن السرعة مربعة، فإذا تضاعفت السرعة تضاعفت الطاقة الحركية أربع مرات.' },
+        { en: 'From v_f² = v_i² + 2ax and W = max: W = ½mv_f² − ½mv_i² = ΔKE.', ar: 'مبرهنة الشغل والطاقة: الشغل الكلي المبذول على جسم يساوي التغير في طاقته الحركية: W = ½mv_f² − ½mv_i² = ΔKE. وتخرج من الجمع بين ΣF = ma ومعادلة الحركة v_f² = v_i² + 2ax.' },
+        { en: 'Negative work (brakes) reduces KE.', ar: 'إذا كان الشغل سالبًا، مثل شغل الفرامل، تنقص الطاقة الحركية فيبطئ الجسم. وإذا كان موجبًا تزيد الطاقة فيسرع.' }
       ],
       terms: [['Kinetic energy', 'الطاقة الحركية', '½mv²'], ['Work–energy theorem', 'مبرهنة الشغل–الطاقة', 'W_net = ΔKE']],
       formulas: [{ f: 'KE = ½ m v² ,  W = KE_f − KE_i', name: '(5.2)', sym: [['KE', 'kinetic energy', 'J', 'الطاقة الحركية'], ['m', 'mass', 'kg', 'الكتلة'], ['v', 'speed', 'm/s', 'السرعة'], ['W', 'net work', 'J', 'الشغل الكلي']], cond: 'W is the net work.' }],
@@ -149,9 +149,9 @@ COURSE.push({
       goalsAr: 'ستحسب التغير في طاقة الوضع وتطبق W = ΔKE + ΔPE.',
       why: { en: 'Energy conservation solves problems that would be very long with forces.', ar: 'حفظ الطاقة يختصر مسائل طويلة جدًا بالقوى.' },
       explain: [
-        { en: 'A body has PE "if it is able to produce a work due to the change of its position". ΔPE = mgΔh (5.3).', ar: 'طاقة الوضع ناتجة عن موضع الجسم.' },
-        { en: 'Only the change ΔPE is physical; PE itself depends on the reference level (BK p.77).', ar: 'التغير في طاقة الوضع هو المهم، والقيمة المطلقة تعتمد على مستوى الإسناد.' },
-        { en: 'Work and energy theory: "The work done of any system is equal to the sum of the change in the kinetic and potential energy": W = ΔKE + ΔPE (5.4).', ar: 'الشغل = التغير في الطاقة الحركية + التغير في طاقة الوضع.' }
+        { en: 'A body has PE "if it is able to produce a work due to the change of its position". ΔPE = mgΔh (5.3).', ar: 'طاقة الوضع (Potential energy) طاقة مخزنة في الجسم بسبب موضعه، فالجسم المرفوع يستطيع أن يبذل شغلًا عندما يسقط. والتغير فيها عند تغير الارتفاع ΔPE = mgΔh.' },
+        { en: 'Only the change ΔPE is physical; PE itself depends on the reference level (BK p.77).', ar: 'قيمة طاقة الوضع نفسها تعتمد على المستوى الذي تختاره صفرًا (أرض الغرفة أو سطح الطاولة)، لكن التغير فيها لا يعتمد على هذا الاختيار. لذلك نحسب دائمًا التغير ΔPE (BK p.77).' },
+        { en: 'Work and energy theory: "The work done of any system is equal to the sum of the change in the kinetic and potential energy": W = ΔKE + ΔPE (5.4).', ar: 'نظرية الشغل والطاقة في المقرر: شغل القوة المؤثرة يساوي مجموع التغير في الطاقة الحركية والتغير في طاقة الوضع: W = ΔKE + ΔPE. فإذا رفعت صندوقًا بسرعة ثابتة يذهب كل شغلك إلى طاقة الوضع.' }
       ],
       terms: [['Potential energy', 'طاقة الوضع', 'Energy of position'], ['Reference level', 'مستوى الإسناد', 'Where PE = 0'], ['Conservation of energy', 'حفظ الطاقة', 'Energy is not created or destroyed']],
       formulas: [{ f: 'ΔPE = m g Δh', name: '(5.3)', sym: [['ΔPE', 'change of potential energy', 'J', 'تغير طاقة الوضع'], ['m', 'mass', 'kg', 'الكتلة'], ['g', '9.8 m/s²', 'm/s²', 'تسارع الجاذبية'], ['Δh', 'height change', 'm', 'تغير الارتفاع']], cond: 'Near Earth\'s surface.' }, { f: 'W = ΔKE + ΔPE', name: '(5.4)', sym: [['W', 'work by the applied force', 'J', 'شغل القوة المؤثرة'], ['ΔKE', 'change of kinetic energy', 'J', 'تغير الطاقة الحركية'], ['ΔPE', 'change of potential energy', 'J', 'تغير طاقة الوضع']], cond: '—' }],
@@ -176,8 +176,8 @@ COURSE.push({
       goalsAr: 'ستحسب القدرة كمعدل لبذل الشغل.',
       why: { en: 'Two cranes may do the same work; the more powerful one does it faster.', ar: 'رافعتان تبذلان الشغل نفسه، والأقوى تنجزه أسرع.' },
       explain: [
-        { en: '"Power is defined as the rate of work done": P = {{dW // dt}} (5.5); average P = {{W // t}}.', ar: 'القدرة معدل بذل الشغل.' },
-        { en: 'Unit: watt W = J/s = kg·m²/s³. Do not confuse W (watt) with W (work).', ar: 'وحدتها الواط، لا تخلط بين رمز الواط ورمز الشغل.' }
+        { en: '"Power is defined as the rate of work done": P = {{dW // dt}} (5.5); average P = {{W // t}}.', ar: 'القدرة (Power) تقيس سرعة إنجاز الشغل: القدرة = الشغل ÷ الزمن، P = {{W // t}}. شخصان يرفعان الحمل نفسه إلى الارتفاع نفسه يبذلان الشغل نفسه، لكن الأسرع منهما قدرته أكبر.' },
+        { en: 'Unit: watt W = J/s = kg·m²/s³. Do not confuse W (watt) with W (work).', ar: 'وحدة القدرة الواط W، ويساوي جولًا لكل ثانية. انتبه أن الحرف W يُستخدم للواط (وحدة القدرة) وللشغل (الكمية)، فميّز بينهما من سياق المسألة.' }
       ],
       terms: [['Power', 'القدرة', 'Rate of work'], ['Watt', 'الواط', 'J/s']],
       formulas: [{ f: 'P = {{dW // dt}}  (average: P = {{W // t}})', name: '(5.5)', sym: [['P', 'power', 'W', 'القدرة'], ['W', 'work', 'J', 'الشغل'], ['t', 'time', 's', 'الزمن']], cond: '—' }],
@@ -201,10 +201,10 @@ COURSE.push({
       goalsAr: 'ستحسب الإجهاد والانفعال ومعاملات المرونة الثلاثة.',
       why: { en: 'Cable, bridge and bone design depend on how materials stretch.', ar: 'تصميم الكابلات والجسور يعتمد على استطالة المواد.' },
       explain: [
-        { en: 'Stress = {{F // A}} (N/m²): "the force affecting on the unit of areas". Strain = {{ΔL // L}} (unitless).', ar: 'الإجهاد قوة لكل وحدة مساحة، والانفعال تغير الطول النسبي بلا وحدة.' },
-        { en: 'Young\'s modulus Y = {{stress // strain}} → {{F // A}} = Y {{ΔL // L}} (6.1). Bulk: {{F // A}} = −B {{ΔV // V}} (6.2). Shear: {{F // A}} = S {{x // L}} (6.3).', ar: 'ثلاثة معاملات: للطول وللحجم وللشكل.' },
-        { en: 'Stress–strain curve (Fig 6.2): elastic limit → yield point → breaking point. The formulas hold below the elastic limit.', ar: 'القوانين صحيحة تحت حد المرونة فقط.' },
-        { en: 'Area of a wire: A = πr² with r = {{diameter // 2}}.', ar: 'مساحة مقطع السلك πr² ونصف القطر = القطر/2.' }
+        { en: 'Stress = {{F // A}} (N/m²): "the force affecting on the unit of areas". Strain = {{ΔL // L}} (unitless).', ar: 'الإجهاد (Stress) هو القوة المؤثرة على كل متر مربع من مقطع الجسم: الإجهاد = {{F // A}}، ووحدته N/m². فإذا شُدّ سلكان بالقوة نفسها، يكون إجهاد الأرفع أكبر لأن القوة موزعة على مساحة أصغر. أما الانفعال (Strain) فهو مقدار الاستطالة نسبةً إلى الطول الأصلي: الانفعال = {{ΔL // L}}. ولأنه طول ÷ طول فليس له وحدة؛ فانفعال 0.001 يعني أن السلك زاد بمقدار جزء من ألف من طوله.' },
+        { en: 'Young\'s modulus Y = {{stress // strain}} → {{F // A}} = Y {{ΔL // L}} (6.1). Bulk: {{F // A}} = −B {{ΔV // V}} (6.2). Shear: {{F // A}} = S {{x // L}} (6.3).', ar: 'معامل المرونة يربط الإجهاد بالانفعال: كلما كان المعامل أكبر كانت المادة أصلب وأقل تأثرًا بالقوة. وفي المقرر ثلاثة معاملات: معامل يونغ Y لتغير الطول (شد سلك)، ومعامل المرونة الحجمي B لتغير الحجم (ضغط من كل الجهات)، ومعامل القص S لتغير الشكل (قوة مماسية تُميل الوجه العلوي).' },
+        { en: 'Stress–strain curve (Fig 6.2): elastic limit → yield point → breaking point. The formulas hold below the elastic limit.', ar: 'منحنى الإجهاد والانفعال (شكل 6.2): في البداية يرجع الجسم إلى طوله إذا أزلنا القوة، وذلك حتى حد المرونة. بعده تحدث استطالة دائمة عند نقطة الخضوع، ثم ينقطع الجسم عند نقطة الكسر. والقوانين الثلاثة صحيحة فقط قبل حد المرونة.' },
+        { en: 'Area of a wire: A = πr² with r = {{diameter // 2}}.', ar: 'مقطع السلك دائرة، فمساحته A = πr². إذا أعطتك المسألة القطر d فاقسمه على 2 أولًا لتحصل على نصف القطر r، ثم حوّله إلى متر قبل التربيع.' }
       ],
       terms: [['Stress', 'الإجهاد', 'F/A'], ['Strain', 'الانفعال', 'ΔL/L'], ['Young\'s modulus', 'معامل يونغ', 'Elasticity of length'], ['Bulk modulus', 'معامل المرونة الحجمي', 'Elasticity of volume'], ['Shear modulus', 'معامل القص', 'Elasticity of shape'], ['Elastic limit', 'حد المرونة', 'Max stress with full recovery']],
       formulas: [
@@ -232,10 +232,10 @@ COURSE.push({
       goalsAr: 'ستحسب الكثافة والضغط والضغط عند عمق في سائل.',
       why: { en: 'Divers and dam engineers need pressure at depth.', ar: 'الغواصون ومهندسو السدود يحتاجون حساب الضغط على عمق.' },
       explain: [
-        { en: 'Density "is defined as mass per unit volume": ρ = {{m // V}} (kg/m³) (6.4). Density mostly decreases as temperature increases.', ar: 'الكثافة = الكتلة ÷ الحجم.' },
-        { en: 'Pressure is the perpendicular force per unit area: P = {{F // A}}, unit pascal Pa = N/m² (6.5).', ar: 'الضغط = القوة العمودية ÷ المساحة.' },
-        { en: 'Liquid column: F = mg = ρAhg ⇒ P = ρgh (6.6). With the atmosphere on top: P = P₀ + ρgh.', ar: 'ضغط عمود السائل ρgh، ويضاف الضغط الجوي إذا كان السطح مكشوفًا.' },
-        { en: 'Pressure depends on depth, not on the shape of the container (BK p.93).', ar: 'الضغط يعتمد على العمق لا على شكل الإناء.' }
+        { en: 'Density "is defined as mass per unit volume": ρ = {{m // V}} (kg/m³) (6.4). Density mostly decreases as temperature increases.', ar: 'الكثافة (Density) هي كتلة المتر المكعب الواحد من المادة: ρ = {{m // V}}، ووحدتها kg/m³. الحديد أكثف من الخشب لأن المتر المكعب منه أثقل. ومعظم المواد تقل كثافتها عندما تسخن لأنها تتمدد.' },
+        { en: 'Pressure is the perpendicular force per unit area: P = {{F // A}}, unit pascal Pa = N/m² (6.5).', ar: 'الضغط (Pressure) هو القوة العمودية الموزعة على كل متر مربع: P = {{F // A}}، ووحدته الباسكال Pa = N/m². لذلك يخترق المسمار المدبب الخشب بسهولة: القوة نفسها، لكن على مساحة صغيرة جدًا، فيكون الضغط كبيرًا.' },
+        { en: 'Liquid column: F = mg = ρAhg ⇒ P = ρgh (6.6). With the atmosphere on top: P = P₀ + ρgh.', ar: 'ضغط السائل على عمق h سببه وزن عمود السائل الذي فوقك: P = ρgh. وإذا كان سطح السائل مكشوفًا للهواء نضيف الضغط الجوي فوقه: P = P₀ + ρgh، وهذا هو الضغط الكلي.' },
+        { en: 'Pressure depends on depth, not on the shape of the container (BK p.93).', ar: 'الضغط في السائل يعتمد على العمق فقط، لا على شكل الإناء ولا على كمية الماء فيه. فعند العمق نفسه يكون الضغط واحدًا في كوب ضيق وفي حوض سباحة (BK p.93).' }
       ],
       terms: [['Density', 'الكثافة', 'm/V'], ['Pressure', 'الضغط', 'F/A'], ['Pascal', 'باسكال', 'N/m²'], ['Atmospheric pressure', 'الضغط الجوي', '≈ 1×10⁵ Pa']],
       formulas: [{ f: 'ρ = {{m // V}}', name: '(6.4)', sym: [['ρ', 'density', 'kg/m³', 'الكثافة'], ['m', 'mass', 'kg', 'الكتلة'], ['V', 'volume', 'm³', 'الحجم']], cond: '—' }, { f: 'P = {{F // A}} ,  P = P₀ + ρgh', name: '(6.5–6.6)', sym: [['P', 'pressure', 'Pa', 'الضغط'], ['F', 'force', 'N', 'القوة'], ['A', 'area', 'm²', 'المساحة'], ['P₀', 'atmospheric pressure', 'Pa', 'الضغط الجوي'], ['ρ', 'liquid density', 'kg/m³', 'كثافة السائل'], ['h', 'depth', 'm', 'العمق']], cond: 'Fluid at rest.' }],
@@ -260,9 +260,9 @@ COURSE.push({
       goalsAr: 'ستطبق قاعدة باسكال وتحسب الضغط بالبارومتر والمانومتر.',
       why: { en: 'Car brakes and hydraulic lifts multiply force using Pascal\'s law.', ar: 'فرامل السيارة والرافعة الهيدروليكية تضاعف القوة بقاعدة باسكال.' },
       explain: [
-        { en: 'Pascal\'s law: "A change in pressure at any point in an enclosed fluid at rest is transmitted undiminished to all points in the fluid." Hydraulic press: {{f // a}} = {{F // A}}.', ar: 'الضغط ينتقل كاملًا في المائع المحصور.' },
-        { en: 'Areas scale with r² (or d²): {{F // f}} = ( {{R // r}} )².', ar: 'النسبة بين القوتين تساوي مربع نسبة نصفي القطرين.' },
-        { en: 'Barometer: P₀ = ρgh (mercury column 0.76 m). Manometer: P = P₀ + ρgh.', ar: 'البارومتر يقيس الضغط الجوي، والمانومتر يقيس ضغط غاز محصور.' }
+        { en: 'Pascal\'s law: "A change in pressure at any point in an enclosed fluid at rest is transmitted undiminished to all points in the fluid." Hydraulic press: {{f // a}} = {{F // A}}.', ar: 'قاعدة باسكال: إذا زاد الضغط في نقطة من سائل محصور، انتقلت الزيادة كاملة إلى كل نقاط السائل. وعليها تعمل المكابس الهيدروليكية: الضغط متساوٍ على المكبسين، أي {{f // a}} = {{F // A}}، فقوة صغيرة على مكبس صغير تعطي قوة كبيرة على مكبس كبير.' },
+        { en: 'Areas scale with r² (or d²): {{F // f}} = ( {{R // r}} )².', ar: 'المساحة تتناسب مع مربع نصف القطر، لذلك نسبة القوتين تساوي مربع نسبة نصفي القطرين: {{F // f}} = ( {{R // r}} )². فإذا كان نصف قطر المكبس الكبير أكبر بعشر مرات تكون قوته أكبر بمئة مرة.' },
+        { en: 'Barometer: P₀ = ρgh (mercury column 0.76 m). Manometer: P = P₀ + ρgh.', ar: 'البارومتر يقيس الضغط الجوي بارتفاع عمود زئبق: P₀ = ρgh، وعند سطح البحر يكون العمود 0.76 m تقريبًا. أما المانومتر فيقيس ضغط غاز محصور بفرق ارتفاع السائل في أنبوب على شكل حرف U: P = P₀ + ρgh.' }
       ],
       terms: [['Pascal\'s law', 'قاعدة باسكال', 'Pressure transmitted undiminished'], ['Hydraulic press', 'المكبس الهيدروليكي', 'Force multiplier'], ['Barometer', 'البارومتر', 'Measures P₀'], ['Manometer', 'المانومتر', 'Measures gas pressure']],
       formulas: [{ f: '{{f // a}} = {{F // A}}', name: 'Hydraulic press', sym: [['f, F', 'small/large piston force', 'N', 'قوة المكبس الصغير والكبير'], ['a, A', 'small/large piston area', 'm²', 'مساحة المكبس الصغير والكبير']], cond: 'Same level, fluid at rest.' }, { f: 'P₀ = ρgh ,  P = P₀ + ρgh', name: 'Barometer / manometer', sym: [['P₀', 'atmospheric pressure', 'Pa', 'الضغط الجوي'], ['ρ', 'liquid density', 'kg/m³', 'كثافة السائل'], ['h', 'column height difference', 'm', 'فرق ارتفاع عمود السائل']], cond: '—' }],
@@ -286,10 +286,10 @@ COURSE.push({
       goalsAr: 'ستطبق معادلة الاستمرارية ومعادلة برنولي بافتراضات المائع المثالي.',
       why: { en: 'It explains garden‑hose jets, aircraft lift and perfume sprays (BK p.99).', ar: 'تفسر اندفاع ماء الخرطوم ورفع الطائرة وبخاخ العطر.' },
       explain: [
-        { en: 'Ideal fluid: incompressible, non‑viscous, steady (regular) flow, irrotational (BK p.96).', ar: 'المائع المثالي: غير قابل للانضغاط، عديم اللزوجة، جريان منتظم، غير دوّامي.' },
-        { en: 'Flow rate R = Av (m³/s). Continuity: A₁v₁ = A₂v₂ (6.7): narrower pipe → faster flow.', ar: 'معدل التدفق ثابت: الأنبوب الأضيق سرعته أكبر.' },
-        { en: 'Bernoulli (energy conservation): P + hρg + ½ρv² is constant along a flow line (6.8).', ar: 'برنولي: مجموع الضغط وطاقة الوضع والحركة لكل وحدة حجم ثابت.' },
-        { en: 'Horizontal tube: P₁ − P₂ = ½ρ(v₂² − v₁²) → faster flow, lower pressure. Static fluid: P₁ − P₂ = (h₂ − h₁)ρg.', ar: 'في الأنبوب الأفقي: السرعة الأكبر تعني ضغطًا أقل.' }
+        { en: 'Ideal fluid: incompressible, non‑viscous, steady (regular) flow, irrotational (BK p.96).', ar: 'لتبسيط دراسة السوائل المتحركة نفترض مائعًا مثاليًا: لا ينضغط فحجمه ثابت، ولا لزوجة فيه أي لا احتكاك داخلي، وجريانه منتظم فلا تتغير سرعته عند كل نقطة مع الزمن، ولا تكون فيه دوامات (BK p.96).' },
+        { en: 'Flow rate R = Av (m³/s). Continuity: A₁v₁ = A₂v₂ (6.7): narrower pipe → faster flow.', ar: 'معدل التدفق R = Av هو حجم السائل الذي يمر كل ثانية (m³/s). ولأن السائل لا ينضغط يبقى هذا المعدل ثابتًا على طول الأنبوب: A₁v₁ = A₂v₂. فعندما يضيق الأنبوب تزيد السرعة، كما يحدث عندما تضغط فوهة خرطوم الماء.' },
+        { en: 'Bernoulli (energy conservation): P + hρg + ½ρv² is constant along a flow line (6.8).', ar: 'معادلة برنولي هي حفظ الطاقة للسائل المتحرك: مجموع الضغط P، وطاقة الوضع لكل وحدة حجم hρg، والطاقة الحركية لكل وحدة حجم ½ρv²، ثابت على طول خط الجريان.' },
+        { en: 'Horizontal tube: P₁ − P₂ = ½ρ(v₂² − v₁²) → faster flow, lower pressure. Static fluid: P₁ − P₂ = (h₂ − h₁)ρg.', ar: 'في أنبوب أفقي يتساوى الارتفاع، فتبقى المعادلة P₁ − P₂ = ½ρ(v₂² − v₁²): حيث تكون السرعة أكبر يكون الضغط أقل. وإذا كان السائل ساكنًا تعود المعادلة إلى قانون الضغط في السوائل: P₁ − P₂ = (h₂ − h₁)ρg.' }
       ],
       terms: [['Flow rate', 'معدل التدفق', 'R = Av'], ['Continuity equation', 'معادلة الاستمرارية', 'A₁v₁ = A₂v₂'], ['Streamline', 'خط الانسياب', 'Path of fluid particles'], ['Viscosity', 'اللزوجة', 'Internal friction']],
       formulas: [{ f: 'A₁v₁ = A₂v₂', name: 'Continuity (6.7)', sym: [['A', 'cross‑section area', 'm²', 'مساحة المقطع'], ['v', 'flow speed', 'm/s', 'سرعة السائل']], cond: 'Incompressible fluid.' }, { f: 'P₁ + h₁ρg + ½ρv₁² = P₂ + h₂ρg + ½ρv₂²', name: 'Bernoulli (6.8)', sym: [['P', 'pressure', 'Pa', 'الضغط'], ['h', 'height', 'm', 'الارتفاع'], ['ρ', 'density', 'kg/m³', 'الكثافة'], ['v', 'flow speed', 'm/s', 'سرعة السائل']], cond: 'Ideal fluid, along one streamline.' }],

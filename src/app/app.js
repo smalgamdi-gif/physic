@@ -889,10 +889,11 @@
     const link = n => `<a href="#${n[0]}" class="nl ${on(n) ? 'active' : ''}" title="${n[1].replace(/^\S+\s/, '')} · ${n[2]}"><span>${n[1]}</span><small>${n[2]}</small></a>`;
     // collapsible groups; the group holding the open page always stays open
     const g = S.prefs.groups || {};
-    const group = (id, title, html, has) => { const open = has || g[id] !== false; return `<button class="sec grp" data-g="${id}" aria-expanded="${open}"><span>${title}</span><span class="caret">${open ? '▾' : '▸'}</span></button><div class="grpbody${open ? '' : ' closed'}">${html}</div>`; };
-    return link(NAV[0]) + group('tools', 'Study tools · أدوات المذاكرة', NAV.slice(1).map(link).join(''), NAV.slice(1).some(on))
-      + group('found', 'Foundation · التأسيس', FNAV.map(link).join(''), FNAV.some(on))
-      + group('chapters', 'Chapters · الفصول', chs, active.startsWith('chapter/') || active.startsWith('lesson/'));
+    const group = (id, icon, en, ar, n, html, has) => { const open = has || g[id] !== false; return `<button class="grp" data-g="${id}" aria-expanded="${open}"><span class="gi" aria-hidden="true">${icon}</span><span class="gt">${en}</span><span class="ga">${ar}</span><span class="caret" aria-hidden="true"><svg viewBox="0 0 10 10" width="10" height="10"><path d="M3.5 1.5 7 5l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button><div class="grpbody${open ? '' : ' closed'}">${html}</div>`; };
+    return link(NAV[0]) + group('tools', '🧰', 'Study tools', 'أدوات المذاكرة', NAV.length - 1, NAV.slice(1).map(link).join(''), NAV.slice(1).some(on))
+      + group('found', '🧱', 'Foundation', 'التأسيس', FNAV.length, FNAV.map(link).join(''), FNAV.some(on))
+      + group('chapters', '📚', 'Chapters', 'الفصول', COURSE.length, chs, active.startsWith('chapter/') || active.startsWith('lesson/'))
+      + `<a class="sidelab" href="Virtual_Lab.html"><span>⚗ Virtual Lab</span><small dir="rtl">المعمل الافتراضي · 11 تجربة</small></a>`;
   }
   function route() {
     const h = (location.hash || '#home').slice(1); const [v, arg] = h.split('/');
@@ -931,7 +932,7 @@
     const applySide = () => { document.body.classList.toggle('side-closed', S.prefs.side === false); $('#menu').setAttribute('aria-expanded', String(wide.matches ? S.prefs.side !== false : $('#side').classList.contains('open'))); };
     $('#menu').onclick = () => { if (wide.matches) { S.prefs.side = S.prefs.side === false; save(); } else $('#side').classList.toggle('open'); applySide(); };
     $('#side').addEventListener('click', e => { const b = e.target.closest('.grp'); if (!b) return; const body = b.nextElementSibling, open = body.classList.toggle('closed') === false;
-      b.setAttribute('aria-expanded', String(open)); b.querySelector('.caret').textContent = open ? '▾' : '▸'; S.prefs.groups = Object.assign({}, S.prefs.groups, { [b.dataset.g]: open }); save(); });
+      b.setAttribute('aria-expanded', String(open)); S.prefs.groups = Object.assign({}, S.prefs.groups, { [b.dataset.g]: open }); save(); });
     applySide();
     const sr = $('#search'), res = $('#results');
     sr.oninput = () => { const r = search(sr.value); res.innerHTML = r.length ? `<div class="card results">${r.join('')}</div>` : ''; };

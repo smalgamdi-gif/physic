@@ -8,10 +8,10 @@ COURSE.push({
       goalsAr: 'ستعرف الخواص التي تعتمد عليها الترمومترات وتحوّل بين المقاييس الثلاثة.',
       why: { en: 'Gas laws and radiation need kelvin; weather reports use °C or °F.', ar: 'قوانين الغازات والإشعاع تحتاج الكلفن.' },
       explain: [
-        { en: 'Thermometers use a property that changes with temperature: liquid volume, gas volume (constant P), gas pressure (constant V), solid dimensions, electrical resistance, emitted wavelength.', ar: 'الترمومتر يعتمد على خاصية فيزيائية تتغير بالحرارة.' },
-        { en: 'Fixed points: Celsius 0–100, Fahrenheit 32–212 (180 divisions), Kelvin 273.15–373.15.', ar: 'نقاط التجمد والغليان في المقاييس الثلاثة.' },
-        { en: '{{T_C // 100}} = {{T_K − 273 // 100}} = {{T_F − 32 // 180}} → T_C = {{5 // 9}} (T_F − 32), T_K = T_C + 273 (7.1, 7.2).', ar: 'العلاقة العامة بين المقاييس.' },
-        { en: 'Absolute zero −273.15 °C = 0 K (gas pressure → 0, Fig 7.2). Write K, not °K (G‑17).', ar: 'الصفر المطلق −273.15 °C.' }
+        { en: 'Thermometers use a property that changes with temperature: liquid volume, gas volume (constant P), gas pressure (constant V), solid dimensions, electrical resistance, emitted wavelength.', ar: 'الترمومتر يقيس درجة الحرارة باستخدام خاصية تتغير بانتظام مع الحرارة، مثل تمدد السائل في الأنبوب، أو حجم غاز عند ضغط ثابت، أو ضغط غاز عند حجم ثابت، أو أبعاد جسم صلب، أو المقاومة الكهربائية، أو لون الضوء المنبعث.' },
+        { en: 'Fixed points: Celsius 0–100, Fahrenheit 32–212 (180 divisions), Kelvin 273.15–373.15.', ar: 'لكل مقياس نقطتان ثابتتان هما تجمد الماء وغليانه: في السيليزي 0 و 100، وفي الفهرنهايت 32 و 212 (أي 180 قسمًا بينهما)، وفي الكلفن 273.15 و 373.15.' },
+        { en: '{{T_C // 100}} = {{T_K − 273 // 100}} = {{T_F − 32 // 180}} → T_C = {{5 // 9}} (T_F − 32), T_K = T_C + 273 (7.1, 7.2).', ar: 'لأن المسافة بين التجمد والغليان واحدة في كل المقاييس، نساوي الكسور: {{T_C // 100}} = {{T_K − 273 // 100}} = {{T_F − 32 // 180}}. ومنها T_C = {{5 // 9}} (T_F − 32) و T_K = T_C + 273. ولاحظ أن تغير درجة سيليزية واحدة يساوي تغير كلفن واحد.' },
+        { en: 'Absolute zero −273.15 °C = 0 K (gas pressure → 0, Fig 7.2). Write K, not °K (G‑17).', ar: 'الصفر المطلق −273.15 °C = 0 K هو أدنى درجة حرارة ممكنة، وعندها يصل ضغط الغاز نظريًا إلى الصفر (شكل 7.2). ونكتب وحدة الكلفن K بدون علامة الدرجة ° (G‑17).' }
       ],
       terms: [['Temperature', 'درجة الحرارة', 'Measure of hotness'], ['Thermometer', 'مقياس الحرارة', 'Uses a thermometric property'], ['Absolute zero', 'الصفر المطلق', '0 K']],
       formulas: [{ f: 'T_C = {{5 // 9}} (T_F − 32) ,  T_K = T_C + 273', name: '(7.1–7.2)', sym: [['T_C', 'Celsius temperature', '°C', 'درجة الحرارة السيليزية'], ['T_F', 'Fahrenheit temperature', '°F', 'درجة الحرارة الفهرنهايتية'], ['T_K', 'absolute temperature', 'K', 'درجة الحرارة المطلقة']], cond: 'ΔT in °C equals ΔT in K.' }],
@@ -35,11 +35,11 @@ COURSE.push({
       goalsAr: 'ستحسب التمدد الطولي والسطحي والحجمي وتفهم شذوذ الماء.',
       why: { en: 'Rails, bridges and pipelines need expansion gaps (Fig 7.4).', ar: 'السكك والجسور تحتاج فواصل تمدد.' },
       explain: [
-        { en: 'Atoms vibrate more at higher temperature, so distances between them grow.', ar: 'تزداد اهتزازات الذرات فتتباعد.' },
-        { en: 'Linear: Δℓ = αℓ₁ΔT, ℓ₂ = ℓ₁(1 + αΔT) (7.3). Area: S₂ = S₁(1 + γΔT), γ = 2α (7.4). Volume: V₂ = V₁(1 + βΔT), β = 3α (7.5).', ar: 'التمدد الطولي والسطحي والحجمي.' },
-        { en: 'α "defined as the amount of change in length for each temperature change of one‑degree Kelvin" (relative change).', ar: 'معامل التمدد الطولي هو التغير النسبي في الطول لكل درجة.' },
-        { en: 'Water anomaly: from 0 °C to 4 °C water contracts; its volume is minimal (density maximal) at 4 °C, so lakes freeze from the top (BK p.111–112).', ar: 'شذوذ الماء: أعلى كثافة عند 4 °C فتتجمد البحيرات من الأعلى.' },
-        { en: 'A hole in a plate expands as if it were made of the plate material (Ex 7.4).', ar: 'الثقب في صفيحة يتمدد كأنه من مادة الصفيحة.' }
+        { en: 'Atoms vibrate more at higher temperature, so distances between them grow.', ar: 'لماذا تتمدد الأجسام عند التسخين؟ لأن الذرات تهتز أكثر عندما تسخن، فتحتاج كل ذرة حيزًا أكبر، وتزيد المسافات بينها، فيكبر الجسم كله.' },
+        { en: 'Linear: Δℓ = αℓ₁ΔT, ℓ₂ = ℓ₁(1 + αΔT) (7.3). Area: S₂ = S₁(1 + γΔT), γ = 2α (7.4). Volume: V₂ = V₁(1 + βΔT), β = 3α (7.5).', ar: 'التمدد يكون في الطول أو المساحة أو الحجم: الطول Δℓ = αℓ₁ΔT أي ℓ₂ = ℓ₁(1 + αΔT)، والمساحة S₂ = S₁(1 + γΔT) حيث γ = 2α، والحجم V₂ = V₁(1 + βΔT) حيث β = 3α. فيكفي أن تعرف α لتحسب الثلاثة.' },
+        { en: 'α "defined as the amount of change in length for each temperature change of one‑degree Kelvin" (relative change).', ar: 'معامل التمدد الطولي α هو مقدار الزيادة في كل متر من الطول عندما ترتفع الحرارة درجة واحدة. فإذا كان α = 1.2×10⁻⁵ يزيد كل متر 0.000012 m لكل درجة، ولهذا نترك فواصل بين قضبان السكة الحديدية.' },
+        { en: 'Water anomaly: from 0 °C to 4 °C water contracts; its volume is minimal (density maximal) at 4 °C, so lakes freeze from the top (BK p.111–112).', ar: 'الماء شاذ: عندما يبرد من 4 °C إلى 0 °C يتمدد بدل أن ينكمش، فتكون كثافته أكبر ما يمكن عند 4 °C. لذلك ينزل الماء الذي حرارته 4 °C إلى القاع، ويتجمد السطح أولًا، وتبقى الأسماك حية تحت الجليد (BK p.111–112).' },
+        { en: 'A hole in a plate expands as if it were made of the plate material (Ex 7.4).', ar: 'الثقب في صفيحة معدنية يتسع عند التسخين ولا يضيق، كأنه مصنوع من مادة الصفيحة نفسها، لأن كل أبعاد الصفيحة تكبر بالنسبة نفسها (مثال 7.4).' }
       ],
       terms: [['Linear expansion coefficient α', 'معامل التمدد الطولي', '°C⁻¹'], ['Surface coefficient γ', 'معامل التمدد السطحي', '2α'], ['Volume coefficient β', 'معامل التمدد الحجمي', '3α'], ['Anomaly of water', 'شذوذ الماء', 'Max density at 4 °C']],
       formulas: [{ f: 'Δℓ = α ℓ ΔT ,  ΔS = γ S ΔT ,  ΔV = β V ΔT', name: '(7.3–7.5)', sym: [['Δℓ, ΔS, ΔV', 'change of length, area, volume', 'm, m², m³', 'تغير الطول والمساحة والحجم'], ['α', 'linear coefficient', '°C⁻¹ or K⁻¹', 'معامل التمدد الطولي'], ['γ, β', 'area / volume coefficient', '°C⁻¹', 'معاملا التمدد السطحي والحجمي'], ['ΔT', 'temperature change', '°C or K', 'تغير درجة الحرارة']], cond: 'γ = 2α, β = 3α (small αΔT).' }],
@@ -63,10 +63,10 @@ COURSE.push({
       goalsAr: 'ستحسب كمية الحرارة وتحل مسائل الاتزان الحراري (المسعر).',
       why: { en: 'Cooking, air‑conditioning and engine cooling all rely on heat capacity.', ar: 'الطبخ والتكييف وتبريد المحركات تعتمد على السعة الحرارية.' },
       explain: [
-        { en: 'Heat is energy. Q acquired or lost is proportional to m and ΔT: Q = cmΔT (7.6). Heat capacity C: Q = CΔT (7.7).', ar: 'الحرارة طاقة، وتتناسب مع الكتلة وتغير درجة الحرارة.' },
-        { en: 'Latent heat L: heat to change phase at constant temperature: Q = mL (7.8).', ar: 'الحرارة الكامنة لتغيير الحالة عند درجة ثابتة.' },
-        { en: 'Units: calorie (heat to raise 1 g of water by 1 °C); 1 cal = 4.18 J (Joule\'s mechanical equivalent). c_water = 1 cal/g·°C = 4186 J/kg·K (🧩 conversion).', ar: 'السعر الحراري = 4.18 جول تقريبًا.' },
-        { en: 'Heat balance in an insulated system: heat lost by hot bodies = heat gained by cold bodies (Ex 7.8).', ar: 'في نظام معزول: الحرارة المفقودة = الحرارة المكتسبة.' }
+        { en: 'Heat is energy. Q acquired or lost is proportional to m and ΔT: Q = cmΔT (7.6). Heat capacity C: Q = CΔT (7.7).', ar: 'الحرارة (Heat) طاقة تنتقل من الجسم الساخن إلى البارد. وكمية الحرارة اللازمة لتسخين جسم تزيد بزيادة كتلته وبزيادة التغير في درجة حرارته: Q = cmΔT، حيث c الحرارة النوعية، وهي خاصية للمادة. والسعة الحرارية للجسم كله C = cm، فيكون Q = CΔT.' },
+        { en: 'Latent heat L: heat to change phase at constant temperature: Q = mL (7.8).', ar: 'الحرارة الكامنة (Latent heat) هي الحرارة اللازمة لتغيير حالة المادة، كالانصهار أو الغليان، دون أن تتغير درجة حرارتها: Q = mL. فالثلج عند 0 °C يمتص حرارة وهو يذوب، ودرجته تبقى 0 °C حتى يذوب كله.' },
+        { en: 'Units: calorie (heat to raise 1 g of water by 1 °C); 1 cal = 4.18 J (Joule\'s mechanical equivalent). c_water = 1 cal/g·°C = 4186 J/kg·K (🧩 conversion).', ar: 'السعر الحراري (calorie) هو الحرارة اللازمة لرفع حرارة 1 g من الماء درجة واحدة، و 1 cal ≈ 4.18 J. لذلك الحرارة النوعية للماء 1 cal/g·°C، وتساوي 4186 J/kg·K. انتبه أن تستخدم نظام وحدات واحدًا في المسألة كلها.' },
+        { en: 'Heat balance in an insulated system: heat lost by hot bodies = heat gained by cold bodies (Ex 7.8).', ar: 'ميزان الحرارة: في وعاء معزول لا تضيع الحرارة، فما يفقده الجسم الساخن يكتسبه الجسم البارد بالضبط، حتى يصلا إلى درجة حرارة واحدة. نكتب الحرارة المفقودة = الحرارة المكتسبة، ثم نحسب المجهول (مثال 7.8).' }
       ],
       terms: [['Specific heat c', 'الحرارة النوعية', 'J/kg·K or cal/g·°C'], ['Heat capacity C', 'السعة الحرارية', 'J/K'], ['Latent heat L', 'الحرارة الكامنة', 'J/kg'], ['Calorimeter', 'المسعر', 'Insulated container']],
       formulas: [
@@ -96,9 +96,9 @@ COURSE.push({
       goalsAr: 'ستتعرف طرق انتقال الحرارة الثلاث وتحسب التوصيل والإشعاع.',
       why: { en: 'Insulation, cooking pots and the Sun warming Earth are the three modes in action.', ar: 'العزل وأواني الطبخ وتسخين الشمس للأرض أمثلة على الطرق الثلاث.' },
       explain: [
-        { en: 'Conduction: heat Q through a slab is ∝ A, (T₁ − T₂), t and ∝ {{1 // x}}. Rate H = {{Q // t}} = {{k_c A (T₁ − T₂) // x}} (7.9).', ar: 'التوصيل يعتمد على المساحة وفرق الحرارة والسمك.' },
-        { en: 'Convection: movement of the fluid itself; hot water rises because its density decreases (Fig 7.8).', ar: 'الحمل: انتقال المادة الساخنة نفسها.' },
-        { en: 'Radiation: electromagnetic waves, no medium needed. Stefan–Boltzmann: Q = σAT⁴, σ = 5.67×10⁻⁸ W/m²K⁴, T in kelvin; Q here is energy per second of a black body (G‑16).', ar: 'الإشعاع لا يحتاج وسطًا، ويتناسب مع T⁴ بالكلفن.' }
+        { en: 'Conduction: heat Q through a slab is ∝ A, (T₁ − T₂), t and ∝ {{1 // x}}. Rate H = {{Q // t}} = {{k_c A (T₁ − T₂) // x}} (7.9).', ar: 'التوصيل (Conduction): تنتقل الحرارة خلال المادة من ذرة إلى ذرة دون أن تتحرك المادة نفسها، كما تسخن ملعقة معدنية في كوب الشاي. ومعدل انتقالها H = {{k_c A (T₁ − T₂) // x}} يزيد بزيادة المساحة وفرق درجتي الحرارة، ويقل بزيادة السمك x.' },
+        { en: 'Convection: movement of the fluid itself; hot water rises because its density decreases (Fig 7.8).', ar: 'الحمل (Convection): تنتقل الحرارة بحركة السائل أو الغاز نفسه. الماء الساخن تقل كثافته فيصعد، والبارد ينزل مكانه، فتتكوّن تيارات تنقل الحرارة (شكل 7.8).' },
+        { en: 'Radiation: electromagnetic waves, no medium needed. Stefan–Boltzmann: Q = σAT⁴, σ = 5.67×10⁻⁸ W/m²K⁴, T in kelvin; Q here is energy per second of a black body (G‑16).', ar: 'الإشعاع (Radiation): تنتقل الحرارة بموجات كهرومغناطيسية لا تحتاج وسطًا، ولهذا تصلنا حرارة الشمس عبر الفراغ. والطاقة المشعة في الثانية من جسم أسود Q = σAT⁴، ويجب أن تكون T بالكلفن لأنها مرفوعة للأس الرابع (G‑16).' }
       ],
       terms: [['Thermal conductivity k_c', 'معامل التوصيل الحراري', 'W/m·K'], ['Temperature gradient', 'الميل الحراري', '(T₁ − T₂)/x'], ['Convection', 'الحمل', 'Fluid motion'], ['Radiation', 'الإشعاع', 'EM waves'], ['Black body', 'الجسم الأسود', 'Ideal emitter']],
       formulas: [{ f: 'H = {{k_c A (T₁ − T₂) // x}}', name: 'Conduction (7.9)', sym: [['H', 'heat rate', 'W or cal/s', 'معدل انتقال الحرارة'], ['k_c', 'thermal conductivity', 'W/m·K', 'معامل التوصيل الحراري'], ['A', 'area', 'm²', 'المساحة'], ['T₁ − T₂', 'temperature difference', 'K or °C', 'فرق درجتي الحرارة'], ['x', 'thickness', 'm', 'السمك']], cond: 'Steady state.' }, { f: 'Q = σ A T⁴', name: 'Stefan–Boltzmann (7.10)', sym: [['Q', 'energy radiated per second', 'W', 'الطاقة المشعة في الثانية'], ['σ', '5.67×10⁻⁸', 'W/m²K⁴', 'ثابت ستيفان-بولتزمان'], ['A', 'surface area', 'm²', 'مساحة السطح'], ['T', 'absolute temperature', 'K', 'درجة الحرارة المطلقة']], cond: 'Ideal black body; per second.' }],
@@ -125,10 +125,10 @@ COURSE.push({
       goalsAr: 'ستتعرف طرق الشحن وتحسب القوة الكهربائية بين شحنتين ومحصلة عدة قوى.',
       why: { en: 'Laser printers and paint sprayers use electrostatic forces (BK p.125).', ar: 'الطابعات الليزرية وبخاخات الطلاء تستخدم القوى الكهروستاتيكية.' },
       explain: [
-        { en: 'Two kinds of charge: negative (electron) and positive (proton). e = 1.6×10⁻¹⁹ C. Like charges repel, unlike attract.', ar: 'نوعان من الشحنات؛ المتشابهة تتنافر والمختلفة تتجاذب.' },
-        { en: 'Charging: friction (electrons transfer), contact (charge shared), induction without contact.', ar: 'الشحن بالدلك والتلامس والحث.' },
-        { en: 'Coulomb\'s law: "the magnitude of electrical force between two charged particles is directly proportional to the product … (q₁q₂) and inversely with the square of the distance (r²)": F = {{k_e q₁q₂ // r²}}, k_e = {{1 // 4πε₀}} ≈ 9×10⁹ N·m²/C² (8.1).', ar: 'قانون كولوم: القوة تتناسب مع حاصل ضرب الشحنتين وعكسيًا مع مربع المسافة.' },
-        { en: 'Several charges: compute each force separately, then add as vectors (BK Ex 8.4).', ar: 'مع عدة شحنات نجمع القوى جمعًا اتجاهيًا.' }
+        { en: 'Two kinds of charge: negative (electron) and positive (proton). e = 1.6×10⁻¹⁹ C. Like charges repel, unlike attract.', ar: 'هناك نوعان من الشحنة: سالبة يحملها الإلكترون، وموجبة يحملها البروتون، ومقدار شحنة كل منهما e = 1.6×10⁻¹⁹ C. والقاعدة: الشحنات المتشابهة تتنافر، والمختلفة تتجاذب.' },
+        { en: 'Charging: friction (electrons transfer), contact (charge shared), induction without contact.', ar: 'طرق الشحن ثلاث: الدلك، حيث تنتقل إلكترونات من جسم إلى آخر بالاحتكاك. والتلامس، حيث تتوزع الشحنة بين الجسمين عندما يتلامسان. والحث، حيث نقرّب جسمًا مشحونًا فيعيد ترتيب الشحنات في جسم آخر دون أن يلمسه.' },
+        { en: 'Coulomb\'s law: "the magnitude of electrical force between two charged particles is directly proportional to the product … (q₁q₂) and inversely with the square of the distance (r²)": F = {{k_e q₁q₂ // r²}}, k_e = {{1 // 4πε₀}} ≈ 9×10⁹ N·m²/C² (8.1).', ar: 'قانون كولوم: القوة بين شحنتين تزيد بزيادة حاصل ضربهما، وتقل كثيرًا بزيادة المسافة لأنها تتناسب عكسيًا مع مربعها: F = {{k_e q₁q₂ // r²}}، حيث k_e ≈ 9×10⁹ N·m²/C². فإذا تضاعفت المسافة تصبح القوة ربع ما كانت.' },
+        { en: 'Several charges: compute each force separately, then add as vectors (BK Ex 8.4).', ar: 'إذا كانت هناك عدة شحنات، احسب القوة من كل شحنة على حدة، وحدد اتجاهها (تجاذب أو تنافر)، ثم اجمع القوى جمعًا اتجاهيًا لا جبريًا، كما في مثال 8.4.' }
       ],
       terms: [['Coulomb (C)', 'كولوم', 'Unit of charge'], ['Elementary charge e', 'الشحنة الأولية', '1.6×10⁻¹⁹ C'], ['Induction', 'الحث', 'Charging without contact'], ['Permittivity ε₀', 'السماحية', '8.85×10⁻¹² C²/N·m²']],
       formulas: [{ f: 'F = {{k_e |q₁ q₂| // r²}}', name: 'Coulomb (8.1)', sym: [['F', 'electric force', 'N', 'القوة الكهربائية'], ['k_e', 'Coulomb constant = {{1 // 4πε₀}} ≈ 9×10⁹', 'N·m²/C²', 'ثابت كولوم'], ['q₁, q₂', 'the two charges', 'C', 'الشحنتان'], ['r', 'distance between the charges', 'm', 'المسافة بين الشحنتين']], cond: 'Point charges. Use the sizes of the charges, then get the direction from their signs: like charges repel, unlike attract.' }],
@@ -152,8 +152,8 @@ COURSE.push({
       goalsAr: 'ستحسب شدة المجال الكهربائي وترسم خطوطه.',
       why: { en: 'The field tells the force on any charge placed at a point, without knowing that charge first.', ar: 'المجال يحدد القوة على أي شحنة توضع في النقطة.' },
       explain: [
-        { en: '"The electrical field at a point is defined as the electrical force affecting a positive point‑test charge of the unit placed at that point": E = {{F // q_t}} = {{k_e q // r²}} (8.2). Unit N/C.', ar: 'المجال = القوة على وحدة الشحنات الموجبة.' },
-        { en: 'Direction: away from + charges, toward − charges. Field lines: density ∝ field strength (Faraday) (Fig 8.6).', ar: 'خطوط المجال تخرج من الموجب وتدخل السالب، وكثافتها تدل على الشدة.' }
+        { en: '"The electrical field at a point is defined as the electrical force affecting a positive point‑test charge of the unit placed at that point": E = {{F // q_t}} = {{k_e q // r²}} (8.2). Unit N/C.', ar: 'المجال الكهربائي (Electric field) عند نقطة هو القوة التي تؤثر على شحنة موجبة مقدارها 1 C لو وُضعت هناك: E = {{F // q_t}}. ومجال الشحنة النقطية E = {{k_e q // r²}}، ووحدته N/C. فهو يخبرك بالقوة على أي شحنة توضع في تلك النقطة قبل أن تضعها: F = qE.' },
+        { en: 'Direction: away from + charges, toward − charges. Field lines: density ∝ field strength (Faraday) (Fig 8.6).', ar: 'اتجاه المجال يخرج من الشحنة الموجبة ويدخل في السالبة. ونرسمه بخطوط المجال: كلما تقاربت الخطوط كان المجال أقوى، كما رسمها فاراداي (شكل 8.6).' }
       ],
       terms: [['Electric field', 'المجال الكهربائي', 'Force per unit positive charge'], ['Test charge', 'شحنة الاختبار', 'Small positive charge'], ['Field lines', 'خطوط المجال', 'Visual representation']],
       formulas: [{ f: 'E = {{F // q_t}} = {{k_e q // r²}}', name: '(8.2)', sym: [['E', 'electric field', 'N/C', 'المجال الكهربائي'], ['F', 'force on the test charge', 'N', 'القوة على شحنة الاختبار'], ['q_t', 'test charge', 'C', 'شحنة الاختبار'], ['q', 'charge that makes the field', 'C', 'الشحنة المولّدة للمجال'], ['r', 'distance from q', 'm', 'البعد عن الشحنة']], cond: 'kq/r² is for a point charge. E points away from + charges and toward − charges.' }],
@@ -171,9 +171,9 @@ COURSE.push({
       goalsAr: 'ستحسب فرق الجهد في مجال منتظم وجهد شحنة نقطية ومجموع الجهود.',
       why: { en: 'Batteries and sockets are rated in volts: potential is how electric energy is delivered.', ar: 'البطاريات تُقاس بالفولت، والجهد هو طريقة نقل الطاقة الكهربائية.' },
       explain: [
-        { en: 'ΔV = V_A − V_B = {{W // q_t}}: work per unit positive charge moved against the field (8.3). 1 V = 1 J/C.', ar: 'فرق الجهد = الشغل لكل وحدة شحنة.' },
-        { en: 'Uniform field (between plates): ΔV = Ed (8.4).', ar: 'في المجال المنتظم ΔV = Ed.' },
-        { en: 'Point charge: V = {{k_e q // r}} (8.5), a scalar with sign. Several charges: add algebraically.', ar: 'جهد الشحنة النقطية كمية قياسية بإشارة، وتُجمع جبريًا.' }
+        { en: 'ΔV = V_A − V_B = {{W // q_t}}: work per unit positive charge moved against the field (8.3). 1 V = 1 J/C.', ar: 'فرق الجهد (Potential difference) بين نقطتين هو الشغل اللازم لنقل شحنة موجبة مقدارها 1 C من نقطة إلى أخرى عكس المجال: ΔV = {{W // q_t}}، ووحدته الفولت V = J/C. فبطارية 12 V تعطي كل كولوم يمر فيها 12 J.' },
+        { en: 'Uniform field (between plates): ΔV = Ed (8.4).', ar: 'بين لوحين متوازيين يكون المجال منتظمًا، أي متساويًا في كل نقطة، وعندها فرق الجهد = المجال × المسافة بين اللوحين: ΔV = Ed.' },
+        { en: 'Point charge: V = {{k_e q // r}} (8.5), a scalar with sign. Several charges: add algebraically.', ar: 'جهد الشحنة النقطية V = {{k_e q // r}}، وهو كمية قياسية نكتب معها إشارة الشحنة. فإذا كانت هناك عدة شحنات نجمع جهودها جمعًا عاديًا بالإشارات، بلا زوايا ولا مركبات، وهذا أسهل من جمع القوى.' }
       ],
       terms: [['Potential difference', 'فرق الجهد', 'Volt'], ['Electric potential', 'الجهد الكهربائي', 'Work per unit charge from infinity'], ['Volt', 'الفولت', 'J/C']],
       formulas: [{ f: 'ΔV = {{W // q_t}} = E d', name: '(8.3–8.4)', sym: [['ΔV', 'potential difference', 'V', 'فرق الجهد'], ['W', 'work to move the charge', 'J', 'الشغل'], ['q_t', 'test charge', 'C', 'شحنة الاختبار'], ['E', 'uniform field', 'N/C = V/m', 'المجال المنتظم'], ['d', 'distance along the field', 'm', 'المسافة باتجاه المجال']], cond: 'Ed for a uniform field.' }, { f: 'V = {{k_e q // r}}', name: '(8.5)', sym: [['V', 'potential', 'V', 'الجهد'], ['q', 'point charge, with its sign', 'C', 'الشحنة بإشارتها'], ['r', 'distance from the charge', 'm', 'البعد عن الشحنة']], cond: 'Point charge, V(∞) = 0.' }],
@@ -194,10 +194,10 @@ COURSE.push({
       goalsAr: 'ستحسب السعة وتوصيل المكثفات والطاقة المخزنة.',
       why: { en: 'Camera flashes and defibrillators store energy in capacitors.', ar: 'فلاش الكاميرا وجهاز إنعاش القلب يخزنان الطاقة في مكثفات.' },
       explain: [
-        { en: 'Q ∝ V → Q = CV (8.6). Capacitance C (farad, F = C/V): "the amount of electrical charge accumulated on the capacitor plate when a unit difference of voltage is applied".', ar: 'السعة = الشحنة لكل وحدة جهد.' },
-        { en: 'Parallel plates: C = {{ε₀A // d}} (8.7), ε₀ = 8.85×10⁻¹² C²/N·m².', ar: 'سعة المكثف المستوي تزيد بالمساحة وتقل بالمسافة.' },
-        { en: 'Series: same Q, V adds → {{1 // C_eq}} = Σ{{1 // Cᵢ}} (8.8). Parallel: same V, Q adds → C_eq = ΣCᵢ (8.9). (Opposite to resistors!)', ar: 'التوالي: نفس الشحنة. التوازي: نفس الجهد. عكس المقاومات.' },
-        { en: 'Energy: U = {{Q² // 2C}} = ½CV² = ½QV (8.10).', ar: 'الطاقة المخزنة ½CV².' }
+        { en: 'Q ∝ V → Q = CV (8.6). Capacitance C (farad, F = C/V): "the amount of electrical charge accumulated on the capacitor plate when a unit difference of voltage is applied".', ar: 'المكثف (Capacitor) لوحان يخزنان الشحنة. كلما زاد الجهد بينهما زادت الشحنة المخزنة: Q = CV. والسعة C هي مقدار الشحنة التي يخزنها المكثف لكل فولت، ووحدتها الفاراد F = C/V.' },
+        { en: 'Parallel plates: C = {{ε₀A // d}} (8.7), ε₀ = 8.85×10⁻¹² C²/N·m².', ar: 'سعة المكثف ذي اللوحين المتوازيين C = {{ε₀A // d}}: تزيد بزيادة مساحة اللوحين A، وتقل بزيادة المسافة بينهما d. والثابت ε₀ = 8.85×10⁻¹² هو سماحية الفراغ.' },
+        { en: 'Series: same Q, V adds → {{1 // C_eq}} = Σ{{1 // Cᵢ}} (8.8). Parallel: same V, Q adds → C_eq = ΣCᵢ (8.9). (Opposite to resistors!)', ar: 'التوصيل على التوالي: كل المكثفات عليها الشحنة نفسها، ونجمع مقلوبات السعات {{1 // C_eq}} = {{1 // C₁}} + {{1 // C₂}}، فتكون السعة المكافئة أصغر من أصغر مكثف. وعلى التوازي: كلها على الجهد نفسه، ونجمع السعات مباشرة. وهذا عكس قواعد المقاومات، فانتبه.' },
+        { en: 'Energy: U = {{Q² // 2C}} = ½CV² = ½QV (8.10).', ar: 'الطاقة المخزنة في المكثف لها ثلاث صيغ متكافئة: U = ½CV² = {{Q² // 2C}} = ½QV. اختر الصيغة التي معطياتها موجودة في المسألة.' }
       ],
       terms: [['Capacitance', 'السعة', 'C = Q/V'], ['Farad', 'الفاراد', 'C/V'], ['Dielectric', 'العازل', 'Insulator between plates'], ['Series / parallel', 'توالي / توازي', 'Connection types']],
       formulas: [
@@ -232,9 +232,9 @@ COURSE.push({
       goalsAr: 'ستحسب شدة التيار وكثافته وسرعة الانجراف.',
       why: { en: 'Choosing wire thickness for a home appliance depends on current density.', ar: 'اختيار سمك سلك الجهاز يعتمد على كثافة التيار.' },
       explain: [
-        { en: 'S09U: "The electric current is defined as the rate of flow of electric charge through the conductor. The direction of the current is opposite the direction of flow of electrons." I = {{dq // dt}}; 1 A = 1 C/s (9.1).', ar: 'التيار معدل تدفق الشحنة، واتجاهه عكس حركة الإلكترونات.' },
-        { en: '⚠ The older S09 says "rate of flow of negative charges"; use S09U (gap G‑13).', ar: 'تنبيه: اعتمد تعريف الملف المحدَّث.' },
-        { en: 'Microscopic: Δq = nevAΔt → I = nevA (9.2); J = {{I // A}} = nev (9.3) in A/m²; n = {{ρN_A // A_mass}} for one free electron per atom.', ar: 'الصيغة المجهرية للتيار وكثافته.' }
+        { en: 'S09U: "The electric current is defined as the rate of flow of electric charge through the conductor. The direction of the current is opposite the direction of flow of electrons." I = {{dq // dt}}; 1 A = 1 C/s (9.1).', ar: 'التيار الكهربائي (Electric current) هو كمية الشحنة التي تمر في مقطع السلك كل ثانية: I = {{Δq // Δt}}، ووحدته الأمبير A = C/s. واتجاهه المتفق عليه عكس اتجاه حركة الإلكترونات (ملف S09U).' },
+        { en: '⚠ The older S09 says "rate of flow of negative charges"; use S09U (gap G‑13).', ar: 'تنبيه: الملف القديم S09 يعرّف التيار بأنه «معدل تدفق الشحنات السالبة»، والتعريف المعتمد هو الملف المحدَّث S09U: معدل تدفق الشحنة الكهربائية، واتجاهه عكس اتجاه الإلكترونات (G‑13).' },
+        { en: 'Microscopic: Δq = nevAΔt → I = nevA (9.2); J = {{I // A}} = nev (9.3) in A/m²; n = {{ρN_A // A_mass}} for one free electron per atom.', ar: 'داخل السلك يعتمد التيار على عدد الإلكترونات الحرة في كل متر مكعب n، وشحنة الإلكترون e، وسرعة انجرافها v، ومساحة المقطع A: I = nevA. وكثافة التيار هي التيار لكل متر مربع من المقطع: J = {{I // A}} = nev.' }
       ],
       terms: [['Current', 'التيار', 'Ampere'], ['Current density', 'كثافة التيار', 'A/m²'], ['Drift speed', 'سرعة الانجراف', 'v of carriers'], ['Charge carriers', 'حاملات الشحنة', 'Free electrons']],
       formulas: [{ f: 'I = {{dq // dt}} = n e v A', name: '(9.1–9.2)', sym: [['I', 'current', 'A', 'التيار'], ['q', 'charge', 'C', 'الشحنة'], ['t', 'time', 's', 'الزمن'], ['n', 'free electrons per m³', 'm⁻³', 'عدد الإلكترونات الحرة في المتر المكعب'], ['e', 'electron charge 1.6×10⁻¹⁹', 'C', 'شحنة الإلكترون'], ['v', 'drift speed', 'm/s', 'سرعة الانجراف'], ['A', 'cross‑section area', 'm²', 'مساحة المقطع']], cond: 'Average current: I = {{Δq // Δt}}.' }, { f: 'J = {{I // A}} = n e v', name: '(9.3)', sym: [['J', 'current density', 'A/m²', 'كثافة التيار'], ['I', 'current', 'A', 'التيار'], ['A', 'cross‑section area', 'm²', 'مساحة المقطع']], cond: '—' }],
@@ -255,9 +255,9 @@ COURSE.push({
       goalsAr: 'ستطبق قانون أوم وتحسب المقاومة من أبعاد السلك.',
       why: { en: 'Every circuit calculation starts from V = RI.', ar: 'كل حسابات الدوائر تبدأ من V = RI.' },
       explain: [
-        { en: 'Ohm\'s law: "the voltage difference between the two ends of a conductor is proportional to the intensity of the electrical current passing through it, when its temperature is constant": V = RI (9.5). 1 Ω = 1 V/A.', ar: 'قانون أوم عند ثبوت درجة الحرارة.' },
-        { en: 'Microscopic form J = σE. Resistivity ρ = {{1 // σ}} (Ω·m).', ar: 'المقاومية مقلوب الموصلية.' },
-        { en: 'R = {{ρℓ // A}} (9.4): ∝ length, ∝ {{1 // area}}. Doubling both length and radius halves R (Ex 9.4).', ar: 'المقاومة تزيد بالطول وتقل بالمساحة.' }
+        { en: 'Ohm\'s law: "the voltage difference between the two ends of a conductor is proportional to the intensity of the electrical current passing through it, when its temperature is constant": V = RI (9.5). 1 Ω = 1 V/A.', ar: 'قانون أوم: إذا بقيت درجة حرارة الموصل ثابتة، فإن فرق الجهد بين طرفيه يتناسب طرديًا مع التيار المار فيه: V = RI. والمقاومة R هي ثابت التناسب، أي مقدار ممانعة الموصل لمرور التيار، ووحدتها الأوم Ω = V/A.' },
+        { en: 'Microscopic form J = σE. Resistivity ρ = {{1 // σ}} (Ω·m).', ar: 'المقاومية ρ (Resistivity) خاصية للمادة نفسها لا لشكل السلك، فالنحاس مقاوميته صغيرة والنيكروم مقاوميته كبيرة. والموصلية σ هي مقلوبها: ρ = {{1 // σ}}. والصيغة المجهرية لقانون أوم J = σE.' },
+        { en: 'R = {{ρℓ // A}} (9.4): ∝ length, ∝ {{1 // area}}. Doubling both length and radius halves R (Ex 9.4).', ar: 'مقاومة السلك R = {{ρℓ // A}}: تزيد كلما طال السلك، لأن الإلكترونات تقطع طريقًا أطول، وتقل كلما زادت مساحة مقطعه، لأن الطريق أعرض. فإذا ضاعفنا الطول ونصف القطر معًا تصبح المقاومة النصف، لأن المساحة تصبح أربعة أضعاف (مثال 9.4).' }
       ],
       terms: [['Resistance', 'المقاومة', 'Ω'], ['Resistivity ρ', 'المقاومة النوعية', 'Ω·m'], ['Conductivity σ', 'الموصلية', '1/(Ω·m)'], ['Ohmic', 'أومي', 'Obeys V ∝ I']],
       formulas: [{ f: 'V = R I', name: '(9.5)', sym: [['V', 'voltage', 'V', 'فرق الجهد'], ['R', 'resistance', 'Ω', 'المقاومة'], ['I', 'current', 'A', 'التيار']], cond: 'Constant temperature.' }, { f: 'R = {{ρ ℓ // A}} ,  ρ = {{1 // σ}}', name: '(9.4)', sym: [['R', 'resistance', 'Ω', 'المقاومة'], ['ρ', 'resistivity', 'Ω·m', 'المقاومية'], ['ℓ', 'length', 'm', 'الطول'], ['A', 'cross‑section area = πr²', 'm²', 'مساحة المقطع'], ['σ', 'conductivity', '(Ω·m)⁻¹', 'الموصلية']], cond: 'A uses the radius: r = d/2.' }],
@@ -278,8 +278,8 @@ COURSE.push({
       goalsAr: 'ستحسب القدرة الكهربائية بالصيغ الثلاث.',
       why: { en: 'Electricity bills charge for energy = power × time.', ar: 'فاتورة الكهرباء تحسب الطاقة = القدرة × الزمن.' },
       explain: [
-        { en: 'Power: energy per unit time to move charges: P = {{W // Δt}} = {{QV // Δt}} = VI (9.6).', ar: 'القدرة الكهربائية = VI.' },
-        { en: 'With Ohm\'s law: P = RI² = {{V² // R}}. Choose the form that uses the known quantities.', ar: 'اختر الصيغة حسب المعطيات.' }
+        { en: 'Power: energy per unit time to move charges: P = {{W // Δt}} = {{QV // Δt}} = VI (9.6).', ar: 'القدرة الكهربائية (Electric power) هي الطاقة التي يستهلكها الجهاز كل ثانية: P = VI، أي الجهد × التيار، ووحدتها الواط W. فغلاية قدرتها 2000 W تستهلك 2000 J كل ثانية.' },
+        { en: 'With Ohm\'s law: P = RI² = {{V² // R}}. Choose the form that uses the known quantities.', ar: 'باستخدام قانون أوم نحصل على صيغتين أخريين للقدرة: P = RI² إذا عرفت المقاومة والتيار، و P = {{V² // R}} إذا عرفت الجهد والمقاومة. الصيغ الثلاث تعطي الجواب نفسه، فاختر التي معطياتها عندك.' }
       ],
       terms: [['Electric power', 'القدرة الكهربائية', 'Watt'], ['Kilowatt‑hour', 'كيلوواط ساعة', '3.6×10⁶ J (Appendix)']],
       formulas: [{ f: 'P = V I = R I² = {{V² // R}}', name: '(9.6)', sym: [['P', 'power', 'W', 'القدرة'], ['V', 'voltage', 'V', 'الجهد'], ['I', 'current', 'A', 'التيار'], ['R', 'resistance', 'Ω', 'المقاومة']], cond: 'Use the V and I of the same device.' }],
@@ -297,9 +297,9 @@ COURSE.push({
       goalsAr: 'ستحسب المقاومة المكافئة لدوائر التوالي والتوازي والمختلطة.',
       why: { en: 'House outlets are in parallel so each device gets the full voltage.', ar: 'مقابس المنزل على التوازي ليحصل كل جهاز على الجهد كاملًا.' },
       explain: [
-        { en: 'Series: same current; ΔV = IR₁ + IR₂ → R_eq = R₁ + R₂ + … (9.7).', ar: 'التوالي: نفس التيار، والمقاومات تُجمع.' },
-        { en: 'Parallel: same voltage; I = I₁ + I₂ → {{1 // R_eq}} = {{1 // R₁}} + {{1 // R₂}} + … (9.8).', ar: 'التوازي: نفس الجهد، ونجمع المقلوبات.' },
-        { en: 'Mixed: simplify step by step from the innermost group (Ex 9.9).', ar: 'المختلطة: بسّط خطوة خطوة.' }
+        { en: 'Series: same current; ΔV = IR₁ + IR₂ → R_eq = R₁ + R₂ + … (9.7).', ar: 'التوصيل على التوالي: المقاومات في مسار واحد، فيمر فيها التيار نفسه، ويتوزع الجهد عليها. والمقاومة المكافئة مجموعها: R_eq = R₁ + R₂ + …، فتكون أكبر من أي مقاومة منها.' },
+        { en: 'Parallel: same voltage; I = I₁ + I₂ → {{1 // R_eq}} = {{1 // R₁}} + {{1 // R₂}} + … (9.8).', ar: 'التوصيل على التوازي: كل مقاومة في فرع مستقل، فيكون عليها الجهد نفسه، ويتوزع التيار على الفروع. ونجمع المقلوبات: {{1 // R_eq}} = {{1 // R₁}} + {{1 // R₂}} + …، فتكون المقاومة المكافئة أصغر من أصغر مقاومة. ولهذا تُوصَّل أجهزة المنزل على التوازي.' },
+        { en: 'Mixed: simplify step by step from the innermost group (Ex 9.9).', ar: 'الدائرة المختلطة: ابدأ بأصغر مجموعة واضحة، توالي أو توازي، واستبدلها بمقاومة واحدة. ثم أعد الرسم وكرر حتى تبقى مقاومة واحدة (مثال 9.9).' }
       ],
       terms: [['Series', 'توالي', 'One path'], ['Parallel', 'توازي', 'Several branches'], ['Equivalent resistance', 'المقاومة المكافئة', 'R_eq']],
       formulas: [{ f: 'Series: R_eq = R₁ + R₂ + …   ·   Parallel: {{1 // R_eq}} = {{1 // R₁}} + {{1 // R₂}} + …', name: '(9.7–9.8)', sym: [['R_eq', 'equivalent resistance', 'Ω', 'المقاومة المكافئة'], ['R₁, R₂', 'each resistor', 'Ω', 'كل مقاومة']], cond: 'Series: same I in each. Parallel: same V on each.' }],
@@ -326,10 +326,10 @@ COURSE.push({
       goalsAr: 'ستتعرف تاريخ طبيعة الضوء وقانوني الانعكاس.',
       why: { en: 'Mirrors in cars, periscopes and road signs (retro‑reflection) use reflection.', ar: 'المرايا وإشارات الطريق العاكسة تستخدم الانعكاس.' },
       explain: [
-        { en: 'Newton: particles; Huygens (1678): waves; Young (1801): interference; Hertz (1887): EM waves; Planck (1900) & Einstein (1905): photons → light has a dual nature.', ar: 'الضوء له طبيعة مزدوجة: موجية وجسيمية.' },
-        { en: 'Laws of reflection: (1) incident ray, reflected ray and normal lie in one plane; (2) θ₁ = θ₂ (10.1), angles measured from the normal.', ar: 'زاوية السقوط = زاوية الانعكاس، وتُقاس من العمود المقام.' },
-        { en: 'Regular reflection (smooth mirror) vs diffuse reflection (rough surface).', ar: 'الانعكاس المنتظم والانعكاس المنتشر.' },
-        { en: 'Two mirrors at angle Φ: total deviation = 360° − 2Φ; at 90° the ray returns (retro‑reflection) (BK p.164–165).', ar: 'مرآتان بزاوية Φ: الانحراف 360 − 2Φ.' }
+        { en: 'Newton: particles; Huygens (1678): waves; Young (1801): interference; Hertz (1887): EM waves; Planck (1900) & Einstein (1905): photons → light has a dual nature.', ar: 'اختلف العلماء في طبيعة الضوء: نيوتن قال إنه جسيمات، وهويغنز (1678) قال إنه موجات، ثم أثبت يونغ (1801) التداخل، وهيرتز (1887) الموجات الكهرومغناطيسية، ثم بيّن بلانك (1900) وأينشتاين (1905) أنه فوتونات. والنتيجة أن للضوء طبيعة مزدوجة: يتصرف كموجة أحيانًا وكجسيم أحيانًا.' },
+        { en: 'Laws of reflection: (1) incident ray, reflected ray and normal lie in one plane; (2) θ₁ = θ₂ (10.1), angles measured from the normal.', ar: 'قانونا الانعكاس: الشعاع الساقط والشعاع المنعكس والعمود المقام على السطح تقع كلها في مستوى واحد، وزاوية السقوط تساوي زاوية الانعكاس θ₁ = θ₂. والزاويتان تُقاسان دائمًا من العمود المقام، لا من سطح المرآة.' },
+        { en: 'Regular reflection (smooth mirror) vs diffuse reflection (rough surface).', ar: 'الانعكاس المنتظم يحدث على سطح أملس كالمرآة، فتنعكس الأشعة المتوازية متوازية وترى صورتك. والانعكاس المنتشر يحدث على سطح خشن كالورق، فتتبعثر الأشعة في كل اتجاه، ولهذا ترى الورقة من أي مكان دون أن ترى صورتك فيها.' },
+        { en: 'Two mirrors at angle Φ: total deviation = 360° − 2Φ; at 90° the ray returns (retro‑reflection) (BK p.164–165).', ar: 'إذا انعكس الشعاع على مرآتين بينهما زاوية Φ يكون انحرافه الكلي 360° − 2Φ. وعندما تكون الزاوية 90° يرجع الشعاع في عكس اتجاهه تمامًا، وهذه فكرة العاكسات على الطرق (BK p.164–165).' }
       ],
       terms: [['Normal', 'العمود المقام', 'Line ⟂ to surface'], ['Angle of incidence', 'زاوية السقوط', 'θ₁'], ['Diffuse reflection', 'الانعكاس المنتشر', 'From rough surfaces'], ['Photon', 'الفوتون', 'Light quantum']],
       formulas: [{ f: 'θ₁ = θ₂', name: 'Law of reflection (10.1)', sym: [['θ₁', 'angle of incidence, from the normal', '°', 'زاوية السقوط مع العمود'], ['θ₂', 'angle of reflection, from the normal', '°', 'زاوية الانعكاس مع العمود']], cond: '—' }],
@@ -347,10 +347,10 @@ COURSE.push({
       goalsAr: 'ستطبق قانون سنل وتحسب سرعة الضوء وطوله الموجي في الوسط.',
       why: { en: 'Glasses, cameras and the apparent depth of pools come from refraction.', ar: 'النظارات والكاميرات وظاهرة العمق الظاهري سببها الانكسار.' },
       explain: [
-        { en: 'Refraction laws: incident, reflected, refracted rays and the normal lie in one plane; {{sin θ₁ // sin θ₂}} = {{v₁ // v₂}} (10.2).', ar: 'نسبة الجيبين = نسبة السرعتين.' },
-        { en: 'Refractive index n = {{c // v}} (> 1). Snell: n₁ sin θ₁ = n₂ sin θ₂ (10.3). Vacuum n = 1.', ar: 'معامل الانكسار وقانون سنل.' },
-        { en: 'Frequency does not change between media; therefore n = {{λ // λₙ}} and n₁λ₁ = n₂λ₂.', ar: 'التردد لا يتغير، فيتغير الطول الموجي.' },
-        { en: 'Into a denser medium the ray bends toward the normal; the path is reversible (Fig 10.6).', ar: 'عند الدخول لوسط أكبر معاملًا ينكسر مقتربًا من العمود.' }
+        { en: 'Refraction laws: incident, reflected, refracted rays and the normal lie in one plane; {{sin θ₁ // sin θ₂}} = {{v₁ // v₂}} (10.2).', ar: 'الانكسار (Refraction) هو انحراف الضوء عندما ينتقل من وسط إلى آخر، لأن سرعته تتغير. والشعاع الساقط والمنكسر والعمود في مستوى واحد، ونسبة جيبي الزاويتين تساوي نسبة السرعتين: {{sin θ₁ // sin θ₂}} = {{v₁ // v₂}}.' },
+        { en: 'Refractive index n = {{c // v}} (> 1). Snell: n₁ sin θ₁ = n₂ sin θ₂ (10.3). Vacuum n = 1.', ar: 'معامل الانكسار n = {{c // v}} يخبرك كم مرة تقل سرعة الضوء في الوسط مقارنة بالفراغ، لذلك هو دائمًا أكبر من 1، وفي الفراغ يساوي 1. وقانون سنل يربط الوسطين: n₁ sin θ₁ = n₂ sin θ₂.' },
+        { en: 'Frequency does not change between media; therefore n = {{λ // λₙ}} and n₁λ₁ = n₂λ₂.', ar: 'عند انتقال الضوء بين وسطين لا يتغير تردده لأن المصدر نفسه، لكن سرعته تتغير فيتغير طوله الموجي: n = {{λ // λₙ}}، أي أن الطول الموجي داخل الوسط أقصر منه في الفراغ.' },
+        { en: 'Into a denser medium the ray bends toward the normal; the path is reversible (Fig 10.6).', ar: 'إذا دخل الضوء وسطًا معامل انكساره أكبر، كأن ينتقل من الهواء إلى الماء، يبطئ وينكسر مقتربًا من العمود. وإذا خرج إلى وسط معامله أصغر ينكسر مبتعدًا عنه. ومسار الشعاع قابل للانعكاس: يمكن أن يسلك الطريق نفسه بالعكس (شكل 10.6).' }
       ],
       terms: [['Refraction', 'الانكسار', 'Change of direction at a boundary'], ['Refractive index', 'معامل الانكسار', 'n = {{c // v}}'], ['Snell\'s law', 'قانون سنل', 'n₁ sin θ₁ = n₂ sin θ₂']],
       formulas: [{ f: 'n = {{c // v}} = {{λ // λₙ}}', name: 'Refractive index', sym: [['n', 'refractive index', '—', 'معامل الانكسار'], ['c', '3×10⁸ m/s', 'm/s', 'سرعة الضوء في الفراغ'], ['v', 'speed in the medium', 'm/s', 'سرعة الضوء في الوسط'], ['λ, λₙ', 'wavelength in vacuum / in the medium', 'm', 'الطول الموجي في الفراغ وفي الوسط']], cond: 'f constant.' }, { f: 'n₁ sin θ₁ = n₂ sin θ₂', name: 'Snell (10.3)', sym: [['n₁, n₂', 'refractive indices', '—', 'معاملا الانكسار'], ['θ₁, θ₂', 'angles from the normal', '°', 'الزاويتان مع العمود']], cond: '—' }],
@@ -376,9 +376,9 @@ COURSE.push({
       goalsAr: 'ستفسر تحلل الضوء وتحسب الزاوية الحرجة.',
       why: { en: 'Fibre‑optic internet relies on total internal reflection.', ar: 'الإنترنت بالألياف البصرية يعتمد على الانعكاس الكلي الداخلي.' },
       explain: [
-        { en: 'Dispersion: n depends on λ; red has a smaller n than violet, so each colour refracts at a different angle (prism, rainbow).', ar: 'التشتت: معامل الانكسار يقل بزيادة الطول الموجي.' },
-        { en: 'From larger n to smaller n the ray bends away from the normal. At θ₂ = 90° the incident angle is the critical angle: sin θ_c = {{n₂ // n₁}} (10.4).', ar: 'الزاوية الحرجة عند انكسار الشعاع موازيًا للسطح.' },
-        { en: 'If θ₁ > θ_c, all light is reflected back: total internal reflection (only when n₁ > n₂).', ar: 'إذا زادت زاوية السقوط عن الحرجة يحدث انعكاس كلي.' }
+        { en: 'Dispersion: n depends on λ; red has a smaller n than violet, so each colour refracts at a different angle (prism, rainbow).', ar: 'التشتت (Dispersion): معامل الانكسار يختلف قليلًا باختلاف لون الضوء، فالأحمر طوله الموجي أطول ومعامل انكساره أصغر، فينكسر أقل من البنفسجي. لذلك يفصل المنشور الضوء الأبيض إلى ألوان، وبه يتكوّن قوس قزح.' },
+        { en: 'From larger n to smaller n the ray bends away from the normal. At θ₂ = 90° the incident angle is the critical angle: sin θ_c = {{n₂ // n₁}} (10.4).', ar: 'عندما يخرج الضوء من وسط معامله أكبر إلى وسط معامله أصغر، كأن ينتقل من الزجاج إلى الهواء، ينكسر مبتعدًا عن العمود. وكلما زادت زاوية السقوط اقترب الشعاع المنكسر من السطح، حتى يصير موازيًا له عند الزاوية الحرجة: sin θ_c = {{n₂ // n₁}}.' },
+        { en: 'If θ₁ > θ_c, all light is reflected back: total internal reflection (only when n₁ > n₂).', ar: 'إذا زادت زاوية السقوط عن الزاوية الحرجة لا يخرج أي ضوء، وينعكس كله داخل الوسط. وهذا الانعكاس الكلي الداخلي يحدث فقط عند الانتقال من الوسط الأكثف إلى الأقل كثافة، وعليه تعمل الألياف البصرية.' }
       ],
       terms: [['Dispersion', 'التشتت (التحلل)', 'n depends on λ'], ['Critical angle', 'الزاوية الحرجة', 'sin θ_c = {{n₂ // n₁}}'], ['Total internal reflection', 'الانعكاس الكلي الداخلي', 'θ₁ > θ_c']],
       formulas: [{ f: 'sin θ_c = {{n₂ // n₁}}', name: '(10.4)', sym: [['θ_c', 'critical angle', '°', 'الزاوية الحرجة'], ['n₁', 'denser medium', '—', 'الوسط الأكثف'], ['n₂', 'less dense medium', '—', 'الوسط الأقل كثافة']], cond: 'n₁ > n₂ only.' }],

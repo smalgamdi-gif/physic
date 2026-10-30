@@ -31,7 +31,15 @@
       while (run.length && run[run.length - 1].s && /\)$/.test(run[run.length - 1].s) && cnt(')') > cnt('(')) { const l = run[run.length - 1]; tail = ')' + tail; run[run.length - 1] = { t: 'L', s: l.s.slice(0, -1) }; if (!run[run.length - 1].s) run.pop(); }
       return tail;
     };
-    const close = () => { let tail = ''; if (run) tail = balance(); if (run && !run.length) run = null; if (run) { const b = document.createElement('bdi'); b.dir = 'ltr'; run.forEach(a => b.appendChild(node(a))); out.appendChild(b); run = null; } if (tail) out.appendChild(document.createTextNode(tail)); gap.forEach(a => out.appendChild(node(a))); gap = []; };
+    // an operator next to an Arabic word belongs to the Arabic sentence: "الإجهاد = F/A" keeps "=" between the word and the formula
+    const OPS = /^[=+−×÷≈∝→⟹<>≤≥·-]+$/;
+    const trimOps = () => {
+      let tail = '';
+      while (run.length && run[0].s && OPS.test(run[0].s)) { out.appendChild(document.createTextNode(run.shift().s)); while (run.length && run[0].t === 'S') out.appendChild(document.createTextNode(run.shift().s)); }
+      while (run.length && run[run.length - 1].s && OPS.test(run[run.length - 1].s)) { tail = run.pop().s + tail; while (run.length && run[run.length - 1].t === 'S') tail = run.pop().s + tail; }
+      return tail;
+    };
+    const close = () => { let tail = ''; if (run) { tail = balance(); const t2 = run.length ? trimOps() : ''; tail = t2 + tail; } if (run && !run.length) run = null; if (run) { const b = document.createElement('bdi'); b.dir = 'ltr'; run.forEach(a => b.appendChild(node(a))); out.appendChild(b); run = null; } if (tail) out.appendChild(document.createTextNode(tail)); gap.forEach(a => out.appendChild(node(a))); gap = []; };
     atoms.forEach(a => {
       if (a.t === 'L') { if (run) { gap.forEach(g => run.push(g)); gap = []; run.push(a); } else { gap.forEach(g => out.appendChild(node(g))); gap = []; run = [a]; } }
       else if (a.t === 'S') { if (run) gap.push(a); else out.appendChild(node(a)); }

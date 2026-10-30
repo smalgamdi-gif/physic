@@ -12,10 +12,10 @@ COURSE.push({
       goalsAr: 'ستتعلم الفرق بين الكميات الأساسية والمشتقة، ووحدات النظام الدولي السبع، وبادئات الوحدات.',
       why: { en: 'Every number in physics is meaningless without a unit: "300" could be metres or kilometres (BK p.13: Bisha–Abha example).', ar: 'الرقم بلا وحدة لا معنى له؛ 300 قد تكون مترًا أو كيلومترًا، لذلك نبدأ بالوحدات قبل أي قانون.' },
       explain: [
-        { en: '<b>Fundamental quantities</b> "are not expressed in terms of other physical quantities": length, mass, time, electric current, temperature, luminous intensity, amount of substance.', ar: 'الكميات الأساسية لا تُعرَّف بدلالة كميات أخرى، وهي سبع.' },
-        { en: '<b>Derived quantities</b> "are defined in terms of the fundamental physical quantities": volume, velocity, density, acceleration, energy, power…', ar: 'الكميات المشتقة تُبنى من الأساسية، مثل السرعة = طول ÷ زمن.' },
-        { en: 'SI base units: metre (m), kilogram (kg), second (s), ampere (A), kelvin (K), candela (cd), mole (mol).', ar: 'وحدات النظام الدولي: المتر، الكيلوغرام، الثانية، الأمبير، الكلفن، الشمعة، المول.' },
-        { en: 'University level: each base unit has a precise definition, e.g. the metre is the distance light travels in vacuum in {{1 // 299 792 458}} s; the second is 9 192 631 770 periods of Cs‑133 radiation (BK p.14).', ar: 'في المستوى الجامعي: لكل وحدة تعريف دقيق، فالمتر مرتبط بسرعة الضوء والثانية بذرة السيزيوم.' }
+        { en: '<b>Fundamental quantities</b> "are not expressed in terms of other physical quantities": length, mass, time, electric current, temperature, luminous intensity, amount of substance.', ar: 'الكميات الأساسية (Fundamental quantities) هي «حجر البناء» في الفيزياء: لا نعرّفها بكميات أخرى، بل نقيسها مباشرة. وعددها سبع: الطول، والكتلة، والزمن، والتيار الكهربائي، ودرجة الحرارة، وشدة الإضاءة، وكمية المادة.' },
+        { en: '<b>Derived quantities</b> "are defined in terms of the fundamental physical quantities": volume, velocity, density, acceleration, energy, power…', ar: 'الكميات المشتقة (Derived quantities) نحصل عليها بتركيب الكميات الأساسية بالضرب أو القسمة. مثلًا: السرعة = طول ÷ زمن، والكثافة = كتلة ÷ حجم، والحجم = طول × طول × طول. فكل كمية في المقرر غير السبع الأساسية هي كمية مشتقة.' },
+        { en: 'SI base units: metre (m), kilogram (kg), second (s), ampere (A), kelvin (K), candela (cd), mole (mol).', ar: 'لكل كمية أساسية وحدة في النظام الدولي (SI): الطول بالمتر m، والكتلة بالكيلوغرام kg، والزمن بالثانية s، والتيار بالأمبير A، ودرجة الحرارة بالكلفن K، وشدة الإضاءة بالشمعة cd، وكمية المادة بالمول mol. انتبه: وحدة الكتلة الأساسية هي الكيلوغرام وليست الغرام.' },
+        { en: 'University level: each base unit has a precise definition, e.g. the metre is the distance light travels in vacuum in {{1 // 299 792 458}} s; the second is 9 192 631 770 periods of Cs‑133 radiation (BK p.14).', ar: 'في المستوى الجامعي تُعرَّف كل وحدة تعريفًا دقيقًا لا يتغير: فالمتر هو المسافة التي يقطعها الضوء في الفراغ خلال {{1 // 299 792 458}} من الثانية، والثانية مرتبطة بعدد محدد من اهتزازات ذرة السيزيوم. الفكرة المهمة أن الوحدات مبنية على ثوابت في الطبيعة، فهي واحدة في كل مكان.' }
       ],
       terms: [['Fundamental quantity', 'كمية أساسية', 'Not defined from other quantities'], ['Derived quantity', 'كمية مشتقة', 'Built from fundamental quantities'], ['Prefix', 'بادئة', 'Power of ten written before a unit (k, m, μ…)'], ['Amount of substance', 'كمية المادة', 'Measured in mole (mol)'], ['Luminous intensity', 'شدة الإضاءة', 'Measured in candela (cd)']],
       formulas: [{ f: 'n = 10⁻⁹, μ = 10⁻⁶, m = 10⁻³, c = 10⁻², d = 10⁻¹, da = 10¹, k = 10³, M = 10⁶, G = 10⁹', name: 'SI prefixes (Table 1.1)', sym: [['n', 'nano', '10⁻⁹', 'نانو'], ['μ', 'micro', '10⁻⁶', 'مايكرو'], ['m', 'milli', '10⁻³', 'ملّي'], ['k', 'kilo', '10³', 'كيلو'], ['M', 'mega', '10⁶', 'ميغا'], ['G', 'giga', '10⁹', 'جيجا']], cond: 'm (milli) ≠ M (mega): case matters.' }],
@@ -40,9 +40,9 @@ COURSE.push({
       goalsAr: 'ستتعلم كتابة معادلة التحويل وتحويل الوحدات المركبة مثل km/h إلى m/s.',
       why: { en: 'Laws such as F = ma only give correct numbers when every quantity is in SI units.', ar: 'القوانين تعطي نتيجة صحيحة فقط إذا كانت كل الكميات بوحدات SI.' },
       explain: [
-        { en: 'Start from an equality such as 1 min = 60 s. Multiply both sides by the same number to convert (3 min = 180 s).', ar: 'ابدأ بمساواة مثل 1 min = 60 s ثم اضرب الطرفين بالعدد نفسه.' },
-        { en: 'For compound units, replace each unit separately: km → 10³ m and h → 3600 s.', ar: 'في الوحدات المركبة استبدل كل وحدة على حدة.' },
-        { en: 'Powers apply to the prefix too: 1 cm³ = (10⁻² m)³ = 10⁻⁶ m³.', ar: 'الأس يُطبَّق على البادئة أيضًا: السنتيمتر المكعب = 10⁻⁶ m³.' }
+        { en: 'Start from an equality such as 1 min = 60 s. Multiply both sides by the same number to convert (3 min = 180 s).', ar: 'التحويل يبدأ دائمًا من مساواة صحيحة بين وحدتين، مثل 1 min = 60 s. ثم تضرب طرفيها في العدد نفسه: 3 min = 3 × 60 s = 180 s. وهكذا لا تحتاج أن تتذكر هل تضرب أو تقسم، لأن المساواة تقودك.' },
+        { en: 'For compound units, replace each unit separately: km → 10³ m and h → 3600 s.', ar: 'الوحدة المركبة مثل km/h فيها وحدتان، فتستبدل كل واحدة وحدها: الكيلومتر = 1000 m، والساعة = 3600 s. لذلك 1 km/h = {{1000 m // 3600 s}} = {{1 // 3.6}} m/s، أي أن التحويل من km/h إلى m/s يكون بالقسمة على 3.6.' },
+        { en: 'Powers apply to the prefix too: 1 cm³ = (10⁻² m)³ = 10⁻⁶ m³.', ar: 'إذا كانت الوحدة مربعة أو مكعبة فالأس يُطبَّق على معامل التحويل أيضًا. السنتيمتر = 10⁻² m، فالسنتيمتر المكعب = (10⁻² m)³ = 10⁻⁶ m³ وليس 10⁻² m³. وهذا من أكثر الأخطاء تكرارًا في المسائل.' }
       ],
       terms: [['Conversion factor', 'معامل التحويل', 'Number linking two units, e.g. 60 s/min'], ['Compound unit', 'وحدة مركبة', 'Unit made of several units, e.g. m/s']],
       formulas: [{ f: '1 km/h = {{10³ m // 3600 s}} = {{1 // 3.6}} m/s', name: 'Speed conversion', sym: [['km/h', 'kilometre per hour', '—', 'كيلومتر لكل ساعة'], ['m/s', 'metre per second (SI)', '—', 'متر لكل ثانية']], cond: 'Divide km/h by 3.6 to get m/s.' }, { f: '1 g/cm³ = {{10⁻³ kg // (10⁻²)³ m³}} = 10³ kg/m³', name: 'Density conversion', sym: [['ρ', 'density', 'kg/m³', 'الكثافة'], ['g/cm³', 'gram per cubic centimetre', '—', 'غرام لكل سنتيمتر مكعب']], cond: '—' }],
@@ -67,10 +67,10 @@ COURSE.push({
       goalsAr: 'ستتعلم كتابة أبعاد الكميات والتحقق من صحة القوانين واشتقاق علاقات بسيطة.',
       why: { en: 'Dimensional analysis is a free error‑check: if the two sides of your answer have different dimensions, it is wrong.', ar: 'تحليل الأبعاد فحص مجاني لأخطائك: إذا اختلفت أبعاد الطرفين فالجواب خاطئ.' },
       explain: [
-        { en: 'In classical mechanics everything is expressed with mass [M], length [L], time [T].', ar: 'في الميكانيكا الكلاسيكية نعبّر عن كل كمية بالكتلة والطول والزمن.' },
-        { en: 'The importance (S01): validation of physical laws, easily derive some physical laws, derive the units of physical constants.', ar: 'أهميته: التحقق من القوانين، واشتقاق بعضها، واستنتاج وحدات الثوابت.' },
-        { en: 'Table 1.2: [ρ]=ML⁻³, [v]=LT⁻¹, [a]=LT⁻², [F]=MLT⁻², [W]=ML²T⁻², [P]=ML²T⁻³.', ar: 'جدول الأبعاد في الكتاب صفحة 17.' },
-        { en: 'Limitation: numbers like 2π have no dimensions, so dimensional analysis cannot find them (BK p.19: "In practice, the constant C was equal to 2π").', ar: 'القيد: الثوابت العددية مثل 2π لا أبعاد لها فلا يمكن إيجادها بالأبعاد.' }
+        { en: 'In classical mechanics everything is expressed with mass [M], length [L], time [T].', ar: 'تحليل الأبعاد يعني أن نكتب كل كمية بدلالة ثلاث كميات فقط في الميكانيكا: الكتلة [M] والطول [L] والزمن [T]. مثلًا السرعة طول ÷ زمن، فبُعدها LT⁻¹.' },
+        { en: 'The importance (S01): validation of physical laws, easily derive some physical laws, derive the units of physical constants.', ar: 'فائدته ثلاثية (S01): نتحقق به من صحة القانون، ونستنتج به بعض القوانين البسيطة، ونعرف به وحدة أي ثابت فيزيائي. إذا خرجت أبعاد طرفي المعادلة مختلفة فالمعادلة خاطئة بالتأكيد.' },
+        { en: 'Table 1.2: [ρ]=ML⁻³, [v]=LT⁻¹, [a]=LT⁻², [F]=MLT⁻², [W]=ML²T⁻², [P]=ML²T⁻³.', ar: 'هذه أبعاد أهم الكميات (جدول 1.2 في الكتاب، صفحة 17): الكثافة ML⁻³، والسرعة LT⁻¹، والتسارع LT⁻²، والقوة MLT⁻²، والشغل ML²T⁻²، والقدرة ML²T⁻³. لاحظ أن كل واحدة تُبنى من التي قبلها: القوة = كتلة × تسارع، والشغل = قوة × مسافة، والقدرة = شغل ÷ زمن.' },
+        { en: 'Limitation: numbers like 2π have no dimensions, so dimensional analysis cannot find them (BK p.19: "In practice, the constant C was equal to 2π").', ar: 'حدود الطريقة: الأرقام المجردة مثل 2π و ½ ليس لها أبعاد، فتحليل الأبعاد لا يستطيع إيجادها. لذلك يعطينا شكل القانون ولا يعطينا الثابت العددي؛ ففي قانون البندول عرفنا أن T تتناسب مع √(L/g)، لكن العدد 2π جاء من التجربة (BK p.19).' }
       ],
       terms: [['Dimension', 'بُعد', 'Expression of a quantity in M, L, T'], ['Dimensionally homogeneous', 'متجانس بُعديًا', 'Both sides have equal dimensions'], ['Dimensionless', 'عديم الأبعاد', 'Pure number, e.g. strain, angle, 2π']],
       formulas: [{ f: '[F] = [m][a] = M·LT⁻² = MLT⁻²', name: 'Example of dimension algebra', sym: [['[ ]', 'dimension of', '—', 'بُعد الكمية'], ['M, L, T', 'mass, length, time', '—', 'الكتلة، الطول، الزمن']], cond: 'Add/subtract only terms with identical dimensions.' }],
@@ -101,9 +101,9 @@ COURSE.push({
       goalsAr: 'ستميّز بين الكمية القياسية والمتجهة وتتعرف خواص المتجهات.',
       why: { en: 'Displacement, velocity, force and fields are vectors; adding them like ordinary numbers gives wrong answers.', ar: 'الإزاحة والسرعة والقوة متجهات، وجمعها كأعداد عادية يعطي نتائج خاطئة.' },
       explain: [
-        { en: '<b>Scalar</b>: defined by magnitude only (distance, mass, time). <b>Vector</b>: magnitude and direction (displacement, velocity, acceleration, force).', ar: 'القياسية: مقدار فقط. المتجهة: مقدار واتجاه.' },
-        { en: 'BK p.25 example: going home→mosque (30 m east) and back: distance 60 m, but the displacement vectors are opposite.', ar: 'مثال المسجد: المسافة 60 م، لكن متجه الذهاب عكس متجه العودة.' },
-        { en: 'Properties: A = B (same magnitude and direction); A + B = B + A; (A + B) + C = A + (B + C); A + (−A) = 0; A − B = A + (−B); B = nA (n < 0 reverses direction).', ar: 'الخواص: التساوي، الإبدال، التجميع، المعكوس، الطرح، الضرب في عدد.' }
+        { en: '<b>Scalar</b>: defined by magnitude only (distance, mass, time). <b>Vector</b>: magnitude and direction (displacement, velocity, acceleration, force).', ar: 'الكمية القياسية (Scalar) يكفي لوصفها رقم ووحدة، مثل الكتلة 5 kg أو الزمن 10 s. أما الكمية المتجهة (Vector) فتحتاج رقمًا ووحدة واتجاهًا، مثل الإزاحة 30 m شرقًا أو القوة 20 N لأعلى. والسؤال الذي يفرّق بينهما: هل يتغير المعنى إذا تغير الاتجاه؟' },
+        { en: 'BK p.25 example: going home→mosque (30 m east) and back: distance 60 m, but the displacement vectors are opposite.', ar: 'مثال الكتاب (BK p.25): تمشي من البيت إلى المسجد 30 m شرقًا ثم ترجع. المسافة التي مشيتها 60 m، لكن متجه الذهاب نحو الشرق ومتجه العودة نحو الغرب، فهما متعاكسان ومجموعهما صفر، أي أنك رجعت إلى نقطة البداية.' },
+        { en: 'Properties: A = B (same magnitude and direction); A + B = B + A; (A + B) + C = A + (B + C); A + (−A) = 0; A − B = A + (−B); B = nA (n < 0 reverses direction).', ar: 'خواص المتجهات: يتساوى متجهان إذا تساويا في المقدار والاتجاه معًا. والجمع إبدالي (A + B = B + A) وتجميعي. ومعكوس المتجه −A له المقدار نفسه واتجاه معاكس، والطرح هو جمع المعكوس: A − B = A + (−B). وضرب المتجه في عدد سالب يعكس اتجاهه.' }
       ],
       terms: [['Scalar', 'كمية قياسية', 'Magnitude only'], ['Vector', 'متجه', 'Magnitude + direction'], ['Commutative', 'إبدالي', 'Order does not matter'], ['Associative', 'تجميعي', 'Grouping does not matter'], ['Inverse vector', 'المتجه المعكوس', 'Same magnitude, opposite direction']],
       formulas: [{ f: 'C = A − B = A + (−B)', name: 'Vector subtraction', sym: [['A, B', 'vectors', 'same unit', 'متجهان'], ['−B', 'inverse of B', 'same unit', 'معكوس المتجه B'], ['C', 'difference A − B', 'same unit', 'الفرق']], cond: '—' }],
@@ -127,9 +127,9 @@ COURSE.push({
       goalsAr: 'ستجمع متجهين متعامدين بفيثاغورس، وأي متجهين بقانوني جيب التمام والجيب.',
       why: { en: 'Two forces of 4 N each do not make 8 N unless they act in the same direction.', ar: 'قوتان كل منهما 4 نيوتن لا تعطيان 8 نيوتن إلا إذا كانتا في الاتجاه نفسه.' },
       explain: [
-        { en: 'Head‑to‑tail: draw B starting at the head of A; the resultant C goes from the tail of A to the head of B.', ar: 'ارسم ذيل المتجه الثاني عند رأس الأول؛ المحصلة من ذيل الأول إلى رأس الثاني.' },
-        { en: 'Right angle: C = √(A² + B²), θ = tan⁻¹( {{B // A}} ).', ar: 'إذا كانا متعامدين نستخدم فيثاغورس والظل.' },
-        { en: 'Any angle: C = √(A² + B² − 2AB cos θ) where θ is the angle <b>inside the triangle</b> (opposite C); direction by sine rule {{sin β // B}} = {{sin θ // C}}.', ar: 'لأي زاوية: قانون جيب التمام، حيث θ هي الزاوية داخل المثلث المقابلة للمحصلة.' }
+        { en: 'Head‑to‑tail: draw B starting at the head of A; the resultant C goes from the tail of A to the head of B.', ar: 'طريقة الرأس للذيل (Head‑to‑tail): ارسم المتجه الأول، ثم ابدأ رسم الثاني من رأس الأول. المحصلة هي السهم الذي يبدأ من ذيل الأول وينتهي عند رأس الثاني، أي أنها الطريق المختصر من البداية إلى النهاية.' },
+        { en: 'Right angle: C = √(A² + B²), θ = tan⁻¹( {{B // A}} ).', ar: 'إذا كان المتجهان متعامدين (بينهما 90°) فهما ضلعا مثلث قائم والمحصلة وتره. لذلك مقدارها C = √(A² + B²) من فيثاغورس، واتجاهها θ = tan⁻¹( {{B // A}} ) مقيسًا من المتجه A.' },
+        { en: 'Any angle: C = √(A² + B² − 2AB cos θ) where θ is the angle <b>inside the triangle</b> (opposite C); direction by sine rule {{sin β // B}} = {{sin θ // C}}.', ar: 'إذا كانت الزاوية بينهما غير قائمة نستخدم قانون جيب التمام: C = √(A² + B² − 2AB cos θ). المهم أن θ هنا هي الزاوية داخل المثلث المقابلة للمحصلة، وتساوي 180° ناقص الزاوية بين ذيلي المتجهين. ثم نجد الاتجاه بقانون الجيب.' }
       ],
       terms: [['Resultant', 'المحصلة', 'Single vector equal to the sum'], ['Head‑to‑tail', 'رأس لذيل', 'Graphical addition method'], ['Cosine rule', 'قانون جيب التمام', 'C² = A² + B² − 2AB cos θ']],
       formulas: [
@@ -156,9 +156,9 @@ COURSE.push({
       goalsAr: 'ستحلل المتجه إلى مركبتين وتكتبه بمتجهات الوحدة وتجمع بالمركبات.',
       why: { en: 'Components turn hard geometry into simple addition; every later chapter (forces, work, fields) uses them.', ar: 'المركبات تحول الهندسة الصعبة إلى جمع بسيط، وتُستخدم في كل الفصول التالية.' },
       explain: [
-        { en: 'A vector A at angle θ from +x: Aₓ = A cos θ, A_y = A sin θ, so A = A cos θ î + A sin θ ĵ.', ar: 'المركبة الأفقية = A cos θ والرأسية = A sin θ بشرط قياس θ من محور x الموجب.' },
-        { en: 'Unit vectors î, ĵ, k̂ point along x, y, z (right‑hand system).', ar: 'متجهات الوحدة طولها 1 وتشير لاتجاه المحاور.' },
-        { en: 'Sum: A + B = (Aₓ + Bₓ)î + (A_y + B_y)ĵ + (A_z + B_z)k̂; magnitude √(Rₓ² + R_y² + R_z²).', ar: 'نجمع المركبات المتناظرة ثم نحسب المقدار.' }
+        { en: 'A vector A at angle θ from +x: Aₓ = A cos θ, A_y = A sin θ, so A = A cos θ î + A sin θ ĵ.', ar: 'أي متجه مائل يمكن تفكيكه إلى جزأين متعامدين: جزء أفقي Aₓ = A cos θ وجزء رأسي A_y = A sin θ، بشرط أن تُقاس θ من محور x الموجب. تخيّل ظل المتجه على الأرض (الأفقي) وظله على الجدار (الرأسي).' },
+        { en: 'Unit vectors î, ĵ, k̂ point along x, y, z (right‑hand system).', ar: 'متجهات الوحدة î و ĵ و k̂ أسهم طول كل منها 1، وتشير في اتجاه المحاور x و y و z. فعندما نكتب 3î + 4ĵ نعني: 3 وحدات في اتجاه x و 4 وحدات في اتجاه y.' },
+        { en: 'Sum: A + B = (Aₓ + Bₓ)î + (A_y + B_y)ĵ + (A_z + B_z)k̂; magnitude √(Rₓ² + R_y² + R_z²).', ar: 'لجمع متجهات كثيرة: اجمع كل المركبات السينية معًا، وكل المركبات الصادية معًا، ولا تخلط بينهما. فتحصل على مركبتي المحصلة Rₓ و R_y، ثم مقدارها √(Rₓ² + R_y²). هذه أسهل طريقة وأدقها لأي عدد من المتجهات.' }
       ],
       terms: [['Component', 'مركبة', 'Projection on an axis'], ['Unit vector', 'متجه وحدة', 'Magnitude 1, shows direction'], ['Right‑hand system', 'نظام اليد اليمنى', 'Orientation of x, y, z']],
       formulas: [{ f: 'Aₓ = A cos θ ,  A_y = A sin θ', name: 'Components', sym: [['A', 'magnitude', '—', 'مقدار المتجه'], ['Aₓ, A_y', 'x‑ and y‑components', 'same as A', 'المركبتان السينية والصادية'], ['θ', 'angle from +x axis', '°', 'الزاوية من محور x الموجب']], cond: 'θ measured counter‑clockwise from +x.' }, { f: 'A + B = (Aₓ+Bₓ)î + (A_y+B_y)ĵ + (A_z+B_z)k̂', name: 'Component addition', sym: [['î ĵ k̂', 'unit vectors along x, y, z', '—', 'متجهات الوحدة'], ['Aₓ, A_y, A_z', 'components of A', 'same as A', 'مركبات المتجه']], cond: '—' }],
@@ -183,10 +183,10 @@ COURSE.push({
       goalsAr: 'ستحسب الضرب القياسي والاتجاهي وتجد الزاوية بين متجهين.',
       why: { en: 'Work is a dot product (W = F·Δr, Chapter 5); torque and magnetic force are cross products.', ar: 'الشغل ضرب قياسي (الفصل 5)، والعزم ضرب اتجاهي.' },
       explain: [
-        { en: '<b>Scalar product</b>: A·B = AB cos θ = AₓBₓ + A_yB_y + A_zB_z → a scalar; commutative. î·î = 1, î·ĵ = 0.', ar: 'الضرب القياسي ناتجه عدد، وهو إبدالي.' },
-        { en: 'Angle: cos θ = {{A·B // AB}}. If A·B = 0 the vectors are orthogonal.', ar: 'إذا كان الضرب القياسي صفرًا فالمتجهان متعامدان.' },
-        { en: '<b>Vector product</b>: A×B = AB sin θ n̂, perpendicular to both (right‑hand rule); A×B = −B×A. î×ĵ = k̂, ĵ×k̂ = î, k̂×î = ĵ, î×î = 0.', ar: 'الضرب الاتجاهي ناتجه متجه عمودي على الاثنين، وليس إبداليًا.' },
-        { en: 'Determinant form: A×B = î(A_yB_z − A_zB_y) − ĵ(AₓB_z − A_zBₓ) + k̂(AₓB_y − A_yBₓ).', ar: 'صيغة المحدد، انتبه لإشارة السالب أمام ĵ.' }
+        { en: '<b>Scalar product</b>: A·B = AB cos θ = AₓBₓ + A_yB_y + A_zB_z → a scalar; commutative. î·î = 1, î·ĵ = 0.', ar: 'الضرب القياسي (Dot product) يأخذ متجهين ويعطيك عددًا وليس متجهًا: A·B = AB cos θ، أو بالمركبات AₓBₓ + A_yB_y + A_zB_z. وترتيب الضرب لا يهم (A·B = B·A). ومنه î·î = 1 لأن الزاوية صفر، و î·ĵ = 0 لأنهما متعامدان.' },
+        { en: 'Angle: cos θ = {{A·B // AB}}. If A·B = 0 the vectors are orthogonal.', ar: 'من الضرب القياسي نجد الزاوية بين متجهين: cos θ = {{A·B // AB}}. فإذا كان الناتج صفرًا كان cos θ = 0 أي θ = 90°، فالمتجهان متعامدان. وهذه طريقة سريعة لاختبار التعامد.' },
+        { en: '<b>Vector product</b>: A×B = AB sin θ n̂, perpendicular to both (right‑hand rule); A×B = −B×A. î×ĵ = k̂, ĵ×k̂ = î, k̂×î = ĵ, î×î = 0.', ar: 'الضرب الاتجاهي (Cross product) يعطيك متجهًا جديدًا عموديًا على المتجهين معًا، مقداره AB sin θ واتجاهه بقاعدة اليد اليمنى. وهنا الترتيب مهم: A×B = −B×A. ومنه î×ĵ = k̂ و î×î = 0.' },
+        { en: 'Determinant form: A×B = î(A_yB_z − A_zB_y) − ĵ(AₓB_z − A_zBₓ) + k̂(AₓB_y − A_yBₓ).', ar: 'عندما يكون المتجهان بالمركبات نحسب الضرب الاتجاهي بالمحدد: نضع î ĵ k̂ في الصف الأول، ثم مركبات A، ثم مركبات B. انتبه للإشارة السالبة أمام حد ĵ؛ نسيانها هو الخطأ الشائع، وقد وقع فيه الكتاب نفسه في مثال 2.9 (G‑27).' }
       ],
       terms: [['Dot product', 'الضرب القياسي (النقطي)', 'Gives a scalar'], ['Cross product', 'الضرب الاتجاهي', 'Gives a vector'], ['Orthogonal', 'متعامد', 'θ = 90°'], ['Right‑hand rule', 'قاعدة اليد اليمنى', 'Direction of A×B']],
       formulas: [
@@ -221,9 +221,9 @@ COURSE.push({
       goalsAr: 'ستحسب الإزاحة (متجهة) والمسافة (قياسية) لمسار معطى.',
       why: { en: 'Velocity and acceleration are built on displacement, not distance.', ar: 'السرعة المتجهة والتسارع يُبنيان على الإزاحة وليس المسافة.' },
       explain: [
-        { en: 'Displacement is a vector that depends only on the starting and ending points: Δx = x₂ − x₁.', ar: 'الإزاحة تعتمد على نقطتي البداية والنهاية فقط.' },
-        { en: 'Distance is a scalar equal to the actual length of the path.', ar: 'المسافة هي الطول الفعلي للمسار.' },
-        { en: '|Δx| ≤ d always; they are equal only for motion in one direction without turning back.', ar: 'مقدار الإزاحة أقل من أو يساوي المسافة دائمًا.' }
+        { en: 'Displacement is a vector that depends only on the starting and ending points: Δx = x₂ − x₁.', ar: 'الإزاحة (Displacement) هي التغير في الموقع: Δx = x₂ − x₁، أي الموقع النهائي ناقص الموقع الابتدائي. لا يهمها الطريق الذي سلكته، فقط من أين بدأت وأين انتهيت، وإشارتها تخبرك بالاتجاه.' },
+        { en: 'Distance is a scalar equal to the actual length of the path.', ar: 'المسافة (Distance) هي طول الطريق الذي قطعته فعلًا، مهما تعرّج أو رجعت. وهي كمية قياسية موجبة دائمًا، مثل قراءة عداد المسافة في السيارة.' },
+        { en: '|Δx| ≤ d always; they are equal only for motion in one direction without turning back.', ar: 'لذلك مقدار الإزاحة إما أقل من المسافة أو يساويها، ولا يكون أكبر منها أبدًا. ويتساويان فقط إذا تحرك الجسم في خط مستقيم واتجاه واحد دون رجوع.' }
       ],
       terms: [['Displacement', 'الإزاحة', 'Δx = x₂ − x₁ (vector)'], ['Distance', 'المسافة', 'Path length (scalar)'], ['Position', 'الموقع', 'x relative to an origin']],
       formulas: [{ f: 'Δx = x₂ − x₁', name: 'Displacement (3.1)', sym: [['Δx', 'displacement', 'm', 'الإزاحة'], ['x₁, x₂', 'initial, final position', 'm', 'الموقع الابتدائي والنهائي']], cond: 'Sign shows direction.' }],
@@ -247,9 +247,9 @@ COURSE.push({
       goalsAr: 'ستحسب السرعة القياسية المتوسطة والسرعة المتجهة المتوسطة واللحظية بالاشتقاق.',
       why: { en: 'Speedometers show instantaneous speed; trip planners use average speed.', ar: 'عداد السرعة يعرض السرعة اللحظية، وتخطيط الرحلة يستخدم المتوسطة.' },
       explain: [
-        { en: 'Average speed s = {{d // Δt}} (scalar). Average velocity v_av = {{Δx // Δt}} = {{x₂ − x₁ // t₂ − t₁}} (vector).', ar: 'السرعة القياسية = المسافة ÷ الزمن، والمتجهة = الإزاحة ÷ الزمن.' },
-        { en: 'Instantaneous velocity is the limit as Δt → 0: v = {{dx // dt}} (3.3).', ar: 'السرعة اللحظية هي نهاية المتوسطة عندما يقترب الزمن من الصفر، أي المشتقة.' },
-        { en: 'Power rule: {{d // dt}}(tⁿ) = n tⁿ⁻¹, derivative of a constant = 0.', ar: 'قاعدة الاشتقاق: مشتقة tⁿ هي n tⁿ⁻¹.' }
+        { en: 'Average speed s = {{d // Δt}} (scalar). Average velocity v_av = {{Δx // Δt}} = {{x₂ − x₁ // t₂ − t₁}} (vector).', ar: 'السرعة القياسية المتوسطة (Average speed) = المسافة ÷ الزمن، وهي عدد موجب. أما السرعة المتجهة المتوسطة (Average velocity) = الإزاحة ÷ الزمن، ولها اتجاه. فإذا ركضت حول ملعب ورجعت إلى مكانك تكون سرعتك القياسية كبيرة، لكن سرعتك المتجهة المتوسطة صفر.' },
+        { en: 'Instantaneous velocity is the limit as Δt → 0: v = {{dx // dt}} (3.3).', ar: 'السرعة اللحظية (Instantaneous velocity) هي سرعتك عند لحظة معينة، مثل قراءة عداد السرعة الآن. رياضيًا نأخذ المتوسط على زمن صغير جدًا يقترب من الصفر، وهذا هو المشتقة: v = {{dx // dt}}.' },
+        { en: 'Power rule: {{d // dt}}(tⁿ) = n tⁿ⁻¹, derivative of a constant = 0.', ar: 'قاعدة الاشتقاق التي تحتاجها: مشتقة tⁿ هي n tⁿ⁻¹، أي ننزل الأس ونضربه ثم ننقص الأس واحدًا، ومشتقة العدد الثابت صفر. مثال: إذا كان x = 6t² − t + 1 فإن v = 12t − 1.' }
       ],
       terms: [['Average speed', 'السرعة القياسية المتوسطة', '{{d // Δt}}'], ['Average velocity', 'السرعة المتجهة المتوسطة', '{{Δx // Δt}}'], ['Instantaneous velocity', 'السرعة اللحظية', '{{dx // dt}}']],
       formulas: [{ f: 'v_av = {{Δx // Δt}} ,  v = {{dx // dt}}', name: 'Velocity (3.2, 3.3)', sym: [['v_av', 'average velocity', 'm/s', 'السرعة المتوسطة'], ['v', 'instantaneous velocity', 'm/s', 'السرعة اللحظية'], ['Δx', 'displacement', 'm', 'الإزاحة'], ['t', 'time', 's', 'الزمن']], cond: '—' }],
@@ -274,10 +274,10 @@ COURSE.push({
       goalsAr: 'ستحسب التسارع المتوسط واللحظي وتفهم معنى إشارته.',
       why: { en: 'Acceleration links motion to forces (Newton\'s 2nd law, Chapter 4).', ar: 'التسارع هو الجسر بين الحركة والقوة في الفصل الرابع.' },
       explain: [
-        { en: 'Average acceleration: "the rate of velocity change in time", a_av = {{Δv // Δt}} = {{v₂ − v₁ // t₂ − t₁}} (3.4).', ar: 'التسارع المتوسط = التغير في السرعة ÷ الزمن.' },
-        { en: '⚠ The slide S03 words it as "average velocity divided by the time interval"; the equation ({{Δv // Δt}}) and the book are the reference (gap G‑04).', ar: 'تنبيه: صياغة الشريحة غير دقيقة، المعتمد هو {{Δv // Δt}}.' },
-        { en: 'Instantaneous acceleration a = {{dv // dt}} = {{d²x // dt²}} (3.5).', ar: 'التسارع اللحظي هو مشتقة السرعة.' },
-        { en: 'Negative a does not necessarily mean slowing down: if a and v are both negative, the object speeds up (BK p.45).', ar: 'التسارع السالب لا يعني دائمًا التباطؤ؛ إذا كانت السرعة سالبة أيضًا فالجسم يتسارع.' }
+        { en: 'Average acceleration: "the rate of velocity change in time", a_av = {{Δv // Δt}} = {{v₂ − v₁ // t₂ − t₁}} (3.4).', ar: 'التسارع (Acceleration) يقيس سرعة تغير السرعة: كم تزيد السرعة أو تنقص في كل ثانية. التسارع المتوسط = (السرعة النهائية − السرعة الابتدائية) ÷ الزمن، ووحدته m/s². فتسارع 2 m/s² يعني أن السرعة تزيد 2 m/s كل ثانية.' },
+        { en: '⚠ The slide S03 words it as "average velocity divided by the time interval"; the equation ({{Δv // Δt}}) and the book are the reference (gap G‑04).', ar: 'تنبيه: شريحة المقرر S03 تقول «السرعة المتوسطة مقسومة على الزمن»، وهذه صياغة غير دقيقة. التعريف الصحيح في الكتاب والقانون هو تغير السرعة ÷ الزمن {{Δv // Δt}}، فاعتمده (G‑04).' },
+        { en: 'Instantaneous acceleration a = {{dv // dt}} = {{d²x // dt²}} (3.5).', ar: 'التسارع اللحظي هو التسارع عند لحظة معينة، ونحسبه بالاشتقاق: a = {{dv // dt}}. أي نشتق السرعة مرة، أو نشتق الموقع مرتين.' },
+        { en: 'Negative a does not necessarily mean slowing down: if a and v are both negative, the object speeds up (BK p.45).', ar: 'التسارع السالب لا يعني دائمًا أن الجسم يبطئ. الجسم يبطئ إذا كانت إشارة التسارع عكس إشارة السرعة، ويسرع إذا كانت إشارتاهما متشابهتين. فإذا كانت السرعة سالبة والتسارع سالبًا فالجسم تزداد سرعته (BK p.45).' }
       ],
       terms: [['Acceleration', 'التسارع', 'Rate of change of velocity'], ['Deceleration', 'التباطؤ', 'Speed decreasing (a opposite to v)']],
       formulas: [{ f: 'a_av = {{Δv // Δt}} ,  a = {{dv // dt}}', name: 'Acceleration (3.4, 3.5)', sym: [['a_av', 'average acceleration', 'm/s²', 'التسارع المتوسط'], ['a', 'instantaneous acceleration', 'm/s²', 'التسارع اللحظي'], ['Δv', 'change of velocity', 'm/s', 'تغير السرعة'], ['t', 'time', 's', 'الزمن']], cond: '—' }],
@@ -301,10 +301,10 @@ COURSE.push({
       goalsAr: 'ستختار المعادلة المناسبة من معادلات الحركة الثلاث، وتحل مسائل السقوط الحر.',
       why: { en: 'Most exam motion problems are solved with three equations; the skill is choosing the right one.', ar: 'أغلب مسائل الحركة تُحل بثلاث معادلات، والمهارة في اختيار المناسبة.' },
       explain: [
-        { en: 'If a is constant: (3.6) v_f = at + v_i · (3.7) x_f = ½at² + v_i t + x_i · (3.8) v_f² = v_i² + 2aΔx.', ar: 'المعادلات الثلاث صالحة فقط عندما يكون التسارع ثابتًا.' },
-        { en: 'Pick the equation that does not contain the quantity you neither know nor need (no t → use 3.8).', ar: 'اختر المعادلة التي لا تحتوي الكمية المجهولة غير المطلوبة.' },
-        { en: 'Free fall: a = g = 9.8 m/s² toward Earth\'s centre, independent of mass (air resistance neglected). Choose + direction first: Ex 3.5 takes down +, Ex 3.6 takes up +.', ar: 'السقوط الحر: التسارع g = 9.8 م/ث² نحو الأرض. حدد الاتجاه الموجب أولًا.' },
-        { en: 'Thrown up: y_max = {{v_i² // 2g}}, t_max = {{v_i // g}}, flight time back to the same level = 2 t_max.', ar: 'أقصى ارتفاع v²/2g وزمن الصعود v/g وزمن التحليق ضعفه.' }
+        { en: 'If a is constant: (3.6) v_f = at + v_i · (3.7) x_f = ½at² + v_i t + x_i · (3.8) v_f² = v_i² + 2aΔx.', ar: 'عندما يكون التسارع ثابتًا لدينا ثلاث معادلات: v_f = v_i + at لحساب السرعة بعد زمن، و x_f = x_i + v_i t + ½at² لحساب الموقع بعد زمن، و v_f² = v_i² + 2aΔx للعلاقة بين السرعة والمسافة بدون زمن. ولا تصلح هذه المعادلات إذا كان التسارع يتغير.' },
+        { en: 'Pick the equation that does not contain the quantity you neither know nor need (no t → use 3.8).', ar: 'كيف تختار المعادلة؟ اكتب المعطيات والمطلوب، ثم انظر إلى الكمية التي لا تعرفها ولا تحتاجها، واختر المعادلة التي لا تحتوي عليها. مثلًا: إذا لم يُذكر الزمن ولم يُطلب، فاستخدم v_f² = v_i² + 2aΔx.' },
+        { en: 'Free fall: a = g = 9.8 m/s² toward Earth\'s centre, independent of mass (air resistance neglected). Choose + direction first: Ex 3.5 takes down +, Ex 3.6 takes up +.', ar: 'السقوط الحر (Free fall) حركة بتسارع ثابت هو g = 9.8 m/s² نحو الأرض، ولا يعتمد على كتلة الجسم إذا أهملنا مقاومة الهواء. وقبل الحل حدد الاتجاه الموجب: مثال 3.5 يأخذ الأسفل موجبًا، ومثال 3.6 يأخذ الأعلى موجبًا، فتتغير إشارة g حسب اختيارك.' },
+        { en: 'Thrown up: y_max = {{v_i² // 2g}}, t_max = {{v_i // g}}, flight time back to the same level = 2 t_max.', ar: 'للجسم المقذوف لأعلى: عند أقصى ارتفاع تصبح سرعته صفرًا. لذلك أقصى ارتفاع y_max = {{v_i² // 2g}}، وزمن الصعود t_max = {{v_i // g}}، وزمن الرجوع إلى المستوى نفسه ضعف زمن الصعود.' }
       ],
       terms: [['Constant acceleration', 'تسارع ثابت', 'a does not change'], ['Free fall', 'السقوط الحر', 'Motion under gravity only'], ['Maximum height', 'أقصى ارتفاع', 'Where v = 0'], ['Flight time', 'زمن التحليق', 'Time to return']],
       formulas: [
