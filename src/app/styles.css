@@ -288,3 +288,18 @@ tr.armr td{border-bottom:1px solid var(--line);padding-top:0}
   main{padding:0!important;max-width:none!important}
   .a4sheet{box-shadow:none;border:none;margin:0;width:210mm;height:297mm;overflow:hidden}
 }
+/* 🔊 listen button */
+.say{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:0 6px;font-size:12px;line-height:1.6;vertical-align:middle;margin-left:4px;cursor:pointer}
+.say:hover{border-color:var(--brand)} .say.on{background:var(--brand-soft);border-color:var(--brand)}
+h1 .say{font-size:15px;padding:1px 8px}
+/* entry screen */
+#welcome{position:fixed;inset:0;z-index:100;background:rgba(15,22,40,.55);backdrop-filter:blur(3px);display:grid;place-items:center;padding:16px}
+#welcome .wcard{background:var(--panel);color:var(--ink);border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.25);width:min(440px,100%);padding:26px 24px;text-align:center}
+#welcome .watom{width:54px;height:54px;margin:0 auto 8px;border-radius:14px;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;font-size:28px}
+#welcome h2{margin:6px 0 10px;font-size:21px}
+#welcome .ar{text-align:right}
+#welcome .wlab{display:flex;flex-direction:column;gap:6px;text-align:left;margin-top:12px;font-weight:600;font-size:14px}
+#welcome .wlab input{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;font-size:16px}
+#welcome .wstats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+#welcome .wstats div{background:var(--bg);border-radius:10px;padding:10px}
+#welcome .wstats b{font-size:22px;display:block} #welcome .wstats small{color:var(--muted)}

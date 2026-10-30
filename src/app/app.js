@@ -28,6 +28,19 @@
   const ARL = id => ((window.AR || {}).lessons || {})[id] || null;
   const ARC = id => ((window.AR || {}).chapters || {})[id] || '';
   const arLine = t => t ? `<div class="ar arsub">${t}</div>` : '';
+  // 🔊 reads an English term aloud with the browser's own voice (works offline where the device has an English voice)
+  const CAN_SAY = 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined';
+  const plain = h => String(h).replace(/<[^>]+>/g, '').replace(/&[a-z]+;/g, ' ').trim();
+  const say = h => CAN_SAY ? `<button class="say noprint" data-say="${esc(plain(h))}" title="Listen · استمع" aria-label="Listen to ${esc(plain(h))}">🔊</button>` : '';
+  function speak(text, btn) {
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.9;
+      const v = speechSynthesis.getVoices().find(x => /^en(-|_)/i.test(x.lang)); if (v) u.voice = v;
+      if (btn) { btn.classList.add('on'); u.onend = u.onerror = () => btn.classList.remove('on'); }
+      speechSynthesis.speak(u);
+    } catch (e) { /* speech not available */ }
+  }
   const ADD = `<span class="pill add" title="Additional design: not from the course files">🧩 Additional design</span>`;
   const EXT = `<span class="pill ext" title="From Serway & Jewett, Physics for Scientists and Engineers, 9th ed.: reference 1 in your course book (BK p.179), not course content">🔗 External reference · Serway</span>`;
   const SW = id => (window.SERWAY || {})[id];
@@ -176,7 +189,7 @@
     const r = recommend();
     const due = dueCards().length;
     return `
-      <h1>Welcome to your Physics Learning Lab</h1>
+      <h1>${S.prefs.name ? `Welcome, ${esc(S.prefs.name)}` : 'Welcome to your Physics Learning Lab'}</h1>
       <p class="sub">General Physics, 10 chapters, ${ls.length} lessons, built from your course files. <span class="pill src">📘 = from your course files</span> <span class="pill add">🧩 = additional design</span></p>
       <div class="ar">مرحبًا بك في مدرسك الخاص لمقرر الفيزياء العامة. المصطلحات والقوانين بالإنجليزية كما في مقررك، والشرح العربي مساعد. كل ما عليه 📘 مأخوذ من ملفاتك، وكل ما عليه 🧩 تصميم إضافي.</div>
       <div class="grid g4">
@@ -223,12 +236,12 @@
     const conds = l.formulas.filter(f => f.cond && f.cond !== '—');
     return `
       <div class="row muted" style="font-size:13px"><a href="#chapter/${l.ch.id}">Ch ${l.ch.n}. ${esc(l.ch.title)}</a> › lesson</div>
-      <h1>${esc(l.title)}</h1>
+      <h1>${esc(l.title)} ${say(l.title)}</h1>
       <p class="sub"><bdi>${l.ar}</bdi> · ${srcPill(l.src)}</p>${arLine((ARL(l.id) || {}).d)}
       ${step(1, 'What will you learn?', 'ماذا ستتعلم؟', `<ul class="clean">${l.goals.map(g => `<li>${g}</li>`).join('')}</ul><div class="ar">${l.goalsAr}</div>`)}
       ${step(2, 'Why do we need this?', 'لماذا نحتاجه؟', `<p>${l.why.en}</p><div class="ar">${l.why.ar}</div>`)}
       ${step(3, 'Step‑by‑step explanation', 'شرح متدرج', l.explain.map((e, i) => `<div class="card" style="margin:8px 0"><span class="pill">${i === 0 ? 'Basics' : i === l.explain.length - 1 && l.explain.length > 2 ? 'University level' : 'Building up'}</span><p style="margin:6px 0">${e.en}</p><div class="ar">${e.ar}</div></div>`).join(''))}
-      ${step(4, 'English terms explained', 'المصطلحات', `<table><tr><th>Term</th><th class="arcell">بالعربية</th><th>Meaning</th></tr>${l.terms.map(t => `<tr><td><b>${t[0]}</b></td><td class="arcell">${t[1]}</td><td>${t[2]}</td></tr>`).join('')}</table>`)}
+      ${step(4, 'English terms explained', 'المصطلحات', `<table><tr><th>Term</th><th class="arcell">بالعربية</th><th>Meaning</th></tr>${l.terms.map(t => `<tr><td><b>${t[0]}</b> ${say(t[0])}</td><td class="arcell">${t[1]}</td><td>${t[2]}</td></tr>`).join('')}</table>`)}
       ${step(5, 'Laws, symbols & units', 'القوانين والرموز والوحدات', l.formulas.map((f, fi) => `<div class="card" style="margin:8px 0"><b>${f.name}</b><div class="formula big">${f.f}</div>${words(l, fi)}${symTable(f)}${formsHTML(l, fi)}</div>`).join(''))}
       ${step(6, 'Assumptions & when to use', 'الافتراضات وشروط الاستخدام', conds.length ? `<ul class="clean">${conds.map(f => `<li><b>${f.name}:</b> ${f.cond}</li>`).join('')}</ul>` : '<p class="muted">No special conditions beyond the definitions above.</p>')}
       ${step(7, 'Real‑life example', 'مثال من الحياة', `<div class="addbox">${ADD}<p style="margin:6px 0">${l.life.en}</p><div class="ar">${l.life.ar}</div></div>`)}
@@ -876,7 +889,7 @@
     <p class="sub">Every English term from the lessons with its Arabic and meaning. <span class="pill src">📘 terms from the lessons</span></p>
     <div class="ar">كل المصطلحات الإنجليزية في الدروس مع معناها بالعربي. ابحث بالعربي أو بالإنجليزي.</div>
     <div class="card row noprint"><input id="gq" class="search" style="width:260px" placeholder="Search · ابحث"><select id="gch"><option value="">All chapters</option>${COURSE.map(c => `<option value="${c.id}">Ch ${c.n}. ${esc(c.title)}</option>`).join('')}</select><span class="muted" id="gn"></span></div>
-    <div class="card"><table id="gtab"><tr><th>Term</th><th class="arcell">بالعربية</th><th>Meaning</th><th>Lesson</th></tr>${allLessons().flatMap(l => l.terms.map(t => `<tr data-ch="${l.ch.id}" data-h="${esc((t.join(' ')).toLowerCase())}"><td><b>${t[0]}</b></td><td class="arcell">${t[1]}</td><td>${t[2]}</td><td><a href="#lesson/${l.id}">${l.ch.n}. ${esc(l.title)}</a></td></tr>`)).join('')}</table></div>`;
+    <div class="card"><table id="gtab"><tr><th>Term</th><th class="arcell">بالعربية</th><th>Meaning</th><th>Lesson</th></tr>${allLessons().flatMap(l => l.terms.map(t => `<tr data-ch="${l.ch.id}" data-h="${esc((t.join(' ')).toLowerCase())}"><td><b>${t[0]}</b> ${say(t[0])}</td><td class="arcell">${t[1]}</td><td>${t[2]}</td><td><a href="#lesson/${l.id}">${l.ch.n}. ${esc(l.title)}</a></td></tr>`)).join('')}</table></div>`;
   function afterGlossary() {
     const f = () => { const q = $('#gq').value.trim().toLowerCase(), ch = $('#gch').value; let n = 0; document.querySelectorAll('#gtab tr[data-h]').forEach(r => { const ok = (!ch || r.dataset.ch === ch) && (!q || r.dataset.h.includes(q)); r.style.display = ok ? '' : 'none'; if (ok) n++; }); $('#gn').textContent = `${n} terms`; };
     $('#gq').oninput = f; $('#gch').onchange = f; f();
@@ -884,7 +897,7 @@
   views.phrases = () => `<h1>Problem language <span class="muted" style="font-size:18px;font-weight:400">· لغة المسائل</span></h1>
     <p class="sub">Words in an English problem that hide a number or tell you what to do. ${ADD}</p>
     <div class="ar">كثير من الأخطاء سببها فهم السؤال لا الفيزياء. هذه الكلمات تتكرر في أسئلة المقرر، وبعضها يعطيك رقمًا دون أن يكتبه، مثل from rest التي تعني أن السرعة الابتدائية صفر.</div>
-    ${PHRASES.map(g => `<div class="card"><h3 style="margin-top:0">${g.sec}</h3><table><tr><th>In the problem</th><th class="arcell">بالعربية</th><th>What it tells you</th></tr>${g.rows.map(r => `<tr><td><b>${r[0]}</b></td><td class="arcell">${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</table></div>`).join('')}
+    ${PHRASES.map(g => `<div class="card"><h3 style="margin-top:0">${g.sec}</h3><table><tr><th>In the problem</th><th class="arcell">بالعربية</th><th>What it tells you</th></tr>${g.rows.map(r => `<tr><td><b>${r[0]}</b> ${say(r[0])}</td><td class="arcell">${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</table></div>`).join('')}
     <div class="card"><h3 style="margin-top:0">Drill · تدريب</h3><div id="phbox"></div></div>`;
   function afterPhrases() {
     const rows = PHRASES.flatMap(g => g.rows); let score = 0, total = 0;
@@ -956,7 +969,38 @@
     sr.oninput = () => { const r = search(sr.value); res.innerHTML = r.length ? `<div class="card results">${r.join('')}</div>` : ''; };
     res.onclick = () => { res.innerHTML = ''; sr.value = ''; };
     applyPrefs(); route();
+    document.addEventListener('click', e => { const b = e.target.closest('.say'); if (b) { e.preventDefault(); e.stopPropagation(); speak(b.dataset.say, b); } }, true);
+    $('#who').onclick = () => welcome(true);
+    showWho();
+    let seen = false; try { seen = sessionStorage.getItem('pll-welcomed') === '1'; } catch (e) { /* ignore */ }
+    if (!S.prefs.name || !seen) welcome(false);
   });
+  function showWho() { $('#who').textContent = S.prefs.name ? `👤 ${S.prefs.name}` : '👤 Sign in'; }
+  // entry screen: asks the student's name the first time, then greets them on each visit
+  function welcome(edit) {
+    const name = S.prefs.name || '', first = !name || edit;
+    const all = allLessons(), done = all.filter(l => mastery(l.id) != null).length;
+    const avg = done ? Math.round(all.reduce((t, l) => t + (mastery(l.id) || 0), 0) / all.length) : 0;
+    const r = !first ? recommend() : null;
+    const box = document.createElement('div'); box.id = 'welcome'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true');
+    box.innerHTML = fx(`<div class="wcard"><div class="watom">⚛</div>
+      <h2>${first ? 'Welcome to Physics Learning Lab' : `Welcome back, ${esc(name)}!`}</h2>
+      <div class="ar">${first ? 'أهلاً بك في مختبر تعلم الفيزياء. اكتب اسمك ليرحّب بك الموقع ويحفظ تقدمك على هذا الجهاز.' : `أهلاً بعودتك يا ${esc(name)}! أكملت ${done} من ${all.length} درساً، ومتوسط إتقانك ${avg}%.`}</div>
+      ${first ? `<label class="wlab">Your name · اسمك<input id="wname" maxlength="40" value="${esc(name)}" placeholder="e.g. Saad · مثلاً سعد" autocomplete="name"></label><div class="hint" id="wmsg"></div>`
+        : `<div class="wstats"><div><b>${done}/${all.length}</b><small>lessons started</small></div><div><b>${avg}%</b><small>average mastery</small></div></div>${r && r.l ? `<p class="muted" style="margin:6px 0 0">Next: <a href="#lesson/${r.l.id}" id="wnext">${esc(r.l.title)}</a></p>` : ''}`}
+      <div class="row" style="justify-content:center;margin-top:14px"><button class="btn" id="wgo">${first ? 'Start · ابدأ' : 'Continue · متابعة'}</button>${!first ? '<button class="btn ghost" id="wchg">Not you? · غيّر الاسم</button>' : ''}</div>
+      <p class="muted" style="font-size:12.5px;margin:12px 0 0">Your name and progress stay in this browser only. · اسمك وتقدمك محفوظان في هذا المتصفح فقط.</p></div>`);
+    document.body.appendChild(box);
+    const close = () => { box.remove(); try { sessionStorage.setItem('pll-welcomed', '1'); } catch (e) { /* ignore */ } showWho(); route(); };
+    if (first) {
+      const inp = $('#wname'); setTimeout(() => inp.focus(), 50);
+      const go = () => { const v = inp.value.trim().replace(/\s+/g, ' '); if (!v) { $('#wmsg').textContent = 'Please write your name. · اكتب اسمك من فضلك.'; return; } S.prefs.name = v; save(); close(); };
+      $('#wgo').onclick = go; inp.onkeydown = e => { if (e.key === 'Enter') go(); };
+    } else {
+      $('#wgo').onclick = close; $('#wchg').onclick = () => { box.remove(); welcome(true); };
+      if ($('#wnext')) $('#wnext').onclick = () => { box.remove(); try { sessionStorage.setItem('pll-welcomed', '1'); } catch (e) { /* ignore */ } };
+    }
+  }
   window.addEventListener('hashchange', () => { if (EXAM) { history.replaceState(null, '', EXAM.hash); return; } route(); });
   window.addEventListener('beforeunload', e => { if (EXAM) { e.preventDefault(); e.returnValue = ''; } });
   window.__PLL = { mastery, parseNum, numOk, dimOf, G, allLessons };

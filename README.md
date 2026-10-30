@@ -6,6 +6,7 @@ A private tutor and virtual lab for the first-year **General Physics** course (1
   Every law is written with real fractions (numerator over denominator). Under each law, "One law, several forms" lists every form of it, what each form finds, and the algebra steps from the course form (for example Ohm's law: V = RI, R = V/I, I = V/R). The "Rearranging laws" page teaches the rules, with a practice drill.
 - **Foundation section** in the tutor: a placement test, Unit 0 (11 maths and reading skills the course assumes, each with an Arabic‑first explanation, a worked example and fresh practice), an "Are you ready?" check on each chapter page, a course glossary and a "Problem language" page (phrases such as *starts from rest* → vᵢ = 0).
 - Arabic text is shown right to left everywhere; formulas inside an Arabic sentence are kept left to right (`src/shared/rtl.js`).
+- The tutor opens with an entry screen that asks for the student's name and greets them with their progress on each visit. A 🔊 button next to every English term reads it aloud (browser speech, English voice).
 - **`Formula_Sheet_A4.pdf`** is every course law with the unit of each symbol on one A4 page, ready to print. The same sheet is the "A4 sheet" page in the tutor.
 - **`Virtual_Lab.html`** is the virtual lab: 11 experiments built on the course laws, with data tables, graphs and a linear fit.
 - **`docs/Course_Reference_and_Gap_Log.md`** is the course reference and gap log, with a source for every item.
