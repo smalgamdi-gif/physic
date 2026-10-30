@@ -25,6 +25,9 @@
   const lessonById = id => allLessons().find(l => l.id === id);
   const isAdd = src => /🧩|additional design/i.test(src || '');
   const srcPill = src => isAdd(src) ? `<span class="pill add" title="Additional design: not from the course files">🧩 Additional design</span>` : `<span class="pill src" title="From the course files">📘 ${esc(src)}</span>`;
+  const ARL = id => ((window.AR || {}).lessons || {})[id] || null;
+  const ARC = id => ((window.AR || {}).chapters || {})[id] || '';
+  const arLine = t => t ? `<div class="ar arsub">${t}</div>` : '';
   const ADD = `<span class="pill add" title="Additional design: not from the course files">🧩 Additional design</span>`;
   const EXT = `<span class="pill ext" title="From Serway & Jewett, Physics for Scientists and Engineers, 9th ed.: reference 1 in your course book (BK p.179), not course content">🔗 External reference · Serway</span>`;
   const SW = id => (window.SERWAY || {})[id];
@@ -204,10 +207,10 @@
   views.chapter = (id) => {
     const c = COURSE.find(x => x.id === id); if (!c) return views.home();
     const cm = chapterMastery(c);
-    return `<h1>Chapter ${c.n}: ${esc(c.title)}</h1><p class="sub"><bdi>${c.ar}</bdi> · ${srcPill(c.src)}</p>
+    return `<h1>Chapter ${c.n}: ${esc(c.title)}</h1><p class="sub"><bdi>${c.ar}</bdi> · ${srcPill(c.src)}</p>${arLine(ARC(c.id))}
       <div class="card"><div class="chap"><b>Chapter mastery</b><b>${cm.avg}%</b></div>${bar(cm.avg)}</div>
       ${readyBox(c)}
-      ${c.lessons.map((l, i) => { const m = mastery(l.id); const [lv, cls] = level(m); return `<a class="lessonlink" href="#lesson/${l.id}"><span><b>${c.n}.${i + 1} ${esc(l.title)}</b><br><small class="muted">${l.ar}</small></span><span class="row"><span class="${cls}">${lv}${m != null ? ' · ' + m + '%' : ''}</span></span></a>`; }).join('')}
+      ${c.lessons.map((l, i) => { const m = mastery(l.id); const [lv, cls] = level(m); return `<a class="lessonlink" href="#lesson/${l.id}"><span><b>${c.n}.${i + 1} ${esc(l.title)}</b><br><small class="muted">${l.ar}</small>${ARL(l.id) ? `<small class="ar arsub">${ARL(l.id).d}</small>` : ''}</span><span class="row"><span class="${cls}">${lv}${m != null ? ' · ' + m + '%' : ''}</span></span></a>`; }).join('')}
       <div class="row noprint" style="margin-top:14px"><a class="btn ghost" href="#exam/${c.id}">Chapter exam</a><a class="btn ghost" href="#practice/${c.id}">Unlimited practice</a><a class="btn ghost" href="#formulas/${c.id}">Formula sheet</a></div>`;
   };
 
@@ -221,7 +224,7 @@
     return `
       <div class="row muted" style="font-size:13px"><a href="#chapter/${l.ch.id}">Ch ${l.ch.n}. ${esc(l.ch.title)}</a> › lesson</div>
       <h1>${esc(l.title)}</h1>
-      <p class="sub"><bdi>${l.ar}</bdi> · ${srcPill(l.src)}</p>
+      <p class="sub"><bdi>${l.ar}</bdi> · ${srcPill(l.src)}</p>${arLine((ARL(l.id) || {}).d)}
       ${step(1, 'What will you learn?', 'ماذا ستتعلم؟', `<ul class="clean">${l.goals.map(g => `<li>${g}</li>`).join('')}</ul><div class="ar">${l.goalsAr}</div>`)}
       ${step(2, 'Why do we need this?', 'لماذا نحتاجه؟', `<p>${l.why.en}</p><div class="ar">${l.why.ar}</div>`)}
       ${step(3, 'Step‑by‑step explanation', 'شرح متدرج', l.explain.map((e, i) => `<div class="card" style="margin:8px 0"><span class="pill">${i === 0 ? 'Basics' : i === l.explain.length - 1 && l.explain.length > 2 ? 'University level' : 'Building up'}</span><p style="margin:6px 0">${e.en}</p><div class="ar">${e.ar}</div></div>`).join(''))}
@@ -229,11 +232,11 @@
       ${step(5, 'Laws, symbols & units', 'القوانين والرموز والوحدات', l.formulas.map((f, fi) => `<div class="card" style="margin:8px 0"><b>${f.name}</b><div class="formula big">${f.f}</div>${words(l, fi)}${symTable(f)}${formsHTML(l, fi)}</div>`).join(''))}
       ${step(6, 'Assumptions & when to use', 'الافتراضات وشروط الاستخدام', conds.length ? `<ul class="clean">${conds.map(f => `<li><b>${f.name}:</b> ${f.cond}</li>`).join('')}</ul>` : '<p class="muted">No special conditions beyond the definitions above.</p>')}
       ${step(7, 'Real‑life example', 'مثال من الحياة', `<div class="addbox">${ADD}<p style="margin:6px 0">${l.life.en}</p><div class="ar">${l.life.ar}</div></div>`)}
-      ${step(8, 'Worked example, step by step', 'مثال محلول خطوة بخطوة', `<div class="card">${srcPill(l.worked.src)}<p><b>${l.worked.q}</b></p><ol class="clean" id="wsteps">${l.worked.steps.map((s, i) => `<li data-i="${i}" style="${i ? 'display:none' : ''}">${s}</li>`).join('')}</ol><div class="row noprint"><button class="btn small" id="wnext">Show next step</button><button class="btn small ghost" id="wall">Show all</button></div><p id="wans" style="display:none"><b>Answer:</b> ${l.worked.ans}</p>${l.worked.note ? `<div class="note">⚠ ${l.worked.note}</div>` : ''}</div>`)}
-      ${step(9, 'Your turn: solve it yourself', 'دورك: حلّ بنفسك', `<div class="card" id="tryit">${srcPill(l.tryit.src)} <span class="pill add" title="The worked solution shown after you answer is additional design">solution 🧩</span>${qHTML({ q: l.tryit.q, num: l.tryit.ans, unit: l.tryit.unit }, 'try')}<div class="row noprint"><button class="btn small ghost" id="hintbtn">Need a hint?</button></div><div id="hintbox"></div></div>`)}
+      ${step(8, 'Worked example, step by step', 'مثال محلول خطوة بخطوة', `<div class="card">${srcPill(l.worked.src)}<p><b>${l.worked.q}</b></p>${arLine((ARL(l.id) || {}).w)}<ol class="clean" id="wsteps">${l.worked.steps.map((s, i) => `<li data-i="${i}" style="${i ? 'display:none' : ''}">${s}</li>`).join('')}</ol><div class="row noprint"><button class="btn small" id="wnext">Show next step</button><button class="btn small ghost" id="wall">Show all</button></div><p id="wans" style="display:none"><b>Answer:</b> ${l.worked.ans}</p>${l.worked.note ? `<div class="note">⚠ ${l.worked.note}</div>` : ''}</div>`)}
+      ${step(9, 'Your turn: solve it yourself', 'دورك: حلّ بنفسك', `<div class="card" id="tryit">${srcPill(l.tryit.src)} <span class="pill add" title="The worked solution shown after you answer is additional design">solution 🧩</span>${qHTML({ q: l.tryit.q + arLine((ARL(l.id) || {}).t), num: l.tryit.ans, unit: l.tryit.unit }, 'try')}<div class="row noprint"><button class="btn small ghost" id="hintbtn">Need a hint?</button></div><div id="hintbox"></div></div>`)}
       ${step(10, 'Quick checks', 'أسئلة تحقق سريعة', `${ADD} <span class="muted" style="font-size:13px">(some reuse course examples, cited inside)</span><div id="checks">${l.checks.map((c, i) => `<div data-c="${i}">${qHTML(c, 'c' + i)}</div>`).join('')}</div>`)}
-      ${step(11, 'Common mistakes & why they happen', 'أخطاء شائعة وأسبابها', `<div class="addbox">${ADD}<table>${l.mistakes.map(m => `<tr><td>✘ ${m[0]}</td><td>✔ ${m[1]}</td></tr>`).join('')}</table></div>`)}
-      ${step(12, 'Summary for revision', 'ملخص للمراجعة', `<div class="card"><ul class="clean">${l.summary.map(s => `<li>${s}</li>`).join('')}</ul></div>`)}
+      ${step(11, 'Common mistakes & why they happen', 'أخطاء شائعة وأسبابها', `<div class="addbox">${ADD}<table>${l.mistakes.map((m, mi) => `<tr><td>✘ ${m[0]}</td><td>✔ ${m[1]}</td></tr>${ARL(l.id) && ARL(l.id).m[mi] ? `<tr class="armr"><td colspan="2"><div class="ar arsub">${ARL(l.id).m[mi]}</div></td></tr>` : ''}`).join('')}</table></div>`)}
+      ${step(12, 'Summary for revision', 'ملخص للمراجعة', `<div class="card"><ul class="clean">${l.summary.map(s => `<li>${s}</li>`).join('')}</ul>${arLine((ARL(l.id) || {}).s)}</div>`)}
       ${step(13, 'Short quiz (solutions appear only after you answer)', 'اختبار قصير', `${ADD} <span class="muted" style="font-size:13px">questions citing “BK Ex.” are the textbook's exercises; their solutions are additional design</span><div id="quiz">${l.quiz.map((q, i) => `<div data-q="${i}">${qHTML(q, 'q' + i)}</div>`).join('')}</div><div id="quizres"></div>`)}
       ${SW(l.id) ? `<div class="step"><div class="num">📗</div><h3>Go deeper with Serway <bdi class="muted" style="font-weight:400">· تعمّق أكثر من مرجع Serway</bdi></h3></div><div class="stepbody">${EXT}
         <div class="card"><b>Read:</b> ${SW(l.id).read.map(r => `§${r.sec} ${esc(r.title)} <span class="muted">(PDF p.${r.page})</span>`).join(' · ')}<div class="ar">اقرأ هذه الأقسام فقط؛ فهي تغطي موضوع هذا الدرس نفسه. باقي الكتاب أوسع من مقررك.</div></div>
@@ -881,7 +884,7 @@
   }
 
   const FNAV = [['placement', '🧭 Placement', 'تحديد المستوى'], ['found', '🧱 Unit 0', 'الوحدة صفر'], ['glossary', '🔤 Glossary', 'قاموس المقرر'], ['phrases', '🗝️ Problem words', 'لغة المسائل']];
-  views.course = () => `<h1>Course map</h1><p class="sub">General Physics · 10 chapters as ordered in your textbook. <span class="pill src">📘 BK chapter openers</span></p>` + COURSE.map(c => { const cm = chapterMastery(c); return `<div class="card"><div class="chap"><a href="#chapter/${c.id}"><b>Ch ${c.n}. ${esc(c.title)}</b></a><span class="muted"><bdi>${c.ar}</bdi> · ${c.src}</span></div>${bar(cm.avg)}${c.lessons.map((l, i) => { const m = mastery(l.id); const [lv, cls] = level(m); return `<a class="lessonlink" href="#lesson/${l.id}"><span>${c.n}.${i + 1} ${esc(l.title)}</span><span class="${cls}">${lv}${m != null ? ' ' + m + '%' : ''}</span></a>`; }).join('')}</div>`; }).join('');
+  views.course = () => `<h1>Course map</h1><p class="sub">General Physics · 10 chapters as ordered in your textbook. <span class="pill src">📘 BK chapter openers</span></p>` + COURSE.map(c => { const cm = chapterMastery(c); return `<div class="card"><div class="chap"><a href="#chapter/${c.id}"><b>Ch ${c.n}. ${esc(c.title)}</b></a><span class="muted"><bdi>${c.ar}</bdi> · ${c.src}</span></div>${arLine(ARC(c.id))}${bar(cm.avg)}${c.lessons.map((l, i) => { const m = mastery(l.id); const [lv, cls] = level(m); return `<a class="lessonlink" href="#lesson/${l.id}"><span>${c.n}.${i + 1} ${esc(l.title)} <small class="muted"><bdi>· ${l.ar}</bdi></small>${ARL(l.id) ? `<small class="ar arsub">${ARL(l.id).d}</small>` : ''}</span><span class="${cls}">${lv}${m != null ? ' ' + m + '%' : ''}</span></a>`; }).join('')}</div>`; }).join('');
 
   function sidebar(active) {
     const chs = COURSE.map(c => { const cm = chapterMastery(c); return `<a href="#chapter/${c.id}" class="nl chl ${active === 'chapter/' + c.id ? 'active' : ''}"><span>${c.n}. ${esc(c.title)}</span><small>${cm.avg}%</small></a>`; }).join('');
