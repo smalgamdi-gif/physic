@@ -270,6 +270,27 @@ nav.side a.sidelab small{color:inherit;opacity:.85;font-weight:600}
 @media (max-width:860px){.labbtn{padding:6px 11px 6px 8px;font-size:13px}.labbtn .lba{display:none}}
 @media (prefers-reduced-motion:reduce){.labbtn{transition:none}.labbtn:hover{transform:none}}
 @media print{.labbtn{display:none}}
+/* number answers: key bar and the value the answer reads as */
+.numin{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.numin input{font-family:Consolas,"Cambria Math",monospace}
+.mkeys{flex-basis:100%;display:none;flex-wrap:wrap;gap:5px;margin-top:4px}
+.numin.kb .mkeys{display:flex}
+.mk{min-width:36px;height:32px;padding:0 9px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font:600 14px "Cambria Math","Cambria",serif;cursor:pointer}
+.mk:hover{border-color:var(--brand);color:var(--brand)}
+.mk[data-del]{color:var(--bad)}
+.mprev{flex-basis:100%;font-size:13.5px;color:var(--muted);min-height:0}
+.mprev b{color:var(--ink);font-family:"Cambria Math","Cambria",serif;font-size:15px}
+.extimer.up{background:var(--bg);color:var(--ink);font-size:24px}
+/* review after a test: one block per question */
+.rev{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;background:var(--panel);padding:12px 14px;margin:10px 0}
+.rev.ok{border-left-color:var(--ok)} .rev.bad{border-left-color:var(--bad)}
+.revhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:4px;font-size:13.5px}
+.revhead .pill{margin-left:auto}
+.revans{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px}
+.revans>div,.revwhy{background:var(--bg);border-radius:8px;padding:8px 10px;min-width:0}
+.revans small,.revwhy small{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:2px}
+.okv{color:var(--ok);font-weight:600} .badv{color:var(--bad);font-weight:600}
+.revwhy{margin-top:8px;border-left:3px solid var(--brand)}
 </style>
 </head>
 <body>
@@ -3540,15 +3561,57 @@ window.SERWAY = {
   }
   const fmt = (x, d = 3) => { if (!isFinite(x)) return String(x); const a = Math.abs(x); if (a !== 0 && (a >= 1e5 || a < 1e-3)) return x.toExponential(d - 1).replace('e', ' × 10^').replace('+', ''); return String(+x.toPrecision(d + 1)); };
 
+  // A number answer may be a plain number (2.5, 1.6e-19, 1.6×10^-19, 1.6×10⁻¹⁹) or a short calculation:
+  // + − × ÷ ^ ( ), √ / sqrt, π / pi, sin cos tan (degrees), log (base 10). Anything else is not read.
   function parseNum(str) {
     if (str == null) return NaN;
-    let s = String(str).trim().replace(/\s+/g, '').replace(/,/g, '').replace(/−/g, '-');
-    s = s.replace(/[×x*]10\^?\(?([+-]?\d+)\)?/i, 'e$1');
+    let s = String(str).trim().replace(/\s+/g, '').replace(/,/g, '').replace(/[−–]/g, '-');
+    if (!s) return NaN;
+    if (/^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i.test(s)) return parseFloat(s);
     const sup = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁻': '-' };
-    s = s.replace(/[×x*]10([⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+)/, (m, p) => 'e' + p.split('').map(c => sup[c]).join(''));
-    if (!/^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i.test(s)) return NaN;
-    return parseFloat(s);
+    s = s.replace(/[⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+/g, m => '^(' + m.split('').map(c => sup[c]).join('') + ')')
+      .replace(/[×·]/g, '*').replace(/÷/g, '/').replace(/π/g, 'pi').replace(/√/g, 'sqrt').replace(/(\d|\))x(?=[\d(.])/gi, '$1*').toLowerCase();
+    const tk = s.match(/\d+\.?\d*(?:e[+-]?\d+)?|\.\d+(?:e[+-]?\d+)?|[a-z]+|[-+*/^()]/g);
+    if (!tk || tk.join('') !== s) return NaN;
+    let i = 0;
+    const F = { sqrt: Math.sqrt, sin: x => Math.sin(x * Math.PI / 180), cos: x => Math.cos(x * Math.PI / 180), tan: x => Math.tan(x * Math.PI / 180), log: Math.log10, ln: Math.log };
+    const starts = t => t != null && (/^[\d.]/.test(t) || /^[a-z]/.test(t) || t === '(');
+    function prim() {
+      const t = tk[i++];
+      if (t == null) throw 0;
+      if (/^[\d.]/.test(t)) return parseFloat(t);
+      if (t === 'pi') return Math.PI;
+      if (t === '(') { const v = expr(); if (tk[i++] !== ')') throw 0; return v; }
+      if (F[t]) return F[t](unary());
+      throw 0;
+    }
+    function power() { const b = prim(); if (tk[i] === '^') { i++; return Math.pow(b, unary()); } return b; }
+    function unary() { if (tk[i] === '-') { i++; return -unary(); } if (tk[i] === '+') { i++; return unary(); } return power(); }
+    function term() { let v = unary(); for (;;) { if (tk[i] === '*') { i++; v *= unary(); } else if (tk[i] === '/') { i++; v /= unary(); } else if (starts(tk[i])) v *= unary(); else return v; } }
+    function expr() { let v = term(); while (tk[i] === '+' || tk[i] === '-') { const op = tk[i++]; const w = term(); v = op === '+' ? v + w : v - w; } return v; }
+    try { const v = expr(); return i === tk.length && isFinite(v) ? v : NaN; } catch (e) { return NaN; }
   }
+  const pretty = x => fmt(x).replace(/ × 10\^(-?\d+)/, (m, e) => ' × 10' + e.replace(/-/g, '⁻').replace(/\d/g, d => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d]));
+  // key bar under every number box: inserts at the cursor and keeps the box focused
+  const KEYS = [['×10ⁿ', '×10^', 'times ten to the power'], ['^', '^', 'power'], ['√', '√(', 'square root'], ['π', 'π', 'pi'], ['(', '(', ''], [')', ')', ''], ['×', '×', 'multiply'], ['÷', '÷', 'divide'], ['−', '-', 'minus'], ['⌫', null, 'delete']];
+  const keyBar = () => `<div class="mkeys" role="toolbar" aria-label="Answer keys">${KEYS.map(k => `<button type="button" class="mk" data-k="${k[1] == null ? '' : esc(k[1])}" ${k[1] == null ? 'data-del="1"' : ''} title="${k[2]}">${k[0]}</button>`).join('')}</div><div class="mprev" aria-live="polite"></div>`;
+  document.addEventListener('mousedown', e => { if (e.target.closest('.mk')) e.preventDefault(); });
+  // the bar appears the first time the box is used and then stays, so nothing jumps when the box loses focus
+  document.addEventListener('focusin', e => { const n = e.target.closest && e.target.closest('.numin'); if (n && e.target.tagName === 'INPUT') n.classList.add('kb'); });
+  document.addEventListener('click', e => {
+    const k = e.target.closest('.mk'); if (!k) return;
+    const inp = k.closest('.numin').querySelector('input'); if (inp.disabled) return;
+    const a = inp.selectionStart ?? inp.value.length, b = inp.selectionEnd ?? a;
+    if (k.dataset.del) { if (a === b && a > 0) inp.setRangeText('', a - 1, a, 'end'); else inp.setRangeText('', a, b, 'end'); }
+    else inp.setRangeText(k.dataset.k, a, b, 'end');
+    inp.focus(); inp.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  document.addEventListener('input', e => {
+    const inp = e.target; if (!inp.closest || !inp.closest('.numin')) return;
+    const box = inp.closest('.numin').querySelector('.mprev'); if (!box) return;
+    const raw = inp.value.trim(), v = parseNum(raw);
+    box.innerHTML = !raw ? '' : isNaN(v) ? '<span class="hint">Not a number yet: use digits, ×10^, ^, √, π, ( ) and + − × ÷</span>' : (/^[+-]?(\d+\.?\d*|\.\d+)$/.test(raw.replace(/,/g, '')) ? '' : `Your answer reads as <b>${pretty(v)}</b>`);
+  });
   function numOk(given, ans, tol) {
     const t = tol && tol > 0 ? tol : 0.005;
     if (ans === 0) return Math.abs(given) < 1e-9;
@@ -3565,7 +3628,7 @@ window.SERWAY = {
     if (item.o) {
       return `<div class="q" data-key="${key}"><div class="qt">${fx(item.q)}</div><div class="opts">${item.o.map((o, i) => `<button class="opt" data-i="${i}">${String.fromCharCode(65 + i)}. ${fx(o)}</button>`).join('')}</div><div class="fbwrap"></div></div>`;
     }
-    return `<div class="q" data-key="${key}"><div class="qt">${fx(item.q)}</div><div class="numin"><input type="text" inputmode="decimal" placeholder="e.g. 2.5 or 1.6e-19"> <span class="muted">${esc(item.unit || '')}</span> <button class="btn small chk">Check</button></div><div class="fbwrap"></div></div>`;
+    return `<div class="q" data-key="${key}"><div class="qt">${fx(item.q)}</div><div class="numin"><input type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="e.g. 2.5, 1.6×10^-19 or 9e9*2e-6/0.03^2"> <span class="muted">${esc(item.unit || '')}</span> <button class="btn small chk">Check</button>${keyBar()}</div><div class="fbwrap"></div></div>`;
   }
   function wireQ(root, item, onDone, opts = {}) {
     const box = root.querySelector('.q');
@@ -3596,7 +3659,7 @@ window.SERWAY = {
       const go = () => {
         if (done) return;
         const v = parseNum(inp.value);
-        if (isNaN(v)) { fb.innerHTML = `<div class="hint">Enter a number (you can write 1.6e-19 or 1.6×10^-19).</div>`; return false; }
+        if (isNaN(v)) { fb.innerHTML = `<div class="hint">Enter a number or a calculation, e.g. 1.6×10^-19 or 9e9*2e-6/0.03^2.</div>`; return false; }
         done = true; inp.disabled = true; btn.disabled = true;
         const ok = numOk(v, item.num ?? item.ans, item.tol);
         if (!opts.silent) show(ok, ok ? '' : 'expected ≈ ' + fmt(item.num ?? item.ans) + ' ' + (item.unit || ''));
@@ -3849,22 +3912,27 @@ window.SERWAY = {
       COURSE.filter(c => chs.includes(c.id)).forEach(c => c.lessons.forEach(l => { l.quiz.concat(l.checks).forEach(q => pool.push(Object.assign({ ch: c.id, lessonId: l.id }, q))); pool.push({ ch: c.id, lessonId: l.id, q: l.tryit.q, num: l.tryit.ans, tol: l.tryit.tol, unit: l.tryit.unit, sol: l.tryit.sol }); }));
       if ($('#egen').checked) genFor().filter(g => chs.includes(g.ch)).forEach(g => { for (let k = 0; k < 2; k++) { const p = g.f(); pool.push({ ch: g.ch, q: p.q, num: p.ans, unit: p.unit, tol: 0.01, sol: p.sol }); } });
       const qs = shuffle(pool).slice(0, n);
-      EXAM = { qs, ans: {}, start: Date.now(), end: Date.now() + mins * 60000, mins, chs, cur: 0, flags: {}, hash: location.hash || '#exam' };
-      openExam();
+      const chName = id => COURSE.find(c => c.id === id);
+      openTest({ qs, mins, hash: location.hash || '#exam', noun: 'exam', nounAr: 'الاختبار',
+        title: '📝 Exam <span class="muted" style="font-weight:400">· الاختبار</span>', sub: `${chs.map(c => 'Ch ' + chName(c).n).join(', ')} · ${qs.length} questions · ${mins} min`,
+        label: q => `Ch ${chName(q.ch).n}. ${esc(chName(q.ch).title)}`, onFinish: (st, timeUp) => examResults(st, timeUp, chs) });
     };
   }
-  function openExam() {
-    const { qs } = EXAM, chName = id => COURSE.find(c => c.id === id);
-    const ov = document.createElement('div'); ov.className = 'exam-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'Exam');
+  // The test window: full screen over the page, one question at a time, a question map, a timer (a countdown when the
+  // test has a time limit, otherwise the time used), answers can be changed until submitting, nothing graded before.
+  function openTest(cfg) {
+    const qs = cfg.qs;
+    EXAM = Object.assign({ ans: {}, start: Date.now(), end: cfg.mins ? Date.now() + cfg.mins * 60000 : null, cur: 0, flags: {} }, cfg);
+    const ov = document.createElement('div'); ov.className = 'exam-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', cfg.noun);
     ov.innerHTML = subs(`<header class="exhead">
-        <div class="extitle"><span>📝 Exam <span class="muted" style="font-weight:400">· الاختبار</span></span><small class="muted">${EXAM.chs.map(c => 'Ch ' + chName(c).n).join(', ')} · ${qs.length} questions · ${EXAM.mins} min</small></div>
-        <div class="extimer" id="etimer" aria-live="off">--:--</div>
-        <div class="exact"><span class="muted" id="eprog"></span><button class="btn" id="esubmit">Submit · تسليم</button><button class="tog" id="efs" title="Full screen">⛶</button><button class="tog" id="equit" title="Leave the exam">✕</button></div>
+        <div class="extitle"><span>${cfg.title}</span><small class="muted">${cfg.sub}</small></div>
+        <div class="extimer${EXAM.end ? '' : ' up'}" id="etimer" aria-live="off" title="${EXAM.end ? 'Time left' : 'Time used (no time limit)'}">--:--</div>
+        <div class="exact"><span class="muted" id="eprog"></span><button class="btn" id="esubmit">${cfg.submitLabel || 'Submit · تسليم'}</button><button class="tog" id="efs" title="Full screen">⛶</button><button class="tog" id="equit" title="Leave">✕</button></div>
       </header>
       <div class="extime"><i id="etbar"></i></div>
       <div class="exbody">
         <nav class="expal" aria-label="Questions">${qs.map((q, i) => `<button data-go="${i}">${i + 1}</button>`).join('')}<div class="exkey"><span><i class="k ans"></i>answered</span><span><i class="k flag"></i>flagged</span><span><i class="k"></i>not yet</span></div></nav>
-        <section class="exmain">${qs.map((q, i) => `<div class="exq" data-e="${i}" hidden><div class="row" style="justify-content:space-between"><div class="muted" style="font-size:13px">Question ${i + 1} of ${qs.length} · Ch ${chName(q.ch).n}. ${esc(chName(q.ch).title)}</div><button class="tog eflag" data-flag="${i}">⚑ Flag for review</button></div>${qHTML(q, 'e' + i)}</div>`).join('')}
+        <section class="exmain">${qs.map((q, i) => `<div class="exq" data-e="${i}" hidden><div class="row" style="justify-content:space-between"><div class="muted" style="font-size:13px">Question ${i + 1} of ${qs.length} · ${cfg.label(q, i)}</div><button class="tog eflag" data-flag="${i}">⚑ Flag for review</button></div>${qHTML(q, 'e' + i)}</div>`).join('')}
           <div class="row exnav"><button class="btn ghost" id="eprev">← Previous</button><button class="btn" id="enext">Next →</button></div>
           <div id="econfirm"></div></section>
       </div>`);
@@ -3875,7 +3943,8 @@ window.SERWAY = {
     const paint = () => {
       ov.querySelectorAll('[data-go]').forEach(b => { const i = +b.dataset.go; b.classList.toggle('ans', answered(i)); b.classList.toggle('flag', !!EXAM.flags[i]); b.classList.toggle('cur', i === EXAM.cur); });
       ov.querySelectorAll('[data-flag]').forEach(b => b.classList.toggle('on', !!EXAM.flags[+b.dataset.flag]));
-      $('#eprog').textContent = `${qs.filter((q, i) => answered(i)).length} / ${qs.length} answered`;
+      const n = qs.filter((q, i) => answered(i)).length; $('#eprog').textContent = `${n} / ${qs.length} answered`;
+      if (!EXAM.end) $('#etbar').style.width = (n / qs.length * 100) + '%';
     };
     const go = i => { EXAM.cur = Math.max(0, Math.min(qs.length - 1, i)); ov.querySelectorAll('.exq').forEach(d => d.hidden = +d.dataset.e !== EXAM.cur); $('#eprev').disabled = EXAM.cur === 0; $('#enext').textContent = EXAM.cur === qs.length - 1 ? 'Review & submit' : 'Next →'; paint(); const inp = ov.querySelector(`[data-e="${EXAM.cur}"] input`); if (inp) inp.focus(); ov.querySelector('.exmain').scrollTop = 0; };
     EXAM.go = go;
@@ -3889,17 +3958,17 @@ window.SERWAY = {
     $('#eprev').onclick = () => go(EXAM.cur - 1);
     $('#enext').onclick = () => EXAM.cur === qs.length - 1 ? askSubmit() : go(EXAM.cur + 1);
     $('#esubmit').onclick = askSubmit;
-    const quit = () => { $('#econfirm').innerHTML = `<div class="card exconf"><b>Leave the exam? · الخروج من الاختبار؟</b><p>Your answers will be lost and nothing is saved.</p><div class="ar">ستضيع إجاباتك ولن تُحفظ النتيجة.</div><div class="row"><button class="btn" id="eleave">Leave the exam</button><button class="btn ghost" id="estay">Back to the exam</button></div></div>`; $('#eleave').onclick = closeExam; $('#estay').onclick = () => { $('#econfirm').innerHTML = ''; }; $('#econfirm').scrollIntoView({ block: 'nearest' }); };
+    const quit = () => { $('#econfirm').innerHTML = `<div class="card exconf"><b>Leave the ${cfg.noun}? · الخروج من ${cfg.nounAr}؟</b><p>Your answers will be lost and nothing is saved.</p><div class="ar">ستضيع إجاباتك ولن تُحفظ النتيجة.</div><div class="row"><button class="btn" id="eleave">Leave the ${cfg.noun}</button><button class="btn ghost" id="estay">Back to the ${cfg.noun}</button></div></div>`; $('#eleave').onclick = closeExam; $('#estay').onclick = () => { $('#econfirm').innerHTML = ''; }; $('#econfirm').scrollIntoView({ block: 'nearest' }); };
     $('#equit').onclick = quit;
     $('#efs').onclick = () => { try { const r = document.fullscreenElement ? document.exitFullscreen() : ov.requestFullscreen(); if (r && r.catch) r.catch(() => {}); } catch (err) { /* full screen not allowed here */ } };
     function askSubmit() {
       const open = qs.map((q, i) => i).filter(i => !answered(i)), fl = Object.keys(EXAM.flags).filter(k => EXAM.flags[k]).map(Number);
-      $('#econfirm').innerHTML = `<div class="card exconf"><b>Submit the exam? · تسليم الاختبار؟</b>
+      $('#econfirm').innerHTML = `<div class="card exconf"><b>Submit the ${cfg.noun}? · تسليم ${cfg.nounAr}؟</b>
         ${open.length ? `<p>⚠ ${open.length} question(s) not answered: ${open.map(i => `<a href="#" data-jump="${i}">${i + 1}</a>`).join(', ')}. They count as wrong.</p><div class="ar">لم تجب عن ${open.length} سؤال، وستُحسب خاطئة.</div>` : '<p>All questions answered.</p>'}
         ${fl.length ? `<p>⚑ Flagged for review: ${fl.map(i => `<a href="#" data-jump="${i}">${i + 1}</a>`).join(', ')}</p>` : ''}
-        <div class="row"><button class="btn" id="eyes">Yes, submit · نعم، سلّم</button><button class="btn ghost" id="eno">Back to the exam</button></div></div>`;
+        <div class="row"><button class="btn" id="eyes">Yes, submit · نعم، سلّم</button><button class="btn ghost" id="eno">Back to the ${cfg.noun}</button></div></div>`;
       $('#econfirm').querySelectorAll('[data-jump]').forEach(a => a.onclick = e => { e.preventDefault(); $('#econfirm').innerHTML = ''; go(+a.dataset.jump); });
-      $('#eyes').onclick = finishExam; $('#eno').onclick = () => { $('#econfirm').innerHTML = ''; };
+      $('#eyes').onclick = () => finishTest(false); $('#eno').onclick = () => { $('#econfirm').innerHTML = ''; };
       $('#econfirm').scrollIntoView({ block: 'nearest' });
     }
     EXAM.keys = e => {
@@ -3908,13 +3977,16 @@ window.SERWAY = {
       else if (!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) go(EXAM.cur + (e.key === 'ArrowRight' ? 1 : -1));
     };
     document.addEventListener('keydown', EXAM.keys);
+    const mmss = ms => `${String(Math.floor(ms / 60000)).padStart(2, '0')}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
     const tick = () => {
       if (!EXAM) return;
-      const left = Math.max(0, EXAM.end - Date.now()), total = EXAM.end - EXAM.start;
-      const t = $('#etimer'); t.textContent = `${String(Math.floor(left / 60000)).padStart(2, '0')}:${String(Math.floor(left / 1000) % 60).padStart(2, '0')}`;
-      t.classList.toggle('low', left <= Math.min(120000, total * 0.2)); t.classList.toggle('last', left <= 60000);
-      $('#etbar').style.width = (left / total * 100) + '%';
-      if (left <= 0) { finishExam(true); return; }
+      const t = $('#etimer');
+      if (EXAM.end) {
+        const left = Math.max(0, EXAM.end - Date.now()), total = EXAM.end - EXAM.start;
+        t.textContent = mmss(left); t.classList.toggle('low', left <= Math.min(120000, total * 0.2)); t.classList.toggle('last', left <= 60000);
+        $('#etbar').style.width = (left / total * 100) + '%';
+        if (left <= 0) { finishTest(true); return; }
+      } else t.textContent = '⏱ ' + mmss(Date.now() - EXAM.start);
       EXAM.t = setTimeout(tick, 250);
     };
     go(0); tick();
@@ -3926,22 +3998,36 @@ window.SERWAY = {
     EXAM.ov.remove(); document.body.classList.remove('exam-open');
     EXAM = null;
   }
-  function finishExam(timeUp) {
+  function finishTest(timeUp) {
     if (!EXAM) return;
     EXAM.h.forEach(h => h.check());
-    const { qs, ans, chs } = EXAM; const by = {}, used = Math.round((Date.now() - EXAM.start) / 1000);
+    const st = EXAM; st.used = Math.round((Date.now() - st.start) / 1000);
+    closeExam();
+    if (location.hash !== st.hash) location.hash = st.hash;
+    st.onFinish(st, timeUp);
+    window.scrollTo(0, 0);
+  }
+  // every question after the test: your answer, the right answer and why
+  const shownAns = (q, a) => !a || a.given === '(blank)' ? '<i class="muted">no answer</i>' : q.o ? a.given : `${esc(a.given)}${parseNum(a.given) !== +a.given && !isNaN(parseNum(a.given)) ? ` <span class="muted">(= ${pretty(parseNum(a.given))})</span>` : ''} ${q.unit || ''}`;
+  const rightAns = q => q.o ? q.o[q.a] : `${pretty(q.num)} ${q.unit || ''}`;
+  function reviewHTML(qs, ans, label) {
+    return qs.map((q, i) => { const a = ans[i], ok = !!(a && a.ok), blank = !a || a.given === '' ;
+      return `<div class="rev ${ok ? 'ok' : 'bad'}"><div class="revhead"><b>Q${i + 1}</b><span class="muted">${label(q, i)}</span><span class="pill ${ok ? 'ok' : 'bad'}">${ok ? '✔ Correct · صحيحة' : blank ? '— Not answered · لم تُجب' : '✘ Wrong · خاطئة'}</span></div>
+        <div class="qt">${q.q}</div>
+        <div class="revans"><div><small>Your answer · إجابتك</small><div class="${ok ? 'okv' : 'badv'}">${shownAns(q, a)}</div></div><div><small>Correct answer · الإجابة الصحيحة</small><div class="okv">${rightAns(q)}</div></div></div>
+        ${q.why || q.sol ? `<div class="revwhy"><small>Why · التوضيح</small><div>${q.why || q.sol}</div></div>` : ''}</div>`; }).join('');
+  }
+  function examResults(st, timeUp, chs) {
+    const { qs, ans } = st; const by = {};
     let good = 0;
     qs.forEach((q, i) => { const a = ans[i]; const ok = !!(a && a.ok); if (ok) good++; else logMistake(q, a ? a.given : '(blank)', q.lessonId); by[q.ch] = by[q.ch] || [0, 0]; by[q.ch][1]++; if (ok) by[q.ch][0]++; });
     const pct = Math.round(good / qs.length * 100);
     S.exams.unshift({ ts: Date.now(), n: qs.length, pct, chs: chs.map(c => c.replace('ch', 'Ch ')), by }); save();
-    closeExam();
-    if (location.hash.split('/')[0] !== '#exam') location.hash = '#exam';
     $('#esetup').style.display = 'none';
-    $('#ebox').innerHTML = fx(`<div class="card"><h2 style="margin-top:0">Score: ${pct}% (${good}/${qs.length})</h2>${timeUp ? '<p class="note">⏰ Time was up: the exam was submitted automatically. · انتهى الوقت وسُلِّم الاختبار تلقائيًا.</p>' : ''}<p class="muted">Time used: ${Math.floor(used / 60)} min ${used % 60} s</p>
+    $('#ebox').innerHTML = fx(`<div class="card"><h2 style="margin-top:0">Score: ${pct}% (${good}/${qs.length})</h2>${timeUp ? '<p class="note">⏰ Time was up: the exam was submitted automatically. · انتهى الوقت وسُلِّم الاختبار تلقائيًا.</p>' : ''}<p class="muted">Time used: ${Math.floor(st.used / 60)} min ${st.used % 60} s</p>
       <table><tr><th>Chapter</th><th>Correct</th><th></th></tr>${Object.entries(by).map(([c, v]) => `<tr><td>${COURSE.find(x => x.id === c).title}</td><td>${v[0]}/${v[1]}</td><td style="width:40%">${bar(Math.round(v[0] / v[1] * 100))}</td></tr>`).join('')}</table>
       <p>Wrong and blank answers were added to your <a href="#mistakes">Mistake journal</a>.</p><div class="row"><button class="btn" onclick="location.hash='#exam';location.reload()">New exam</button><a class="btn ghost" href="#report">Progress report</a></div></div>
-      <h2>Review</h2>` + qs.map((q, i) => { const a = ans[i]; const ok = !!(a && a.ok); return `<div class="q"><div class="qt">Q${i + 1}. ${q.q}</div><div class="fb ${ok ? 'ok' : 'bad'}">${ok ? '✔' : '✘'} Your answer: ${a ? (q.o ? a.given : esc(a.given) + ' ' + (q.unit || '')) : '(blank)'} · Correct: ${q.o ? q.o[q.a] : fmt(q.num) + ' ' + (q.unit || '')}<div class="sol">${q.why || q.sol || ''}</div></div></div>`; }).join(''));
-    window.scrollTo(0, 0);
+      <h2>Review: every question · مراجعة كل الأسئلة</h2>` + reviewHTML(qs, ans, st.label));
   }
 
   // ---------- flashcards (Leitner) ----------
@@ -4319,28 +4405,30 @@ window.SERWAY = {
     run();
   }
   views.placement = () => `<h1>Placement test <span class="muted" style="font-size:18px;font-weight:400">· اختبار تحديد المستوى</span></h1>
-    <p class="sub">${SKILLS().length * 2} questions, two on each foundation skill. No timer, no feedback until the end. ${ADD}</p>
+    <p class="sub">${SKILLS().length * 2} questions, two on each foundation skill. No time limit, no feedback until the end. ${ADD}</p>
     <div class="ar">سؤالان على كل مهارة من مهارات الوحدة صفر. أجب بصدق ولا تستعجل، والنتيجة تحدد لك من أين تبدأ: المهارات التي تتقنها تتخطاها، والباقي تراجعه قبل فصوله.</div>
-    <div id="plbox"><button class="btn" id="plgo">Start the placement test</button></div>`;
+    <div id="plbox"><div class="card"><ul class="clean"><li>Opens full screen, one question at a time, with a map of all ${SKILLS().length * 2} questions.</li><li>Change any answer before you finish. No time limit: the clock only shows the time used.</li><li>For number answers you can type a calculation, e.g. <code>9e9*2e-6/0.03^2</code>, and use the key bar (×10ⁿ, √, π…).</li><li>At the end you see every question with the right answer and why.</li></ul>
+      <div class="ar">يفتح بملء الشاشة، سؤالًا سؤالًا، ويمكنك تغيير أي إجابة قبل الإنهاء. لا يوجد وقت محدد. وفي النهاية ترى كل سؤال مع الإجابة الصحيحة وتوضيحها.</div><button class="btn" id="plgo">Start the placement test · ابدأ الاختبار</button></div></div>`;
   function afterPlacement() {
     $('#plgo').onclick = () => {
-      const qs = []; SKILLS().forEach(k => { qs.push({ k, it: k.gen() }); qs.push({ k, it: k.gen() }); });
-      const ans = {};
-      $('#plbox').innerHTML = qs.map((x, i) => `<div data-pl="${i}"><div class="muted" style="font-size:13px;margin-top:10px">Q${i + 1} · ${esc(x.k.title)}</div>${qHTML(x.it, 'pl' + i)}</div>`).join('') + '<div id="plres"></div>';
-      const hs = qs.map((x, i) => wireQ(document.querySelector(`[data-pl="${i}"]`), x.it, (ok, given) => { ans[i] = { ok, given }; }, { deferred: true, silent: true, hideSol: true }));
-      const b = document.createElement('button'); b.className = 'btn'; b.textContent = 'Finish and see my plan · أنهِ الاختبار'; b.style.marginTop = '12px'; $('#plres').before(b);
-      b.onclick = () => {
-        hs.forEach(h => h.check());
-        const res = {}; qs.forEach((x, i) => { const r = res[x.k.id] = res[x.k.id] || [0, 0]; r[1]++; if (ans[i] && ans[i].ok) r[0]++; else logMistake(x.it, ans[i] ? ans[i].given : '(blank)', null); });
-        const good = Object.values(res).reduce((a, r) => a + r[0], 0), pct = Math.round(good / qs.length * 100);
-        S.placement = { ts: Date.now(), res, pct }; save(); b.remove();
-        const weak = SKILLS().filter(k => res[k.id][0] < 2);
-        $('#plbox').innerHTML = `<div class="card"><h2 style="margin-top:0">Result: ${pct}% (${good}/${qs.length})</h2><table><tr><th>Skill</th><th>Correct</th><th>Next step</th></tr>${SKILLS().map(k => { const r = res[k.id]; return `<tr><td><a href="#skill/${k.id}">${esc(k.title)}</a><br><small class="muted">${k.ar}</small></td><td><b>${r[0]}/${r[1]}</b></td><td>${r[0] === 2 ? '<span class="pill ok">skip it</span>' : r[0] === 1 ? '<span class="pill warn">quick review</span>' : '<span class="pill bad">study it</span>'}</td></tr>`; }).join('')}</table>
-          ${weak.length ? `<p><b>Your plan:</b> study ${weak.map(k => `<a href="#skill/${k.id}">${esc(k.title)}</a>`).join(', ')}, then start Chapter 1. Each chapter page also shows which of these it needs.</p><div class="ar">خطتك: راجع المهارات المعلَّمة أعلاه بالترتيب، ثم ابدأ الفصل الأول. وصفحة كل فصل تذكّرك بالمهارات التي يحتاجها.</div><a class="btn" href="#skill/${weak[0].id}">Start with: ${esc(weak[0].title)}</a>` : `<p><b>Your foundations are solid.</b> Start Chapter 1.</p><div class="ar">أساسك قوي، ابدأ الفصل الأول مباشرة.</div><a class="btn" href="#lesson/ch1-l1">Start Chapter 1</a>`}
-          <p class="muted" style="font-size:13px">Wrong answers were added to your mistake journal.</p></div>`;
-        window.scrollTo(0, 0);
-      };
+      const qs = []; SKILLS().forEach(k => { for (let j = 0; j < 2; j++) qs.push(Object.assign({ skill: k.id }, k.gen())); });
+      openTest({ qs, mins: 0, hash: '#placement', noun: 'test', nounAr: 'الاختبار', submitLabel: 'Finish · إنهاء',
+        title: '🧭 Placement test <span class="muted" style="font-weight:400">· تحديد المستوى</span>', sub: `${qs.length} questions · 2 per foundation skill · no time limit`,
+        label: q => esc(skillById(q.skill).title), onFinish: placementResults });
     };
+  }
+  function placementResults(st) {
+    const { qs, ans } = st;
+    const res = {}; qs.forEach((q, i) => { const r = res[q.skill] = res[q.skill] || [0, 0]; r[1]++; if (ans[i] && ans[i].ok) r[0]++; else logMistake(q, ans[i] ? ans[i].given : '(blank)', null); });
+    const good = Object.values(res).reduce((a, r) => a + r[0], 0), pct = Math.round(good / qs.length * 100);
+    S.placement = { ts: Date.now(), res, pct }; save();
+    const weak = SKILLS().filter(k => res[k.id][0] < 2);
+    $('#plbox').innerHTML = fx(`<div class="card"><h2 style="margin-top:0">Result: ${pct}% (${good}/${qs.length})</h2><p class="muted">Time used: ${Math.floor(st.used / 60)} min ${st.used % 60} s</p>
+      <table><tr><th>Skill</th><th>Correct</th><th>Next step</th></tr>${SKILLS().map(k => { const r = res[k.id]; return `<tr><td><a href="#skill/${k.id}">${esc(k.title)}</a><br><small class="muted">${k.ar}</small></td><td><b>${r[0]}/${r[1]}</b></td><td>${r[0] === 2 ? '<span class="pill ok">skip it</span>' : r[0] === 1 ? '<span class="pill warn">quick review</span>' : '<span class="pill bad">study it</span>'}</td></tr>`; }).join('')}</table>
+      ${weak.length ? `<p><b>Your plan:</b> study ${weak.map(k => `<a href="#skill/${k.id}">${esc(k.title)}</a>`).join(', ')}, then start Chapter 1. Each chapter page also shows which of these it needs.</p><div class="ar">خطتك: راجع المهارات المعلَّمة أعلاه بالترتيب، ثم ابدأ الفصل الأول. وصفحة كل فصل تذكّرك بالمهارات التي يحتاجها.</div><div class="row"><a class="btn" href="#skill/${weak[0].id}">Start with: ${esc(weak[0].title)}</a><button class="btn ghost" onclick="location.reload()">Retake the test</button></div>` : `<p><b>Your foundations are solid.</b> Start Chapter 1.</p><div class="ar">أساسك قوي، ابدأ الفصل الأول مباشرة.</div><a class="btn" href="#lesson/ch1-l1">Start Chapter 1</a>`}
+      <p class="muted" style="font-size:13px">Wrong answers were added to your mistake journal.</p></div>
+      <h2>Review: every question · مراجعة كل الأسئلة</h2><div class="ar">لكل سؤال: إجابتك، والإجابة الصحيحة، وتوضيح طريقة الوصول لها. الأسئلة الخاطئة مكتوب تحتها رابط المهارة لتراجعها.</div>` +
+      reviewHTML(qs, ans, q => `<a href="#skill/${q.skill}">${esc(skillById(q.skill).title)}</a>`));
   }
   // ---------- glossary & problem language ----------
   views.glossary = () => `<h1>Course glossary <span class="muted" style="font-size:18px;font-weight:400">· قاموس المقرر</span></h1>
