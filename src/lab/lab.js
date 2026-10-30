@@ -16,6 +16,17 @@
   document.documentElement.classList.toggle('framed', FRAMED);
   const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
+  // ---------- canvases ----------
+  // Each drawing keeps its own design coordinates (sim 640×260, graph 520×300) but is painted at the screen's real
+  // pixel size, and its text grows when the drawing is shown narrower than designed (phones), so labels stay readable.
+  function view(cv, W, H) {
+    const cssW = cv.clientWidth || W, dpr = window.devicePixelRatio || 1, k = cssW / W;
+    const pw = Math.max(1, Math.round(cssW * dpr)), ph = Math.max(1, Math.round(H * k * dpr));
+    if (cv.width !== pw || cv.height !== ph) { cv.width = pw; cv.height = ph; }
+    const c = cv.getContext('2d'); c.setTransform(k * dpr, 0, 0, k * dpr, 0, 0);
+    return { width: W, height: H, k, boost: Math.min(2, Math.max(1, 0.85 / k)), getContext: () => c };
+  }
+
   // ---------- linear fit ----------
   function fit(pts, origin) {
     const n = pts.length; if (n < 2) return null;
@@ -31,11 +42,12 @@
     const my = pts.reduce((a, p) => a + p[1], 0) / n; const sst = pts.reduce((a, p) => a + (p[1] - my) ** 2, 0); const ssr = pts.reduce((a, p) => a + (p[1] - m * p[0] - b) ** 2, 0);
     return { m, b, se, r2: sst ? 1 - ssr / sst : 1 };
   }
-  function plot(cv, pts, f, xl, yl) {
-    const c = cv.getContext('2d'), W = cv.width, H = cv.height, P = { l: 62, r: 16, t: 14, b: 44 };
+  function plot(canvas, pts, f, xl, yl) {
+    const cv = view(canvas, 520, 300), b = cv.boost;
+    const c = cv.getContext('2d'), W = cv.width, H = cv.height, P = { l: 62 * b, r: 16, t: 30 * b, b: 44 * b };
     c.clearRect(0, 0, W, H); c.fillStyle = css('--panel'); c.fillRect(0, 0, W, H);
     const ink = css('--ink'), mut = css('--muted'), line = css('--line'), br = css('--brand'), ac = css('--accent');
-    c.font = '12px Segoe UI, sans-serif';
+    c.font = `${Math.round(12 * b)}px Segoe UI, sans-serif`;
     if (!pts.length) { c.fillStyle = mut; c.fillText('Record measurements to build the graph', W / 2 - 110, H / 2); return; }
     const xs = pts.map(p => p[0]).concat(0), ys = pts.map(p => p[1]).concat(0);
     let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
@@ -43,15 +55,15 @@
     x1 += (x1 - x0) * .08; y1 += (y1 - y0) * .08;
     const X = x => P.l + (x - x0) / (x1 - x0) * (W - P.l - P.r), Y = y => H - P.b - (y - y0) / (y1 - y0) * (H - P.t - P.b);
     c.strokeStyle = line; c.lineWidth = 1; c.fillStyle = mut;
-    for (let i = 0; i <= 5; i++) { const gx = x0 + (x1 - x0) * i / 5, gy = y0 + (y1 - y0) * i / 5; c.beginPath(); c.moveTo(X(gx), P.t); c.lineTo(X(gx), H - P.b); c.stroke(); c.beginPath(); c.moveTo(P.l, Y(gy)); c.lineTo(W - P.r, Y(gy)); c.stroke(); c.fillText(fmt(gx, 2), X(gx) - 12, H - P.b + 16); c.fillText(fmt(gy, 2), 4, Y(gy) + 4); }
-    c.fillStyle = ink; c.fillText(xl, W / 2 - c.measureText(xl).width / 2, H - 8);
-    c.save(); c.translate(14, H / 2); c.rotate(-Math.PI / 2); c.fillText(yl, -c.measureText(yl).width / 2, 0); c.restore();
+    for (let i = 0; i <= 5; i++) { const gx = x0 + (x1 - x0) * i / 5, gy = y0 + (y1 - y0) * i / 5; c.beginPath(); c.moveTo(X(gx), P.t); c.lineTo(X(gx), H - P.b); c.stroke(); c.beginPath(); c.moveTo(P.l, Y(gy)); c.lineTo(W - P.r, Y(gy)); c.stroke(); const tx = fmt(gx, 2), tw = c.measureText(tx).width; c.fillText(tx, Math.min(W - tw - 2, Math.max(P.l - tw / 2, X(gx) - tw / 2)), H - P.b + 16 * b); const ty = fmt(gy, 2); c.fillText(ty, Math.max(2, P.l - 6 - c.measureText(ty).width), Y(gy) + 4 * b); }
+    c.fillStyle = ink; c.fillText(xl + ' →', W / 2 - c.measureText(xl).width / 2, H - 8);
+    c.fillText('↑ ' + yl, 4, 16 * b);
     if (f) { c.strokeStyle = ac; c.lineWidth = 2; c.setLineDash([6, 4]); c.beginPath(); c.moveTo(X(x0), Y(f.m * x0 + f.b)); c.lineTo(X(x1), Y(f.m * x1 + f.b)); c.stroke(); c.setLineDash([]); }
     c.fillStyle = br; pts.forEach(p => { c.beginPath(); c.arc(X(p[0]), Y(p[1]), 4.5, 0, 7); c.fill(); });
   }
 
   // ---------- drawing helpers ----------
-  function ctxOf(cv) { const c = cv.getContext('2d'); c.clearRect(0, 0, cv.width, cv.height); c.fillStyle = css('--panel'); c.fillRect(0, 0, cv.width, cv.height); c.font = '13px Segoe UI, sans-serif'; c.lineCap = 'round'; return c; }
+  function ctxOf(cv) { const c = cv.getContext('2d'); c.clearRect(0, 0, cv.width, cv.height); c.fillStyle = css('--panel'); c.fillRect(0, 0, cv.width, cv.height); c.font = `${Math.round(13 * (cv.boost || 1))}px Segoe UI, sans-serif`; c.lineCap = 'round'; return c; }
   function arrow(c, x1, y1, x2, y2, col, w = 3, label) {
     c.strokeStyle = col; c.fillStyle = col; c.lineWidth = w; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
     const a = Math.atan2(y2 - y1, x2 - x1); c.beginPath(); c.moveTo(x2, y2); c.lineTo(x2 - 12 * Math.cos(a - .4), y2 - 12 * Math.sin(a - .4)); c.lineTo(x2 - 12 * Math.cos(a + .4), y2 - 12 * Math.sin(a + .4)); c.fill();
@@ -93,9 +105,9 @@
       measure(s) { const k = this.calc(s); return [s.f1, s.a1, s.f2, s.a2, noisy(k.R, 0.02, 0.05), roundTo(k.th + (NOISE ? 1.5 * gauss() : 0), 1), +k.R.toFixed(3)]; },
       xy: r => [r[6], r[4]], xl: 'R calculated (N)', yl: 'R measured (N)', origin: true,
       result: f => `slope = <b>${fmt(f.m)}</b> (ideal 1.000) · R² = ${fmt(f.r2, 4)}`,
-      draw(cv, s) { const c = ctxOf(cv); const cx = cv.width / 2 - 60, cy = cv.height / 2, k = 13; c.strokeStyle = css('--line'); c.lineWidth = 1; c.beginPath(); c.arc(cx, cy, 140, 0, 7); c.stroke(); for (let a = 0; a < 360; a += 30) { txt(c, a + '°', cx + 152 * Math.cos(rad(a)) - 10, cy - 152 * Math.sin(rad(a)) + 4, css('--muted')); }
+      draw(cv, s) { const c = ctxOf(cv), b = cv.boost || 1; const cx = cv.width / 2 - 60, cy = cv.height / 2, rr = cy - 22 * b, k = 13 * rr / 140; c.strokeStyle = css('--line'); c.lineWidth = 1; c.beginPath(); c.arc(cx, cy, rr, 0, 7); c.stroke(); for (let a = 0; a < 360; a += 30) { const lb = a + '°', w = c.measureText(lb).width; txt(c, lb, cx + (rr + 8 * b + w / 2) * Math.cos(rad(a)) - w / 2, cy - (rr + 9 * b) * Math.sin(rad(a)) + 4 * b, css('--muted')); }
         const r = this.calc(s); arrow(c, cx, cy, cx + s.f1 * k * Math.cos(rad(s.a1)), cy - s.f1 * k * Math.sin(rad(s.a1)), css('--brand'), 3, 'F₁'); arrow(c, cx, cy, cx + s.f2 * k * Math.cos(rad(s.a2)), cy - s.f2 * k * Math.sin(rad(s.a2)), css('--brand'), 3, 'F₂'); arrow(c, cx, cy, cx + r.R * k * Math.cos(rad(r.th)), cy - r.R * k * Math.sin(rad(r.th)), css('--accent'), 3, 'R'); c.setLineDash([5, 4]); arrow(c, cx, cy, cx - r.R * k * Math.cos(rad(r.th)), cy + r.R * k * Math.sin(rad(r.th)), css('--muted'), 2, 'equilibrant'); c.setLineDash([]);
-        txt(c, `R = ${fmt(r.R)} N at ${fmt(r.th)}°`, cv.width - 200, 30); txt(c, `Rₓ = ${fmt(r.R * Math.cos(rad(r.th)))} N`, cv.width - 200, 52, css('--muted')); txt(c, `R_y = ${fmt(r.R * Math.sin(rad(r.th)))} N`, cv.width - 200, 72, css('--muted')); },
+        const lh = 20 * b; txt(c, `R = ${fmt(r.R)} N at ${fmt(r.th)}°`, cv.width - 200, 30); txt(c, `Rₓ = ${fmt(r.R * Math.cos(rad(r.th)))} N`, cv.width - 200, 30 + lh, css('--muted')); txt(c, `R_y = ${fmt(r.R * Math.sin(rad(r.th)))} N`, cv.width - 200, 30 + 2 * lh, css('--muted')); },
       errors: ['Friction in the pulleys: the ring can sit slightly off centre.', 'Angle scale read to ±1°.', 'Mass of the hangers not included in F.'],
       discussion: [['Why is the equilibrant equal and opposite to the resultant?', 'For equilibrium ΣF = 0 (Newton\'s first law, S04), so the third force must cancel R.'], ['When is |F₁ + F₂| equal to F₁ + F₂?', 'Only when the forces point in the same direction.']],
       skills: ['Levelling the force table', 'Tapping the table to reduce pulley friction', 'Reading angles at the string, not the pulley rim']
@@ -250,7 +262,7 @@
         const a = rad(s.th); arrow(c, cx - R * Math.sin(a), cy - R * Math.cos(a), cx, cy, css('--bad'), 3); const refl = css('--muted');
         arrow(c, cx, cy, cx + R * Math.sin(a), cy - R * Math.cos(a), k.tir ? css('--bad') : refl, k.tir ? 3 : 1, k.tir ? 'total internal reflection' : 'reflected');
         if (!k.tir) { const b = rad(k.th2); arrow(c, cx, cy, cx + R * Math.sin(b), cy + R * Math.cos(b), css('--bad'), 3, `θ₂ = ${fmt(k.th2)}°`); }
-        txt(c, `θ₁ = ${s.th}°`, cx - R - 10, cy - R + 10); txt(c, s.dir ? 'block (top) → air (bottom)' : 'air (top) → block (bottom)', 20, 24, css('--muted')); if (k.crit) txt(c, `θc = ${fmt(k.crit)}°`, 20, 46, css('--muted')); },
+        txt(c, `θ₁ = ${s.th}°`, cx - R - 10, cy - R + 10); { const b = cv.boost || 1, l1 = s.dir ? 'block (top)' : 'air (top)', l2 = s.dir ? '→ air (bottom)' : '→ block (bottom)', w = Math.max(c.measureText(l1).width, c.measureText(l2).width); txt(c, l1, cv.width - w - 10, 22 * b, css('--muted')); txt(c, l2, cv.width - w - 10, 42 * b, css('--muted')); } if (k.crit) txt(c, `θc = ${fmt(k.crit)}°`, 20, 46, css('--muted')); },
       errors: ['Ray not aimed at the centre of the flat face (the curved face then refracts too).', 'Protractor read to ±0.5°.', 'Wide beam: mark the centre of the ray.'],
       discussion: [['Why use a semicircular block?', 'A ray aimed at the centre meets the curved surface along a radius (normal), so it is not refracted there.'], ['Why does total internal reflection only occur from block to air?', 'It needs n₁ > n₂ so that n₁ sin θ₁/n₂ can exceed 1 (BK p.172).']],
       skills: ['Aligning the block with the protractor centre', 'Working in a darkened room', 'Laser safety (never look into the beam)']
@@ -297,45 +309,88 @@
   const persist = () => { try { localStorage.setItem('physics-virtual-lab-v1', JSON.stringify({ data, notes })); } catch (e) { /* ignore */ } };
 
   function renderList() { $('#exlist').innerHTML = EX.map(e => `<a href="#${e.id}" class="${e === cur ? 'active' : ''}">${esc(e.title)}<small>${e.ar}</small></a>`).join(''); }
+  // which step (tab) is open, per experiment
+  let tabs = {}; try { tabs = JSON.parse(localStorage.getItem('lab-tabs') || '{}'); } catch (e) { /* no storage */ }
+  const STEPS = [['prep', '1', 'Prepare', 'التحضير'], ['run', '2', 'Experiment', 'التجربة'], ['res', '3', 'Results', 'النتائج'], ['qs', '4', 'Questions', 'الأسئلة']];
+  function showTab(t) {
+    tabs[cur.id] = t; try { localStorage.setItem('lab-tabs', JSON.stringify(tabs)); } catch (e) { /* no storage */ }
+    document.querySelectorAll('.ltab').forEach(b => { const on = b.dataset.t === t; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
+    document.querySelectorAll('.lpanel').forEach(p => p.hidden = p.dataset.p !== t);
+    document.body.classList.toggle('lab-run', t === 'run');
+    if (t === 'res') analyse();
+  }
   function render() {
-    const e = cur, s = state[e.id];
+    const e = cur, s = state[e.id], i = EX.indexOf(e), prev = EX[i - 1], next = EX[i + 1];
     $('#exp').innerHTML = `
-      <div class="row" style="justify-content:space-between"><h1>${esc(e.title)}</h1><span class="pill add">🧩 Additional design · law from ${esc(e.src)}</span></div>
-      <p class="sub"><bdi>${e.ar}</bdi></p>
-      <div class="formula">${mathify(e.law)}</div>${LAWW[e.id] ? `<div class="words"><div class="ar"><bdi>🗣 ${LAWW[e.id][0]}</bdi></div><div class="en">🗣 <b>In words:</b> ${LAWW[e.id][1]}</div></div>` : ''}
-      <div class="grid g2">
-        <div class="card"><h3>🎯 Objective</h3><p>${e.objective}</p><h3>🧪 Apparatus (virtual)</h3><ul>${e.apparatus.map(a => `<li>${a}</li>`).join('')}</ul></div>
-        <div class="card"><h3>📋 Procedure</h3><ol>${e.procedure.map(a => `<li>${a}</li>`).join('')}</ol></div>
-      </div>
-      <div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">🔬 Simulation</h3><label class="muted"><input type="checkbox" id="noise" ${NOISE ? 'checked' : ''}> realistic measurement errors</label></div>
-        <canvas id="sim" width="640" height="260" style="width:100%;max-width:640px;display:block;margin:8px auto"></canvas>
-        <div class="controls">${e.controls.map(k => k.options ? `<label>${k.label}<select data-k="${k.id}">${k.options.map(o => `<option value="${o[1]}" ${o[1] == s[k.id] ? 'selected' : ''}>${o[0]}</option>`).join('')}</select></label>` : `<label>${k.label} <b><span data-v="${k.id}">${s[k.id]}</span> ${k.unit}</b><input type="range" data-k="${k.id}" min="${k.min}" max="${k.max}" step="${k.step}" value="${s[k.id]}"></label>`).join('')}</div>
-        <div class="row" style="margin-top:10px"><button class="btn" id="rec">● Record measurement</button><button class="btn ghost" id="auto">Auto‑sweep 7 readings</button><button class="btn ghost" id="undo">Undo last</button><button class="btn ghost" id="clr">Clear table</button>${e.reveal ? '<button class="btn ghost" id="rev">Reveal true value</button>' : ''}<button class="btn ghost" id="csv">Export CSV</button></div><div id="revbox" class="muted"></div></div>
-      <div class="grid g2">
-        <div class="card"><h3>📊 Data table</h3><div style="overflow:auto;max-height:320px"><table id="tbl"></table></div></div>
-        <div class="card"><h3>📈 Graph & analysis</h3><canvas id="plot" width="520" height="300" style="width:100%"></canvas><div id="res" class="result"></div></div>
-      </div>
-      <div class="grid g2">
-        <div class="card"><h3>⚠️ Sources of error & uncertainty</h3><ul>${e.errors.map(a => `<li>${a}</li>`).join('')}</ul><h3>✋ Skills that need the real apparatus</h3><ul>${e.skills.map(a => `<li>${a}</li>`).join('')}</ul><p class="muted" style="font-size:13px">A simulation cannot train these hands‑on skills: practise them in your real lab sessions.</p></div>
-        <div class="card"><h3>💬 Discussion questions</h3>${e.discussion.map((d, i) => `<div class="dq"><b>${i + 1}. ${d[0]}</b><textarea data-n="${i}" placeholder="Write your answer first…">${esc((notes[e.id] || {})[i] || '')}</textarea><button class="btn small ghost" data-show="${i}">Show model answer</button><div class="model" id="m${i}" hidden>${d[1]}</div></div>`).join('')}</div>
-      </div>
-      <div class="row noprint"><button class="btn printbtn" onclick="window.print()">🖨 Print lab report</button><span class="muted printbtn">Prints the procedure, your data, graph, result and answers.</span></div><div id="labmsg"></div>`;
+      <div class="lnav noprint"><a class="btn ghost small" ${prev ? `href="#${prev.id}"` : 'aria-disabled="true"'} title="${prev ? esc(prev.title) : ''}">← Prev</a>
+        <label class="lpick"><span class="muted">Experiment ${i + 1} of ${EX.length}</span><select id="lsel" aria-label="Choose an experiment">${EX.map(x => `<option value="${x.id}" ${x === e ? 'selected' : ''}>${esc(x.title)}</option>`).join('')}</select></label>
+        <a class="btn ghost small" ${next ? `href="#${next.id}"` : 'aria-disabled="true"'} title="${next ? esc(next.title) : ''}">Next →</a></div>
+      <h1 class="ltitle">${esc(e.title)}</h1>
+      <p class="sub"><bdi>${e.ar}</bdi> · <span class="pill add">🧩 Additional design · law from ${esc(e.src)}</span></p>
+      <div class="ltabs noprint" role="tablist">${STEPS.map(t => `<button class="ltab" role="tab" data-t="${t[0]}"><b>${t[1]}</b><span>${t[2]}</span><small>${t[3]}</small>${t[0] === 'res' ? '<i class="lcount" id="lcount"></i>' : ''}</button>`).join('')}</div>
+
+      <section class="lpanel" data-p="prep">
+        <div class="card"><h3>📐 The law · القانون</h3><div class="formula">${mathify(e.law)}</div>${LAWW[e.id] ? `<div class="words"><div class="ar"><bdi>🗣 ${LAWW[e.id][0]}</bdi></div><div class="en">🗣 <b>In words:</b> ${LAWW[e.id][1]}</div></div>` : ''}</div>
+        <div class="grid g2">
+          <div class="card"><h3>🎯 Objective · الهدف</h3><p>${e.objective}</p><h3>🧪 Apparatus (virtual) · الأدوات</h3><ul>${e.apparatus.map(a => `<li>${a}</li>`).join('')}</ul></div>
+          <div class="card"><h3>📋 Procedure · الخطوات</h3><ol>${e.procedure.map(a => `<li>${a}</li>`).join('')}</ol></div>
+        </div>
+        <div class="row noprint"><button class="btn" data-go-tab="run">Start the experiment → · ابدأ التجربة</button></div>
+      </section>
+
+      <section class="lpanel" data-p="run">
+        <div class="card lsimcard"><div class="row" style="justify-content:space-between"><h3 style="margin:0">🔬 Simulation · المحاكاة</h3><label class="muted" style="font-size:13.5px"><input type="checkbox" id="noise" ${NOISE ? 'checked' : ''}> realistic measurement errors</label></div>
+          <div class="lsimwrap"><canvas id="sim" width="640" height="260"></canvas></div>
+          <div id="lastread" class="lastread" aria-live="polite"></div>
+          <div class="controls">${e.controls.map(k => k.options ? `<label>${k.label}<select data-k="${k.id}">${k.options.map(o => `<option value="${o[1]}" ${o[1] == s[k.id] ? 'selected' : ''}>${o[0]}</option>`).join('')}</select></label>` : `<label>${k.label} <b><span data-v="${k.id}">${s[k.id]}</span> ${k.unit}</b><input type="range" data-k="${k.id}" min="${k.min}" max="${k.max}" step="${k.step}" value="${s[k.id]}"></label>`).join('')}</div>
+          <div class="lrecbar"><button class="btn" id="rec">● <span class="rl">Record measurement</span><span class="rs">Record</span> · سجّل</button><span class="muted" id="recn"></span><button class="btn ghost small lseeres" data-go-tab="res"><span class="rl">See results</span><span class="rs">Results</span> →</button></div>
+          <div class="row lmore"><button class="btn ghost small" id="auto">Auto‑sweep 7 readings</button><button class="btn ghost small" id="undo">Undo last</button><button class="btn ghost small" id="clr">Clear table</button>${e.reveal ? '<button class="btn ghost small" id="rev">Reveal true value</button>' : ''}</div><div id="revbox" class="muted"></div><div id="labmsg"></div>
+          <div id="mini"></div></div>
+      </section>
+
+      <section class="lpanel" data-p="res">
+        <div class="grid g2">
+          <div class="card"><h3>📊 Data table · جدول القراءات</h3><div style="overflow:auto;max-height:360px"><table id="tbl"></table></div><div class="row noprint" style="margin-top:8px"><button class="btn ghost small" id="csv">Export CSV</button></div><div id="csvmsg"></div></div>
+          <div class="card"><h3>📈 Graph & analysis · الرسم والتحليل</h3><canvas id="plot" width="520" height="300"></canvas><div id="res" class="result"></div></div>
+        </div>
+        <div class="row noprint"><button class="btn ghost" data-go-tab="run">← More readings</button><button class="btn" data-go-tab="qs">Questions →</button></div>
+      </section>
+
+      <section class="lpanel" data-p="qs">
+        <div class="grid g2">
+          <div class="card"><h3>💬 Discussion questions · أسئلة المناقشة</h3>${e.discussion.map((d, i) => `<div class="dq"><b>${i + 1}. ${d[0]}</b><textarea data-n="${i}" placeholder="Write your answer first…">${esc((notes[e.id] || {})[i] || '')}</textarea><button class="btn small ghost" data-show="${i}">Show model answer</button><div class="model" id="m${i}" hidden>${d[1]}</div></div>`).join('')}</div>
+          <div class="card"><h3>⚠️ Sources of error & uncertainty · مصادر الخطأ</h3><ul>${e.errors.map(a => `<li>${a}</li>`).join('')}</ul><h3>✋ Skills that need the real apparatus</h3><ul>${e.skills.map(a => `<li>${a}</li>`).join('')}</ul><p class="muted" style="font-size:13px">A simulation cannot train these hands‑on skills: practise them in your real lab sessions.</p></div>
+        </div>
+        <div class="row noprint"><button class="btn printbtn" onclick="window.print()">🖨 Print lab report</button><span class="muted printbtn">Prints the procedure, your data, graph, result and answers.</span>${next ? `<a class="btn ghost" href="#${next.id}">Next experiment: ${esc(next.title)} →</a>` : ''}</div>
+      </section>`;
+    $('#lsel').onchange = ev => { location.hash = ev.target.value; };
+    document.querySelectorAll('.ltab, [data-go-tab]').forEach(b => b.onclick = () => { showTab(b.dataset.t || b.dataset.goTab); if (b.dataset.goTab) window.scrollTo(0, 0); });
     document.querySelectorAll('[data-k]').forEach(inp => inp.oninput = () => { const v = parseFloat(inp.value); s[inp.dataset.k] = v; const sp = document.querySelector(`[data-v="${inp.dataset.k}"]`); if (sp) sp.textContent = v; if (inp.tagName === 'SELECT') analyse(); });
     $('#noise').onchange = ev => { NOISE = ev.target.checked; };
-    $('#rec').onclick = () => { const row = e.measure(s); data[e.id].push(row); persist(); analyse(); };
-    $('#auto').onclick = () => { const k = e.controls.find(c => !c.options && ['h', 'm', 'mh', 'R', 'T', 'V', 'd', 'th', 'r', 'len', 'mw', 'f1'].includes(c.id)); if (!k) return; const sweepId = e.id === 'ohm' && s.mode === 3 ? 'len' : k.id; const kk = e.controls.find(c => c.id === sweepId); const old = s[sweepId]; for (let i = 0; i < 7; i++) { s[sweepId] = +(kk.min + (kk.max - kk.min) * (i + 1) / 8).toFixed(4); if (e.id === 'snell' && s.dir) s[sweepId] = +(5 + i * (Math.min(80, deg(Math.asin(1 / s.n)) + 8) - 5) / 6).toFixed(1); data[e.id].push(e.measure(s)); } s[sweepId] = old; persist(); analyse(); };
-    $('#undo').onclick = () => { data[e.id].pop(); persist(); analyse(); };
-    $('#clr').onclick = () => { $('#labmsg').innerHTML = `<div class="inconf"><span>Clear all readings for this experiment?</span><button class="btn small" id="clryes">Clear readings</button><button class="btn small ghost" id="clrno">Cancel</button></div>`; $('#clryes').onclick = () => { $('#labmsg').innerHTML = ''; data[e.id] = []; persist(); analyse(); }; $('#clrno').onclick = () => { $('#labmsg').innerHTML = ''; }; };
+    const said = row => `<span class="rchips">${e.cols.map((c, j) => `<span class="rchip"><small>${c}</small>${typeof row[j] === 'number' ? fmt(row[j], 4) : esc(row[j])}</span>`).join('')}</span>`;
+    $('#rec').onclick = () => { const row = e.measure(s); data[e.id].push(row); persist(); analyse(); const box = $('#lastread'); box.innerHTML = `<b>✔ Reading ${data[e.id].length} saved</b>${said(row)}`; box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash'); };
+    $('#auto').onclick = () => { const k = e.controls.find(c => !c.options && ['h', 'm', 'mh', 'R', 'T', 'V', 'd', 'th', 'r', 'len', 'mw', 'f1'].includes(c.id)); if (!k) return; const sweepId = e.id === 'ohm' && s.mode === 3 ? 'len' : k.id; const kk = e.controls.find(c => c.id === sweepId); const old = s[sweepId]; for (let i = 0; i < 7; i++) { s[sweepId] = +(kk.min + (kk.max - kk.min) * (i + 1) / 8).toFixed(4); if (e.id === 'snell' && s.dir) s[sweepId] = +(5 + i * (Math.min(80, deg(Math.asin(1 / s.n)) + 8) - 5) / 6).toFixed(1); data[e.id].push(e.measure(s)); } s[sweepId] = old; persist(); analyse(); $('#lastread').innerHTML = '✔ 7 readings added across the range.'; };
+    $('#undo').onclick = () => { data[e.id].pop(); persist(); analyse(); $('#lastread').innerHTML = ''; };
+    $('#clr').onclick = () => { $('#labmsg').innerHTML = `<div class="inconf"><span>Clear all readings for this experiment?</span><button class="btn small" id="clryes">Clear readings</button><button class="btn small ghost" id="clrno">Cancel</button></div>`; $('#clryes').onclick = () => { $('#labmsg').innerHTML = ''; data[e.id] = []; persist(); analyse(); $('#lastread').innerHTML = ''; }; $('#clrno').onclick = () => { $('#labmsg').innerHTML = ''; }; };
     if ($('#rev')) $('#rev').onclick = () => { $('#revbox').textContent = e.reveal(s); };
-    $('#csv').onclick = () => { const rows = [e.cols.join(',')].concat(data[e.id].map(r => r.join(','))); if (FRAMED) { $('#labmsg').innerHTML = '<p class="muted" style="margin:8px 0 0">Downloads are blocked here. Copy these rows into a spreadsheet or a .csv file:</p><textarea class="copybox" id="csvtxt" readonly></textarea>'; $('#csvtxt').value = rows.join('\n'); $('#csvtxt').select(); return; }  const b = new Blob([rows.join('\n')], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = e.id + '-data.csv'; a.click(); };
+    $('#csv').onclick = () => { const rows = [e.cols.join(',')].concat(data[e.id].map(r => r.join(','))); if (FRAMED) { $('#csvmsg').innerHTML = '<p class="muted" style="margin:8px 0 0">Downloads are blocked here. Copy these rows into a spreadsheet or a .csv file:</p><textarea class="copybox" id="csvtxt" readonly></textarea>'; $('#csvtxt').value = rows.join('\n'); $('#csvtxt').select(); return; } const b = new Blob([rows.join('\n')], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = e.id + '-data.csv'; a.click(); };
     document.querySelectorAll('[data-show]').forEach(b => b.onclick = () => { $('#m' + b.dataset.show).hidden = false; });
     document.querySelectorAll('textarea[data-n]').forEach(t => t.oninput = () => { notes[e.id] = notes[e.id] || {}; notes[e.id][t.dataset.n] = t.value; persist(); });
     analyse();
+    showTab(tabs[e.id] || (data[e.id].length ? 'run' : 'prep'));
+    measure();
   }
+  // sticky step tabs and drawing sit right under the header, whatever its height on this screen
+  function measure() { const r = document.documentElement.style, top = document.querySelector('.top'), tb = document.querySelector('.ltabs'); r.setProperty('--hdr', (top ? top.offsetHeight : 54) + 'px'); r.setProperty('--tabs', (tb ? tb.offsetHeight : 0) + 'px'); }
   function analyse() {
     const e = cur, s = state[e.id];
     const rows = data[e.id].filter(r => !e.filter || e.filter(r, s));
-    $('#tbl').innerHTML = `<tr>${e.cols.map(c => `<th>${c}</th>`).join('')}</tr>` + data[e.id].map(r => `<tr>${r.map(v => `<td>${typeof v === 'number' ? fmt(v, 4) : esc(v)}</td>`).join('')}</tr>`).join('');
+    const head = `<tr><th>#</th>${e.cols.map(c => `<th>${c}</th>`).join('')}</tr>`, line = (r, j) => `<tr><td class="muted">${j + 1}</td>${r.map(v => `<td>${typeof v === 'number' ? fmt(v, 4) : esc(v)}</td>`).join('')}</tr>`;
+    $('#tbl').innerHTML = head + data[e.id].map(line).join('');
+    const n = data[e.id].length;
+    if ($('#recn')) $('#recn').textContent = `${n} reading${n === 1 ? '' : 's'}`;
+    if ($('#lcount')) $('#lcount').textContent = n || '';
+    if ($('#mini')) $('#mini').innerHTML = n ? `<div class="minihead"><b>Latest readings</b> <span class="muted">(${n} in total)</span></div><div style="overflow-x:auto"><table class="minitbl">${head}${data[e.id].map(line).slice(-4).join('')}</table></div>` : '<p class="muted" style="margin:8px 0 0">Set the controls, then press <b>Record measurement</b>. Take at least 5 readings at different settings.</p><div class="ar">اضبط القيم ثم اضغط «سجّل». خذ 5 قراءات على الأقل بقيم مختلفة.</div>';
     const pts = rows.map(r => e.xy(r, s)).filter(p => p && isFinite(p[0]) && isFinite(p[1]));
     const f = pts.length >= 2 ? fit(pts, e.origin) : null;
     plot($('#plot'), pts, f, e.xlf ? e.xlf(s) : e.xl, e.ylf ? e.ylf(s) : e.yl);
@@ -343,7 +398,7 @@
   }
 
   let t0 = performance.now();
-  function loop(now) { const cv = $('#sim'); if (cv && cur.draw) cur.draw(cv, state[cur.id], now - t0); requestAnimationFrame(loop); }
+  function loop(now) { const cv = $('#sim'); if (cv && cur.draw && cv.offsetParent) cur.draw(view(cv, 640, 260), state[cur.id], now - t0); requestAnimationFrame(loop); }
   // a refresh keeps the experiment you were on: from the address, or the last one opened if the address is empty
   function route() {
     let id = location.hash.slice(1);
@@ -352,8 +407,20 @@
     renderList(); render(); window.scrollTo(0, 0);
   }
   window.addEventListener('hashchange', route);
+  let rz = 0; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { measure(); if (!$('#plot').closest('[hidden]')) analyse(); }, 150); });
   document.addEventListener('DOMContentLoaded', () => {
-    $('#theme').onclick = () => { const r = document.documentElement, cur = r.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); r.dataset.theme = cur === 'dark' ? 'light' : 'dark'; analyse(); };
+    // light/dark is one setting shared with the lessons (key "pll-theme"); a change in one open tab reaches the other
+    const eff = () => document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const ICON = {
+      sun: '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+      moon: '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 13.4A8.5 8.5 0 1 1 10.6 3.5a6.6 6.6 0 0 0 9.9 9.9z"/></svg>' };
+    // the theme button shows the mode it switches to
+    const themeBtn = (b, dark) => { b.innerHTML = `<span class="ti">${dark ? ICON.sun : ICON.moon}</span><span class="tl">${dark ? 'Light' : 'Dark'}</span>`; b.title = dark ? 'Switch to light mode' : 'Switch to dark mode'; };
+    const label = () => themeBtn($('#theme'), eff() === 'dark');
+    const setTheme = t => { if (t) document.documentElement.dataset.theme = t; label(); if ($('#plot')) analyse(); };
+    try { setTheme(localStorage.getItem('pll-theme')); } catch (e) { label(); }
+    $('#theme').onclick = () => { const t = eff() === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('pll-theme', t); } catch (e) { /* no storage */ } setTheme(t); };
+    window.addEventListener('storage', e => { if (e.key === 'pll-theme' && e.newValue) setTheme(e.newValue); });
     route(); requestAnimationFrame(loop);
   });
   window.__LAB = { EX, fit, state, data };

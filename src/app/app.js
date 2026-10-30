@@ -61,6 +61,8 @@
   const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   // {{a // b}} in the content is drawn as a fraction: a over b
   const mathify = s => String(s).replace(/\{\{(.+?)\s*\/\/\s*(.+?)\}\}/g, (m, a, b) => `<span class="frac"><span class="nu">${a.trim()}</span><span class="de">${b.trim()}</span></span>`);
+  // fuller Arabic goals and reasons, and three real-life examples per lesson (content_life.js)
+  window.COURSE.forEach(c => c.lessons.forEach(l => { const x = (window.LIFE || {})[l.id]; if (!x) return; if (x.goalsAr) l.goalsAr = x.goalsAr; if (x.whyAr) l.why.ar = x.whyAr; if (x.life) l.lifeList = x.life; }));
   (function deepMath(o) { for (const k in o) { const v = o[k]; if (typeof v === 'string') { if (v.includes('{{')) o[k] = mathify(v); } else if (v && typeof v === 'object') deepMath(v); } })([window.COURSE, window.FORMS || {}]);
   const fx = s => subs(mathify(s));
   // inside a Claude link the page runs in a frame where print, downloads and confirm() are blocked
@@ -319,7 +321,7 @@
       ${step(4, 'English terms explained', 'المصطلحات', `<table><tr><th>Term</th><th class="arcell">بالعربية</th><th>Meaning</th></tr>${l.terms.map(t => `<tr><td><b>${t[0]}</b> ${say(t[0])}</td><td class="arcell">${t[1]}</td><td>${t[2]}</td></tr>`).join('')}</table>`)}
       ${step(5, 'Laws, symbols & units', 'القوانين والرموز والوحدات', l.formulas.map((f, fi) => `<div class="card" style="margin:8px 0"><b>${f.name}</b><div class="formula big">${f.f}</div>${words(l, fi)}${symTable(f)}${formsHTML(l, fi)}</div>`).join(''))}
       ${step(6, 'Assumptions & when to use', 'الافتراضات وشروط الاستخدام', conds.length ? `<ul class="clean">${conds.map(f => `<li><b>${f.name}:</b> ${f.cond}</li>`).join('')}</ul>` : '<p class="muted">No special conditions beyond the definitions above.</p>')}
-      ${step(7, 'Real‑life example', 'مثال من الحياة', `<div class="addbox">${ADD}<p style="margin:6px 0">${l.life.en}</p><div class="ar">${l.life.ar}</div></div>`)}
+      ${step(7, l.lifeList ? 'Real‑life examples' : 'Real‑life example', l.lifeList ? 'أمثلة من الحياة' : 'مثال من الحياة', l.lifeList ? `${ADD}<div class="lifelist">${l.lifeList.map(x => `<div class="life"><span class="lic" aria-hidden="true">${x[0]}</span><div class="lbody"><p>${x[1]}</p><div class="ar">${x[2]}</div></div></div>`).join('')}</div>` : `<div class="addbox">${ADD}<p style="margin:6px 0">${l.life.en}</p><div class="ar">${l.life.ar}</div></div>`)}
       ${step(8, 'Worked example, step by step', 'مثال محلول خطوة بخطوة', `<div class="card"><span id="wsrc">${srcPill(l.worked.src)}</span><span class="pill add" title="Solving it step by step yourself is additional design">step-by-step solver 🧩</span><p><b id="wq">${l.worked.q}</b></p><div id="war">${arLine((ARL(l.id) || {}).w)}</div><div class="wprompt" id="wprompt"></div><ol class="clean wsteps" id="wsteps">${workedLis(l.worked.steps)}</ol><div class="row noprint wbtns"><button class="btn small" id="wnext">Show step · أظهر الخطوة</button><button class="btn small ghost" id="wall">Show all · أظهر الكل</button><button class="btn small ghost" id="wreset" disabled>↺ Reset · إعادة تعيين</button>${VARY[l.id] ? '<button class="btn small ghost" id="wnew">🎲 New numbers · أرقام جديدة</button><button class="btn small ghost" id="worig" style="display:none">📘 Original numbers · الأرقام الأصلية</button>' : ''}</div><div id="wscore"></div><p id="wans" style="display:none"><b>Answer:</b> <span id="wansv">${l.worked.ans}</span></p>${l.worked.note ? `<div class="note" id="wnote">⚠ ${l.worked.note}</div>` : ''}</div>`)}
       ${step(9, 'Your turn: solve it yourself', 'دورك: حلّ بنفسك', `<div class="card" id="tryit">${srcPill(l.tryit.src)} <span class="pill add" title="The worked solution shown after you answer is additional design">solution 🧩</span>${qHTML({ q: l.tryit.q + arLine((ARL(l.id) || {}).t), num: l.tryit.ans, unit: l.tryit.unit }, 'try')}<div class="row noprint"><button class="btn small ghost" id="hintbtn">Need a hint?</button></div><div id="hintbox"></div></div>`)}
       ${step(10, 'Quick checks', 'أسئلة تحقق سريعة', `${ADD} <span class="muted" style="font-size:13px">(some reuse course examples, cited inside)</span><div id="checks">${l.checks.map((c, i) => `<div data-c="${i}">${qHTML(c, 'c' + i)}</div>`).join('')}</div>`)}
@@ -1100,16 +1102,24 @@
   let scrollT = 0;
   window.addEventListener('scroll', () => { clearTimeout(scrollT); scrollT = setTimeout(() => { if (EXAM) return; S.prefs.scroll = { h: location.hash, y: Math.round(window.scrollY) }; save(); }, 400); }, { passive: true });
 
+  const ICON = {
+    sun: '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+    moon: '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 13.4A8.5 8.5 0 1 1 10.6 3.5a6.6 6.6 0 0 0 9.9 9.9z"/></svg>' };
+  // the theme button shows the mode it switches to
+  const themeBtn = (b, dark) => { b.innerHTML = `<span class="ti">${dark ? ICON.sun : ICON.moon}</span><span class="tl">${dark ? 'Light' : 'Dark'}</span>`; b.title = dark ? 'Switch to light mode' : 'Switch to dark mode'; };
   const effTheme = () => document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   function applyPrefs() {
     document.body.classList.toggle('hide-ar', !S.prefs.ar);
     // no saved choice: follow the device (or the viewer's) setting
     if (S.prefs.theme) document.documentElement.dataset.theme = S.prefs.theme;
-    $('#tar').classList.toggle('on', S.prefs.ar); $('#tth').textContent = effTheme() === 'dark' ? '☀️ Light' : '🌙 Dark';
+    $('#tar').classList.toggle('on', S.prefs.ar); $('#tar').setAttribute('aria-pressed', String(S.prefs.ar)); themeBtn($('#tth'), effTheme() === 'dark');
   }
   document.addEventListener('DOMContentLoaded', () => {
     $('#tar').onclick = () => { S.prefs.ar = !S.prefs.ar; save(); applyPrefs(); };
-    $('#tth').onclick = () => { S.prefs.theme = effTheme() === 'dark' ? 'light' : 'dark'; save(); applyPrefs(); };
+    // light/dark is one setting shared with the lab (key "pll-theme"); a change in one open tab reaches the other
+    $('#tth').onclick = () => { S.prefs.theme = effTheme() === 'dark' ? 'light' : 'dark'; save(); try { localStorage.setItem('pll-theme', S.prefs.theme); } catch (e) { /* no storage */ } applyPrefs(); };
+    try { const t = localStorage.getItem('pll-theme'); if (t) S.prefs.theme = t; else if (S.prefs.theme) localStorage.setItem('pll-theme', S.prefs.theme); } catch (e) { /* no storage */ }
+    window.addEventListener('storage', e => { if (e.key !== 'pll-theme' || !e.newValue) return; S.prefs.theme = e.newValue; save(); applyPrefs(); });
     // ☰ hides or shows the side menu: a slide-in panel on phones, a collapsible column on wider screens (remembered)
     const wide = matchMedia('(min-width: 861px)');
     const applySide = () => { document.body.classList.toggle('side-closed', S.prefs.side === false); $('#menu').setAttribute('aria-expanded', String(wide.matches ? S.prefs.side !== false : $('#side').classList.contains('open'))); };
@@ -1117,6 +1127,9 @@
     $('#side').addEventListener('click', e => { const b = e.target.closest('.grp'); if (!b) return; const body = b.nextElementSibling, open = body.classList.toggle('closed') === false;
       b.setAttribute('aria-expanded', String(open)); S.prefs.groups = Object.assign({}, S.prefs.groups, { [b.dataset.g]: open }); save(); });
     applySide();
+    // the side menu and sticky bars sit just under the header, whose height changes when it wraps on phones
+    const hdr = () => document.documentElement.style.setProperty('--hdr', $('.top').offsetHeight + 'px');
+    hdr(); if (window.ResizeObserver) new ResizeObserver(hdr).observe($('.top')); else window.addEventListener('resize', hdr);
     const sr = $('#search'), res = $('#results');
     sr.oninput = () => { const r = search(sr.value); res.innerHTML = r.length ? `<div class="card results">${r.join('')}</div>` : ''; };
     res.onclick = () => { res.innerHTML = ''; sr.value = ''; };
@@ -1127,7 +1140,7 @@
     let seen = false; try { seen = sessionStorage.getItem('pll-welcomed') === '1'; } catch (e) { /* ignore */ }
     if (!S.prefs.name || !seen) welcome(false);
   });
-  function showWho() { $('#who').textContent = S.prefs.name ? `👤 ${S.prefs.name}` : '👤 Sign in'; }
+  function showWho() { const n = S.prefs.name || 'Sign in'; $('#whon').textContent = n; $('#who').title = `${n} · اسمك`; }
   // entry screen: asks the student's name the first time, then greets them on each visit
   function welcome(edit) {
     const name = S.prefs.name || '', first = !name || edit;

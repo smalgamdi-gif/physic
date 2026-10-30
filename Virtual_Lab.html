@@ -344,6 +344,51 @@ h1 .say{font-size:15px;padding:1px 8px}
 .revwhy{margin-top:8px;border-left:3px solid var(--brand)}
 .expal button.skip{background:var(--bad-soft);border:1.5px dashed var(--bad);color:var(--bad)}
 .exkey .k.skip{background:var(--bad-soft);border:1.5px dashed var(--bad)}
+/* real-life examples: one row per example, icon on the side */
+.lifelist{display:flex;flex-direction:column;margin-top:6px}
+.life{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+.life:first-child{border-top:0;padding-top:6px}
+.life .lic{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--bg);font-size:21px}
+.life .lbody{flex:1;min-width:0}
+.life p{margin:2px 0 6px}
+/* header: every control the same height, the display toggles grouped as one control, one tidy row (+ search) on phones */
+.top{--hc:38px;gap:10px;padding:9px 18px}
+.top .logo{color:var(--ink);text-decoration:none;gap:10px;line-height:1.15;min-width:0}
+.top .logo .atom{width:36px;height:36px;border-radius:10px;font-size:19px;flex:none}
+.logo .lgt{display:flex;flex-direction:column;min-width:0}
+.logo .lgt b{font-size:16.5px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.logo .lgt small{font-size:12.5px;font-weight:500;color:var(--muted);text-align:left}
+.top .hbtn{width:var(--hc);height:var(--hc);display:inline-grid;place-items:center;padding:0;border:1px solid var(--line);border-radius:11px;background:var(--panel);color:var(--ink);flex:none}
+.top .hbtn:hover{background:var(--bg)}
+.srchwrap{position:relative}
+.srchwrap .sic{position:absolute;left:13px;top:calc(var(--hc) / 2);transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.top .search{height:var(--hc);box-sizing:border-box;padding:0 14px 0 37px;width:250px;border-radius:11px;transition:border-color .15s,box-shadow .15s}
+.top .search:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft);background:var(--panel)}
+#results{top:calc(var(--hc) + 6px)!important}
+.top .labbtn{height:var(--hc);box-sizing:border-box;padding:0 14px 0 5px;border-radius:11px;gap:9px}
+.top .labbtn .lbi{width:28px;height:28px;border-radius:8px}
+.htools{display:inline-flex;align-items:center;gap:2px;height:var(--hc);box-sizing:border-box;padding:3px;border:1px solid var(--line);border-radius:11px;background:var(--bg);flex:none}
+.htool{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:100%;min-width:30px;padding:0 11px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-size:13.5px;font-weight:600;white-space:nowrap}
+.htool:hover{color:var(--ink);background:var(--panel)}
+.htool .ti{display:inline-grid;place-items:center;width:18px;height:18px;font-size:16px;font-weight:700;line-height:1}
+.htool.on{background:var(--panel);color:var(--brand);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.top :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.layout{min-height:calc(100vh - var(--hdr,57px))}
+nav.side{top:var(--hdr,57px);height:calc(100vh - var(--hdr,57px))}
+@media (max-width:1060px){.htool{padding:0}.htool .tl{display:none}.top .search{width:210px}}
+@media (max-width:860px){
+  .top{flex-wrap:wrap;gap:8px;padding:8px 12px;--hc:38px}
+  .top .grow{display:block}
+  .srchwrap{order:10;flex-basis:100%}
+  .top .search{width:100%}
+  .logo .lgt small{display:none}
+  .top .labbtn{padding:0 12px 0 5px}
+  .htool{min-width:32px}
+  nav.side{top:var(--hdr,100px);height:calc(100vh - var(--hdr,100px))}
+}
+@media (max-width:520px){.logo .lgw,.top .labbtn .lgw{display:none}.top .logo .atom{width:34px;height:34px}}
+@media (max-width:350px){.logo .lgt{display:none}}
+@media print{.htools,.srchwrap,.top .hbtn{display:none}}
 :root{--accent:#e0742b}
 :root[data-theme="dark"]{--accent:#ffa45c}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--accent:#ffa45c}}
@@ -360,15 +405,73 @@ nav.side a{flex-direction:column;align-items:flex-start;gap:0}
 @media (max-width:860px){nav.side{top:54px;height:calc(100vh - 54px)}}
 @media print{canvas#sim,.controls,.row button,#noise{display:none!important} textarea{border:none}}
 main{min-width:0;overflow-wrap:anywhere}
+/* experiment page: navigation, four steps, readable drawings, record bar */
+.lnav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.lnav a[aria-disabled]{opacity:.35;pointer-events:none}
+.lpick{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;min-width:0;font-size:12.5px}
+.lpick select{max-width:100%;width:100%;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:6px 8px;font:inherit;font-size:14px;font-weight:600}
+.ltitle{margin:8px 0 2px;text-wrap:balance}
+.ltabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:12px 0 4px;position:sticky;top:var(--hdr,54px);z-index:6;background:var(--bg);padding:6px 0}
+.ltab{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 4px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:inherit;cursor:pointer;line-height:1.2}
+.ltab b{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--bg);font-size:12.5px}
+.ltab span{font-weight:700;font-size:13.5px}
+.ltab small{font-size:11.5px;color:var(--muted)}
+.ltab.on{border-color:var(--brand);background:var(--brand-soft);color:var(--brand)}
+.ltab.on b{background:var(--brand);color:var(--brand-ink)}
+.ltab:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.lcount{position:absolute;top:-6px;right:-4px;min-width:20px;padding:1px 6px;border-radius:999px;background:var(--brand);color:var(--brand-ink);font:700 11px/1.5 "Segoe UI",sans-serif;font-style:normal}
+.lcount:empty{display:none}
+.lsimwrap{margin:8px 0}
+#sim{width:100%;max-width:640px;display:block;margin:0 auto;border-radius:10px}
+#plot{width:100%;display:block}
+.lastread{min-height:0;font-size:14px;margin:4px 0}
+.lastread:not(:empty){padding:7px 10px;border-radius:8px;background:var(--ok-soft);color:var(--ink)}
+.lastread.flash{animation:labflash .9s ease}
+@keyframes labflash{from{box-shadow:0 0 0 3px var(--ok)}to{box-shadow:0 0 0 0 transparent}}
+.lrecbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px}
+.lrecbar #rec{font-size:15px;padding:10px 16px}
+.lmore{margin-top:8px}
+.minihead{margin-top:12px;font-size:14px}
+.minitbl{font-size:13.5px;margin-top:4px}
+@media (max-width:860px){
+  .ltabs{gap:4px}
+  .ltab{padding:6px 2px}
+  .ltab small{display:none}
+  .ltab span{font-size:12.5px}
+  /* keep the drawing in view while moving the sliders */
+  .lsimwrap{position:sticky;top:calc(var(--hdr,54px) + var(--tabs,0px));z-index:4;background:var(--panel);margin:6px -4px;padding:4px;border-radius:12px;box-shadow:0 6px 12px -8px rgba(0,0,0,.25)}
+  .controls{grid-template-columns:1fr}
+  /* record bar fixed at the bottom of the screen in the Experiment step */
+  body.lab-run .lrecbar{position:fixed;left:0;right:0;bottom:0;z-index:20;margin:0;padding:10px max(14px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px));background:var(--panel);border-top:1px solid var(--line);box-shadow:0 -6px 16px -10px rgba(0,0,0,.3)}
+  body.lab-run .lrecbar #rec{flex:1}
+  body.lab-run main{padding-bottom:110px}
+  .lpick span{font-size:11.5px}
+}
+@media (prefers-reduced-motion:reduce){.lastread.flash{animation:none}}
+@media print{.lpanel[hidden]{display:block!important}.lrecbar,.lmore,.ltabs,.lnav{display:none!important}}
+#rec .rs,.lseeres .rs,.top .lgs{display:none}
+.lastread:not(:empty){display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;text-align:left}
+.rchips{display:flex;flex-wrap:wrap;gap:6px}
+.rchip{display:inline-flex;flex-direction:column;padding:3px 9px;border-radius:8px;background:var(--panel);border:1px solid var(--line);font-weight:700;font-variant-numeric:tabular-nums;line-height:1.25}
+.rchip small{font-weight:500;font-size:11px;color:var(--muted)}
+@media (max-width:860px){
+  #rec .rl,.lseeres .rl{display:none} #rec .rs,.lseeres .rs,.top .lgs{display:inline}
+  /* one-row header on phones */
+  .top{flex-wrap:nowrap}
+  .top .lgw{display:none}
+  .top .labbtn{padding:0 12px 0 5px}
+  .ltitle{font-size:22px;margin-top:4px}
+  .sub .pill{white-space:normal}
+}
 </style>
 </head>
 <body>
 <header class="top">
-  <button class="tog menu-btn" id="menu" aria-label="Menu">☰</button>
-  <div class="logo"><span class="atom">⚗</span>Physics Virtual Lab <span class="muted" style="font-weight:400;font-size:13px">· المعمل الافتراضي</span></div>
+  <button class="hbtn menu-btn" id="menu" aria-label="Menu" title="Show or hide the experiments list"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <div class="logo"><span class="atom" aria-hidden="true">⚗</span><span class="lgt"><b><span class="lgw">Physics </span>Virtual Lab</b><small dir="rtl">المعمل الافتراضي</small></span></div>
   <div class="grow"></div>
-  <a class="labbtn" href="index.html" title="Back to the lessons"><span class="lbi" aria-hidden="true">📚</span><span class="lbt">Back to lessons</span><span class="lba">الدروس</span></a>
-  <button class="tog" id="theme">🌓 Theme</button>
+  <a class="labbtn" href="index.html" title="Back to the lessons"><span class="lbi" aria-hidden="true">📚</span><span class="lbt"><span class="lgw">Back to lessons</span><span class="lgs">Lessons</span></span><span class="lba">الدروس</span></a>
+  <div class="htools" role="group" aria-label="Display"><button class="htool" id="theme"><span class="ti"></span><span class="tl">Dark</span></button></div>
 </header>
 <div class="layout">
   <nav class="side" id="side"><div class="sec">Experiments · التجارب</div><div id="exlist"></div>
@@ -450,6 +553,17 @@ main{min-width:0;overflow-wrap:anywhere}
   document.documentElement.classList.toggle('framed', FRAMED);
   const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
+  // ---------- canvases ----------
+  // Each drawing keeps its own design coordinates (sim 640×260, graph 520×300) but is painted at the screen's real
+  // pixel size, and its text grows when the drawing is shown narrower than designed (phones), so labels stay readable.
+  function view(cv, W, H) {
+    const cssW = cv.clientWidth || W, dpr = window.devicePixelRatio || 1, k = cssW / W;
+    const pw = Math.max(1, Math.round(cssW * dpr)), ph = Math.max(1, Math.round(H * k * dpr));
+    if (cv.width !== pw || cv.height !== ph) { cv.width = pw; cv.height = ph; }
+    const c = cv.getContext('2d'); c.setTransform(k * dpr, 0, 0, k * dpr, 0, 0);
+    return { width: W, height: H, k, boost: Math.min(2, Math.max(1, 0.85 / k)), getContext: () => c };
+  }
+
   // ---------- linear fit ----------
   function fit(pts, origin) {
     const n = pts.length; if (n < 2) return null;
@@ -465,11 +579,12 @@ main{min-width:0;overflow-wrap:anywhere}
     const my = pts.reduce((a, p) => a + p[1], 0) / n; const sst = pts.reduce((a, p) => a + (p[1] - my) ** 2, 0); const ssr = pts.reduce((a, p) => a + (p[1] - m * p[0] - b) ** 2, 0);
     return { m, b, se, r2: sst ? 1 - ssr / sst : 1 };
   }
-  function plot(cv, pts, f, xl, yl) {
-    const c = cv.getContext('2d'), W = cv.width, H = cv.height, P = { l: 62, r: 16, t: 14, b: 44 };
+  function plot(canvas, pts, f, xl, yl) {
+    const cv = view(canvas, 520, 300), b = cv.boost;
+    const c = cv.getContext('2d'), W = cv.width, H = cv.height, P = { l: 62 * b, r: 16, t: 30 * b, b: 44 * b };
     c.clearRect(0, 0, W, H); c.fillStyle = css('--panel'); c.fillRect(0, 0, W, H);
     const ink = css('--ink'), mut = css('--muted'), line = css('--line'), br = css('--brand'), ac = css('--accent');
-    c.font = '12px Segoe UI, sans-serif';
+    c.font = `${Math.round(12 * b)}px Segoe UI, sans-serif`;
     if (!pts.length) { c.fillStyle = mut; c.fillText('Record measurements to build the graph', W / 2 - 110, H / 2); return; }
     const xs = pts.map(p => p[0]).concat(0), ys = pts.map(p => p[1]).concat(0);
     let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
@@ -477,15 +592,15 @@ main{min-width:0;overflow-wrap:anywhere}
     x1 += (x1 - x0) * .08; y1 += (y1 - y0) * .08;
     const X = x => P.l + (x - x0) / (x1 - x0) * (W - P.l - P.r), Y = y => H - P.b - (y - y0) / (y1 - y0) * (H - P.t - P.b);
     c.strokeStyle = line; c.lineWidth = 1; c.fillStyle = mut;
-    for (let i = 0; i <= 5; i++) { const gx = x0 + (x1 - x0) * i / 5, gy = y0 + (y1 - y0) * i / 5; c.beginPath(); c.moveTo(X(gx), P.t); c.lineTo(X(gx), H - P.b); c.stroke(); c.beginPath(); c.moveTo(P.l, Y(gy)); c.lineTo(W - P.r, Y(gy)); c.stroke(); c.fillText(fmt(gx, 2), X(gx) - 12, H - P.b + 16); c.fillText(fmt(gy, 2), 4, Y(gy) + 4); }
-    c.fillStyle = ink; c.fillText(xl, W / 2 - c.measureText(xl).width / 2, H - 8);
-    c.save(); c.translate(14, H / 2); c.rotate(-Math.PI / 2); c.fillText(yl, -c.measureText(yl).width / 2, 0); c.restore();
+    for (let i = 0; i <= 5; i++) { const gx = x0 + (x1 - x0) * i / 5, gy = y0 + (y1 - y0) * i / 5; c.beginPath(); c.moveTo(X(gx), P.t); c.lineTo(X(gx), H - P.b); c.stroke(); c.beginPath(); c.moveTo(P.l, Y(gy)); c.lineTo(W - P.r, Y(gy)); c.stroke(); const tx = fmt(gx, 2), tw = c.measureText(tx).width; c.fillText(tx, Math.min(W - tw - 2, Math.max(P.l - tw / 2, X(gx) - tw / 2)), H - P.b + 16 * b); const ty = fmt(gy, 2); c.fillText(ty, Math.max(2, P.l - 6 - c.measureText(ty).width), Y(gy) + 4 * b); }
+    c.fillStyle = ink; c.fillText(xl + ' →', W / 2 - c.measureText(xl).width / 2, H - 8);
+    c.fillText('↑ ' + yl, 4, 16 * b);
     if (f) { c.strokeStyle = ac; c.lineWidth = 2; c.setLineDash([6, 4]); c.beginPath(); c.moveTo(X(x0), Y(f.m * x0 + f.b)); c.lineTo(X(x1), Y(f.m * x1 + f.b)); c.stroke(); c.setLineDash([]); }
     c.fillStyle = br; pts.forEach(p => { c.beginPath(); c.arc(X(p[0]), Y(p[1]), 4.5, 0, 7); c.fill(); });
   }
 
   // ---------- drawing helpers ----------
-  function ctxOf(cv) { const c = cv.getContext('2d'); c.clearRect(0, 0, cv.width, cv.height); c.fillStyle = css('--panel'); c.fillRect(0, 0, cv.width, cv.height); c.font = '13px Segoe UI, sans-serif'; c.lineCap = 'round'; return c; }
+  function ctxOf(cv) { const c = cv.getContext('2d'); c.clearRect(0, 0, cv.width, cv.height); c.fillStyle = css('--panel'); c.fillRect(0, 0, cv.width, cv.height); c.font = `${Math.round(13 * (cv.boost || 1))}px Segoe UI, sans-serif`; c.lineCap = 'round'; return c; }
   function arrow(c, x1, y1, x2, y2, col, w = 3, label) {
     c.strokeStyle = col; c.fillStyle = col; c.lineWidth = w; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
     const a = Math.atan2(y2 - y1, x2 - x1); c.beginPath(); c.moveTo(x2, y2); c.lineTo(x2 - 12 * Math.cos(a - .4), y2 - 12 * Math.sin(a - .4)); c.lineTo(x2 - 12 * Math.cos(a + .4), y2 - 12 * Math.sin(a + .4)); c.fill();
@@ -527,9 +642,9 @@ main{min-width:0;overflow-wrap:anywhere}
       measure(s) { const k = this.calc(s); return [s.f1, s.a1, s.f2, s.a2, noisy(k.R, 0.02, 0.05), roundTo(k.th + (NOISE ? 1.5 * gauss() : 0), 1), +k.R.toFixed(3)]; },
       xy: r => [r[6], r[4]], xl: 'R calculated (N)', yl: 'R measured (N)', origin: true,
       result: f => `slope = <b>${fmt(f.m)}</b> (ideal 1.000) · R² = ${fmt(f.r2, 4)}`,
-      draw(cv, s) { const c = ctxOf(cv); const cx = cv.width / 2 - 60, cy = cv.height / 2, k = 13; c.strokeStyle = css('--line'); c.lineWidth = 1; c.beginPath(); c.arc(cx, cy, 140, 0, 7); c.stroke(); for (let a = 0; a < 360; a += 30) { txt(c, a + '°', cx + 152 * Math.cos(rad(a)) - 10, cy - 152 * Math.sin(rad(a)) + 4, css('--muted')); }
+      draw(cv, s) { const c = ctxOf(cv), b = cv.boost || 1; const cx = cv.width / 2 - 60, cy = cv.height / 2, rr = cy - 22 * b, k = 13 * rr / 140; c.strokeStyle = css('--line'); c.lineWidth = 1; c.beginPath(); c.arc(cx, cy, rr, 0, 7); c.stroke(); for (let a = 0; a < 360; a += 30) { const lb = a + '°', w = c.measureText(lb).width; txt(c, lb, cx + (rr + 8 * b + w / 2) * Math.cos(rad(a)) - w / 2, cy - (rr + 9 * b) * Math.sin(rad(a)) + 4 * b, css('--muted')); }
         const r = this.calc(s); arrow(c, cx, cy, cx + s.f1 * k * Math.cos(rad(s.a1)), cy - s.f1 * k * Math.sin(rad(s.a1)), css('--brand'), 3, 'F₁'); arrow(c, cx, cy, cx + s.f2 * k * Math.cos(rad(s.a2)), cy - s.f2 * k * Math.sin(rad(s.a2)), css('--brand'), 3, 'F₂'); arrow(c, cx, cy, cx + r.R * k * Math.cos(rad(r.th)), cy - r.R * k * Math.sin(rad(r.th)), css('--accent'), 3, 'R'); c.setLineDash([5, 4]); arrow(c, cx, cy, cx - r.R * k * Math.cos(rad(r.th)), cy + r.R * k * Math.sin(rad(r.th)), css('--muted'), 2, 'equilibrant'); c.setLineDash([]);
-        txt(c, `R = ${fmt(r.R)} N at ${fmt(r.th)}°`, cv.width - 200, 30); txt(c, `Rₓ = ${fmt(r.R * Math.cos(rad(r.th)))} N`, cv.width - 200, 52, css('--muted')); txt(c, `R_y = ${fmt(r.R * Math.sin(rad(r.th)))} N`, cv.width - 200, 72, css('--muted')); },
+        const lh = 20 * b; txt(c, `R = ${fmt(r.R)} N at ${fmt(r.th)}°`, cv.width - 200, 30); txt(c, `Rₓ = ${fmt(r.R * Math.cos(rad(r.th)))} N`, cv.width - 200, 30 + lh, css('--muted')); txt(c, `R_y = ${fmt(r.R * Math.sin(rad(r.th)))} N`, cv.width - 200, 30 + 2 * lh, css('--muted')); },
       errors: ['Friction in the pulleys: the ring can sit slightly off centre.', 'Angle scale read to ±1°.', 'Mass of the hangers not included in F.'],
       discussion: [['Why is the equilibrant equal and opposite to the resultant?', 'For equilibrium ΣF = 0 (Newton\'s first law, S04), so the third force must cancel R.'], ['When is |F₁ + F₂| equal to F₁ + F₂?', 'Only when the forces point in the same direction.']],
       skills: ['Levelling the force table', 'Tapping the table to reduce pulley friction', 'Reading angles at the string, not the pulley rim']
@@ -684,7 +799,7 @@ main{min-width:0;overflow-wrap:anywhere}
         const a = rad(s.th); arrow(c, cx - R * Math.sin(a), cy - R * Math.cos(a), cx, cy, css('--bad'), 3); const refl = css('--muted');
         arrow(c, cx, cy, cx + R * Math.sin(a), cy - R * Math.cos(a), k.tir ? css('--bad') : refl, k.tir ? 3 : 1, k.tir ? 'total internal reflection' : 'reflected');
         if (!k.tir) { const b = rad(k.th2); arrow(c, cx, cy, cx + R * Math.sin(b), cy + R * Math.cos(b), css('--bad'), 3, `θ₂ = ${fmt(k.th2)}°`); }
-        txt(c, `θ₁ = ${s.th}°`, cx - R - 10, cy - R + 10); txt(c, s.dir ? 'block (top) → air (bottom)' : 'air (top) → block (bottom)', 20, 24, css('--muted')); if (k.crit) txt(c, `θc = ${fmt(k.crit)}°`, 20, 46, css('--muted')); },
+        txt(c, `θ₁ = ${s.th}°`, cx - R - 10, cy - R + 10); { const b = cv.boost || 1, l1 = s.dir ? 'block (top)' : 'air (top)', l2 = s.dir ? '→ air (bottom)' : '→ block (bottom)', w = Math.max(c.measureText(l1).width, c.measureText(l2).width); txt(c, l1, cv.width - w - 10, 22 * b, css('--muted')); txt(c, l2, cv.width - w - 10, 42 * b, css('--muted')); } if (k.crit) txt(c, `θc = ${fmt(k.crit)}°`, 20, 46, css('--muted')); },
       errors: ['Ray not aimed at the centre of the flat face (the curved face then refracts too).', 'Protractor read to ±0.5°.', 'Wide beam: mark the centre of the ray.'],
       discussion: [['Why use a semicircular block?', 'A ray aimed at the centre meets the curved surface along a radius (normal), so it is not refracted there.'], ['Why does total internal reflection only occur from block to air?', 'It needs n₁ > n₂ so that n₁ sin θ₁/n₂ can exceed 1 (BK p.172).']],
       skills: ['Aligning the block with the protractor centre', 'Working in a darkened room', 'Laser safety (never look into the beam)']
@@ -731,45 +846,88 @@ main{min-width:0;overflow-wrap:anywhere}
   const persist = () => { try { localStorage.setItem('physics-virtual-lab-v1', JSON.stringify({ data, notes })); } catch (e) { /* ignore */ } };
 
   function renderList() { $('#exlist').innerHTML = EX.map(e => `<a href="#${e.id}" class="${e === cur ? 'active' : ''}">${esc(e.title)}<small>${e.ar}</small></a>`).join(''); }
+  // which step (tab) is open, per experiment
+  let tabs = {}; try { tabs = JSON.parse(localStorage.getItem('lab-tabs') || '{}'); } catch (e) { /* no storage */ }
+  const STEPS = [['prep', '1', 'Prepare', 'التحضير'], ['run', '2', 'Experiment', 'التجربة'], ['res', '3', 'Results', 'النتائج'], ['qs', '4', 'Questions', 'الأسئلة']];
+  function showTab(t) {
+    tabs[cur.id] = t; try { localStorage.setItem('lab-tabs', JSON.stringify(tabs)); } catch (e) { /* no storage */ }
+    document.querySelectorAll('.ltab').forEach(b => { const on = b.dataset.t === t; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
+    document.querySelectorAll('.lpanel').forEach(p => p.hidden = p.dataset.p !== t);
+    document.body.classList.toggle('lab-run', t === 'run');
+    if (t === 'res') analyse();
+  }
   function render() {
-    const e = cur, s = state[e.id];
+    const e = cur, s = state[e.id], i = EX.indexOf(e), prev = EX[i - 1], next = EX[i + 1];
     $('#exp').innerHTML = `
-      <div class="row" style="justify-content:space-between"><h1>${esc(e.title)}</h1><span class="pill add">🧩 Additional design · law from ${esc(e.src)}</span></div>
-      <p class="sub"><bdi>${e.ar}</bdi></p>
-      <div class="formula">${mathify(e.law)}</div>${LAWW[e.id] ? `<div class="words"><div class="ar"><bdi>🗣 ${LAWW[e.id][0]}</bdi></div><div class="en">🗣 <b>In words:</b> ${LAWW[e.id][1]}</div></div>` : ''}
-      <div class="grid g2">
-        <div class="card"><h3>🎯 Objective</h3><p>${e.objective}</p><h3>🧪 Apparatus (virtual)</h3><ul>${e.apparatus.map(a => `<li>${a}</li>`).join('')}</ul></div>
-        <div class="card"><h3>📋 Procedure</h3><ol>${e.procedure.map(a => `<li>${a}</li>`).join('')}</ol></div>
-      </div>
-      <div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">🔬 Simulation</h3><label class="muted"><input type="checkbox" id="noise" ${NOISE ? 'checked' : ''}> realistic measurement errors</label></div>
-        <canvas id="sim" width="640" height="260" style="width:100%;max-width:640px;display:block;margin:8px auto"></canvas>
-        <div class="controls">${e.controls.map(k => k.options ? `<label>${k.label}<select data-k="${k.id}">${k.options.map(o => `<option value="${o[1]}" ${o[1] == s[k.id] ? 'selected' : ''}>${o[0]}</option>`).join('')}</select></label>` : `<label>${k.label} <b><span data-v="${k.id}">${s[k.id]}</span> ${k.unit}</b><input type="range" data-k="${k.id}" min="${k.min}" max="${k.max}" step="${k.step}" value="${s[k.id]}"></label>`).join('')}</div>
-        <div class="row" style="margin-top:10px"><button class="btn" id="rec">● Record measurement</button><button class="btn ghost" id="auto">Auto‑sweep 7 readings</button><button class="btn ghost" id="undo">Undo last</button><button class="btn ghost" id="clr">Clear table</button>${e.reveal ? '<button class="btn ghost" id="rev">Reveal true value</button>' : ''}<button class="btn ghost" id="csv">Export CSV</button></div><div id="revbox" class="muted"></div></div>
-      <div class="grid g2">
-        <div class="card"><h3>📊 Data table</h3><div style="overflow:auto;max-height:320px"><table id="tbl"></table></div></div>
-        <div class="card"><h3>📈 Graph & analysis</h3><canvas id="plot" width="520" height="300" style="width:100%"></canvas><div id="res" class="result"></div></div>
-      </div>
-      <div class="grid g2">
-        <div class="card"><h3>⚠️ Sources of error & uncertainty</h3><ul>${e.errors.map(a => `<li>${a}</li>`).join('')}</ul><h3>✋ Skills that need the real apparatus</h3><ul>${e.skills.map(a => `<li>${a}</li>`).join('')}</ul><p class="muted" style="font-size:13px">A simulation cannot train these hands‑on skills: practise them in your real lab sessions.</p></div>
-        <div class="card"><h3>💬 Discussion questions</h3>${e.discussion.map((d, i) => `<div class="dq"><b>${i + 1}. ${d[0]}</b><textarea data-n="${i}" placeholder="Write your answer first…">${esc((notes[e.id] || {})[i] || '')}</textarea><button class="btn small ghost" data-show="${i}">Show model answer</button><div class="model" id="m${i}" hidden>${d[1]}</div></div>`).join('')}</div>
-      </div>
-      <div class="row noprint"><button class="btn printbtn" onclick="window.print()">🖨 Print lab report</button><span class="muted printbtn">Prints the procedure, your data, graph, result and answers.</span></div><div id="labmsg"></div>`;
+      <div class="lnav noprint"><a class="btn ghost small" ${prev ? `href="#${prev.id}"` : 'aria-disabled="true"'} title="${prev ? esc(prev.title) : ''}">← Prev</a>
+        <label class="lpick"><span class="muted">Experiment ${i + 1} of ${EX.length}</span><select id="lsel" aria-label="Choose an experiment">${EX.map(x => `<option value="${x.id}" ${x === e ? 'selected' : ''}>${esc(x.title)}</option>`).join('')}</select></label>
+        <a class="btn ghost small" ${next ? `href="#${next.id}"` : 'aria-disabled="true"'} title="${next ? esc(next.title) : ''}">Next →</a></div>
+      <h1 class="ltitle">${esc(e.title)}</h1>
+      <p class="sub"><bdi>${e.ar}</bdi> · <span class="pill add">🧩 Additional design · law from ${esc(e.src)}</span></p>
+      <div class="ltabs noprint" role="tablist">${STEPS.map(t => `<button class="ltab" role="tab" data-t="${t[0]}"><b>${t[1]}</b><span>${t[2]}</span><small>${t[3]}</small>${t[0] === 'res' ? '<i class="lcount" id="lcount"></i>' : ''}</button>`).join('')}</div>
+
+      <section class="lpanel" data-p="prep">
+        <div class="card"><h3>📐 The law · القانون</h3><div class="formula">${mathify(e.law)}</div>${LAWW[e.id] ? `<div class="words"><div class="ar"><bdi>🗣 ${LAWW[e.id][0]}</bdi></div><div class="en">🗣 <b>In words:</b> ${LAWW[e.id][1]}</div></div>` : ''}</div>
+        <div class="grid g2">
+          <div class="card"><h3>🎯 Objective · الهدف</h3><p>${e.objective}</p><h3>🧪 Apparatus (virtual) · الأدوات</h3><ul>${e.apparatus.map(a => `<li>${a}</li>`).join('')}</ul></div>
+          <div class="card"><h3>📋 Procedure · الخطوات</h3><ol>${e.procedure.map(a => `<li>${a}</li>`).join('')}</ol></div>
+        </div>
+        <div class="row noprint"><button class="btn" data-go-tab="run">Start the experiment → · ابدأ التجربة</button></div>
+      </section>
+
+      <section class="lpanel" data-p="run">
+        <div class="card lsimcard"><div class="row" style="justify-content:space-between"><h3 style="margin:0">🔬 Simulation · المحاكاة</h3><label class="muted" style="font-size:13.5px"><input type="checkbox" id="noise" ${NOISE ? 'checked' : ''}> realistic measurement errors</label></div>
+          <div class="lsimwrap"><canvas id="sim" width="640" height="260"></canvas></div>
+          <div id="lastread" class="lastread" aria-live="polite"></div>
+          <div class="controls">${e.controls.map(k => k.options ? `<label>${k.label}<select data-k="${k.id}">${k.options.map(o => `<option value="${o[1]}" ${o[1] == s[k.id] ? 'selected' : ''}>${o[0]}</option>`).join('')}</select></label>` : `<label>${k.label} <b><span data-v="${k.id}">${s[k.id]}</span> ${k.unit}</b><input type="range" data-k="${k.id}" min="${k.min}" max="${k.max}" step="${k.step}" value="${s[k.id]}"></label>`).join('')}</div>
+          <div class="lrecbar"><button class="btn" id="rec">● <span class="rl">Record measurement</span><span class="rs">Record</span> · سجّل</button><span class="muted" id="recn"></span><button class="btn ghost small lseeres" data-go-tab="res"><span class="rl">See results</span><span class="rs">Results</span> →</button></div>
+          <div class="row lmore"><button class="btn ghost small" id="auto">Auto‑sweep 7 readings</button><button class="btn ghost small" id="undo">Undo last</button><button class="btn ghost small" id="clr">Clear table</button>${e.reveal ? '<button class="btn ghost small" id="rev">Reveal true value</button>' : ''}</div><div id="revbox" class="muted"></div><div id="labmsg"></div>
+          <div id="mini"></div></div>
+      </section>
+
+      <section class="lpanel" data-p="res">
+        <div class="grid g2">
+          <div class="card"><h3>📊 Data table · جدول القراءات</h3><div style="overflow:auto;max-height:360px"><table id="tbl"></table></div><div class="row noprint" style="margin-top:8px"><button class="btn ghost small" id="csv">Export CSV</button></div><div id="csvmsg"></div></div>
+          <div class="card"><h3>📈 Graph & analysis · الرسم والتحليل</h3><canvas id="plot" width="520" height="300"></canvas><div id="res" class="result"></div></div>
+        </div>
+        <div class="row noprint"><button class="btn ghost" data-go-tab="run">← More readings</button><button class="btn" data-go-tab="qs">Questions →</button></div>
+      </section>
+
+      <section class="lpanel" data-p="qs">
+        <div class="grid g2">
+          <div class="card"><h3>💬 Discussion questions · أسئلة المناقشة</h3>${e.discussion.map((d, i) => `<div class="dq"><b>${i + 1}. ${d[0]}</b><textarea data-n="${i}" placeholder="Write your answer first…">${esc((notes[e.id] || {})[i] || '')}</textarea><button class="btn small ghost" data-show="${i}">Show model answer</button><div class="model" id="m${i}" hidden>${d[1]}</div></div>`).join('')}</div>
+          <div class="card"><h3>⚠️ Sources of error & uncertainty · مصادر الخطأ</h3><ul>${e.errors.map(a => `<li>${a}</li>`).join('')}</ul><h3>✋ Skills that need the real apparatus</h3><ul>${e.skills.map(a => `<li>${a}</li>`).join('')}</ul><p class="muted" style="font-size:13px">A simulation cannot train these hands‑on skills: practise them in your real lab sessions.</p></div>
+        </div>
+        <div class="row noprint"><button class="btn printbtn" onclick="window.print()">🖨 Print lab report</button><span class="muted printbtn">Prints the procedure, your data, graph, result and answers.</span>${next ? `<a class="btn ghost" href="#${next.id}">Next experiment: ${esc(next.title)} →</a>` : ''}</div>
+      </section>`;
+    $('#lsel').onchange = ev => { location.hash = ev.target.value; };
+    document.querySelectorAll('.ltab, [data-go-tab]').forEach(b => b.onclick = () => { showTab(b.dataset.t || b.dataset.goTab); if (b.dataset.goTab) window.scrollTo(0, 0); });
     document.querySelectorAll('[data-k]').forEach(inp => inp.oninput = () => { const v = parseFloat(inp.value); s[inp.dataset.k] = v; const sp = document.querySelector(`[data-v="${inp.dataset.k}"]`); if (sp) sp.textContent = v; if (inp.tagName === 'SELECT') analyse(); });
     $('#noise').onchange = ev => { NOISE = ev.target.checked; };
-    $('#rec').onclick = () => { const row = e.measure(s); data[e.id].push(row); persist(); analyse(); };
-    $('#auto').onclick = () => { const k = e.controls.find(c => !c.options && ['h', 'm', 'mh', 'R', 'T', 'V', 'd', 'th', 'r', 'len', 'mw', 'f1'].includes(c.id)); if (!k) return; const sweepId = e.id === 'ohm' && s.mode === 3 ? 'len' : k.id; const kk = e.controls.find(c => c.id === sweepId); const old = s[sweepId]; for (let i = 0; i < 7; i++) { s[sweepId] = +(kk.min + (kk.max - kk.min) * (i + 1) / 8).toFixed(4); if (e.id === 'snell' && s.dir) s[sweepId] = +(5 + i * (Math.min(80, deg(Math.asin(1 / s.n)) + 8) - 5) / 6).toFixed(1); data[e.id].push(e.measure(s)); } s[sweepId] = old; persist(); analyse(); };
-    $('#undo').onclick = () => { data[e.id].pop(); persist(); analyse(); };
-    $('#clr').onclick = () => { $('#labmsg').innerHTML = `<div class="inconf"><span>Clear all readings for this experiment?</span><button class="btn small" id="clryes">Clear readings</button><button class="btn small ghost" id="clrno">Cancel</button></div>`; $('#clryes').onclick = () => { $('#labmsg').innerHTML = ''; data[e.id] = []; persist(); analyse(); }; $('#clrno').onclick = () => { $('#labmsg').innerHTML = ''; }; };
+    const said = row => `<span class="rchips">${e.cols.map((c, j) => `<span class="rchip"><small>${c}</small>${typeof row[j] === 'number' ? fmt(row[j], 4) : esc(row[j])}</span>`).join('')}</span>`;
+    $('#rec').onclick = () => { const row = e.measure(s); data[e.id].push(row); persist(); analyse(); const box = $('#lastread'); box.innerHTML = `<b>✔ Reading ${data[e.id].length} saved</b>${said(row)}`; box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash'); };
+    $('#auto').onclick = () => { const k = e.controls.find(c => !c.options && ['h', 'm', 'mh', 'R', 'T', 'V', 'd', 'th', 'r', 'len', 'mw', 'f1'].includes(c.id)); if (!k) return; const sweepId = e.id === 'ohm' && s.mode === 3 ? 'len' : k.id; const kk = e.controls.find(c => c.id === sweepId); const old = s[sweepId]; for (let i = 0; i < 7; i++) { s[sweepId] = +(kk.min + (kk.max - kk.min) * (i + 1) / 8).toFixed(4); if (e.id === 'snell' && s.dir) s[sweepId] = +(5 + i * (Math.min(80, deg(Math.asin(1 / s.n)) + 8) - 5) / 6).toFixed(1); data[e.id].push(e.measure(s)); } s[sweepId] = old; persist(); analyse(); $('#lastread').innerHTML = '✔ 7 readings added across the range.'; };
+    $('#undo').onclick = () => { data[e.id].pop(); persist(); analyse(); $('#lastread').innerHTML = ''; };
+    $('#clr').onclick = () => { $('#labmsg').innerHTML = `<div class="inconf"><span>Clear all readings for this experiment?</span><button class="btn small" id="clryes">Clear readings</button><button class="btn small ghost" id="clrno">Cancel</button></div>`; $('#clryes').onclick = () => { $('#labmsg').innerHTML = ''; data[e.id] = []; persist(); analyse(); $('#lastread').innerHTML = ''; }; $('#clrno').onclick = () => { $('#labmsg').innerHTML = ''; }; };
     if ($('#rev')) $('#rev').onclick = () => { $('#revbox').textContent = e.reveal(s); };
-    $('#csv').onclick = () => { const rows = [e.cols.join(',')].concat(data[e.id].map(r => r.join(','))); if (FRAMED) { $('#labmsg').innerHTML = '<p class="muted" style="margin:8px 0 0">Downloads are blocked here. Copy these rows into a spreadsheet or a .csv file:</p><textarea class="copybox" id="csvtxt" readonly></textarea>'; $('#csvtxt').value = rows.join('\n'); $('#csvtxt').select(); return; }  const b = new Blob([rows.join('\n')], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = e.id + '-data.csv'; a.click(); };
+    $('#csv').onclick = () => { const rows = [e.cols.join(',')].concat(data[e.id].map(r => r.join(','))); if (FRAMED) { $('#csvmsg').innerHTML = '<p class="muted" style="margin:8px 0 0">Downloads are blocked here. Copy these rows into a spreadsheet or a .csv file:</p><textarea class="copybox" id="csvtxt" readonly></textarea>'; $('#csvtxt').value = rows.join('\n'); $('#csvtxt').select(); return; } const b = new Blob([rows.join('\n')], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = e.id + '-data.csv'; a.click(); };
     document.querySelectorAll('[data-show]').forEach(b => b.onclick = () => { $('#m' + b.dataset.show).hidden = false; });
     document.querySelectorAll('textarea[data-n]').forEach(t => t.oninput = () => { notes[e.id] = notes[e.id] || {}; notes[e.id][t.dataset.n] = t.value; persist(); });
     analyse();
+    showTab(tabs[e.id] || (data[e.id].length ? 'run' : 'prep'));
+    measure();
   }
+  // sticky step tabs and drawing sit right under the header, whatever its height on this screen
+  function measure() { const r = document.documentElement.style, top = document.querySelector('.top'), tb = document.querySelector('.ltabs'); r.setProperty('--hdr', (top ? top.offsetHeight : 54) + 'px'); r.setProperty('--tabs', (tb ? tb.offsetHeight : 0) + 'px'); }
   function analyse() {
     const e = cur, s = state[e.id];
     const rows = data[e.id].filter(r => !e.filter || e.filter(r, s));
-    $('#tbl').innerHTML = `<tr>${e.cols.map(c => `<th>${c}</th>`).join('')}</tr>` + data[e.id].map(r => `<tr>${r.map(v => `<td>${typeof v === 'number' ? fmt(v, 4) : esc(v)}</td>`).join('')}</tr>`).join('');
+    const head = `<tr><th>#</th>${e.cols.map(c => `<th>${c}</th>`).join('')}</tr>`, line = (r, j) => `<tr><td class="muted">${j + 1}</td>${r.map(v => `<td>${typeof v === 'number' ? fmt(v, 4) : esc(v)}</td>`).join('')}</tr>`;
+    $('#tbl').innerHTML = head + data[e.id].map(line).join('');
+    const n = data[e.id].length;
+    if ($('#recn')) $('#recn').textContent = `${n} reading${n === 1 ? '' : 's'}`;
+    if ($('#lcount')) $('#lcount').textContent = n || '';
+    if ($('#mini')) $('#mini').innerHTML = n ? `<div class="minihead"><b>Latest readings</b> <span class="muted">(${n} in total)</span></div><div style="overflow-x:auto"><table class="minitbl">${head}${data[e.id].map(line).slice(-4).join('')}</table></div>` : '<p class="muted" style="margin:8px 0 0">Set the controls, then press <b>Record measurement</b>. Take at least 5 readings at different settings.</p><div class="ar">اضبط القيم ثم اضغط «سجّل». خذ 5 قراءات على الأقل بقيم مختلفة.</div>';
     const pts = rows.map(r => e.xy(r, s)).filter(p => p && isFinite(p[0]) && isFinite(p[1]));
     const f = pts.length >= 2 ? fit(pts, e.origin) : null;
     plot($('#plot'), pts, f, e.xlf ? e.xlf(s) : e.xl, e.ylf ? e.ylf(s) : e.yl);
@@ -777,7 +935,7 @@ main{min-width:0;overflow-wrap:anywhere}
   }
 
   let t0 = performance.now();
-  function loop(now) { const cv = $('#sim'); if (cv && cur.draw) cur.draw(cv, state[cur.id], now - t0); requestAnimationFrame(loop); }
+  function loop(now) { const cv = $('#sim'); if (cv && cur.draw && cv.offsetParent) cur.draw(view(cv, 640, 260), state[cur.id], now - t0); requestAnimationFrame(loop); }
   // a refresh keeps the experiment you were on: from the address, or the last one opened if the address is empty
   function route() {
     let id = location.hash.slice(1);
@@ -786,8 +944,20 @@ main{min-width:0;overflow-wrap:anywhere}
     renderList(); render(); window.scrollTo(0, 0);
   }
   window.addEventListener('hashchange', route);
+  let rz = 0; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { measure(); if (!$('#plot').closest('[hidden]')) analyse(); }, 150); });
   document.addEventListener('DOMContentLoaded', () => {
-    $('#theme').onclick = () => { const r = document.documentElement, cur = r.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); r.dataset.theme = cur === 'dark' ? 'light' : 'dark'; analyse(); };
+    // light/dark is one setting shared with the lessons (key "pll-theme"); a change in one open tab reaches the other
+    const eff = () => document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const ICON = {
+      sun: '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+      moon: '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 13.4A8.5 8.5 0 1 1 10.6 3.5a6.6 6.6 0 0 0 9.9 9.9z"/></svg>' };
+    // the theme button shows the mode it switches to
+    const themeBtn = (b, dark) => { b.innerHTML = `<span class="ti">${dark ? ICON.sun : ICON.moon}</span><span class="tl">${dark ? 'Light' : 'Dark'}</span>`; b.title = dark ? 'Switch to light mode' : 'Switch to dark mode'; };
+    const label = () => themeBtn($('#theme'), eff() === 'dark');
+    const setTheme = t => { if (t) document.documentElement.dataset.theme = t; label(); if ($('#plot')) analyse(); };
+    try { setTheme(localStorage.getItem('pll-theme')); } catch (e) { label(); }
+    $('#theme').onclick = () => { const t = eff() === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('pll-theme', t); } catch (e) { /* no storage */ } setTheme(t); };
+    window.addEventListener('storage', e => { if (e.key === 'pll-theme' && e.newValue) setTheme(e.newValue); });
     route(); requestAnimationFrame(loop);
   });
   window.__LAB = { EX, fit, state, data };

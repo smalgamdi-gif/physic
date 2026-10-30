@@ -339,3 +339,48 @@ h1 .say{font-size:15px;padding:1px 8px}
 .revwhy{margin-top:8px;border-left:3px solid var(--brand)}
 .expal button.skip{background:var(--bad-soft);border:1.5px dashed var(--bad);color:var(--bad)}
 .exkey .k.skip{background:var(--bad-soft);border:1.5px dashed var(--bad)}
+/* real-life examples: one row per example, icon on the side */
+.lifelist{display:flex;flex-direction:column;margin-top:6px}
+.life{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+.life:first-child{border-top:0;padding-top:6px}
+.life .lic{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--bg);font-size:21px}
+.life .lbody{flex:1;min-width:0}
+.life p{margin:2px 0 6px}
+/* header: every control the same height, the display toggles grouped as one control, one tidy row (+ search) on phones */
+.top{--hc:38px;gap:10px;padding:9px 18px}
+.top .logo{color:var(--ink);text-decoration:none;gap:10px;line-height:1.15;min-width:0}
+.top .logo .atom{width:36px;height:36px;border-radius:10px;font-size:19px;flex:none}
+.logo .lgt{display:flex;flex-direction:column;min-width:0}
+.logo .lgt b{font-size:16.5px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.logo .lgt small{font-size:12.5px;font-weight:500;color:var(--muted);text-align:left}
+.top .hbtn{width:var(--hc);height:var(--hc);display:inline-grid;place-items:center;padding:0;border:1px solid var(--line);border-radius:11px;background:var(--panel);color:var(--ink);flex:none}
+.top .hbtn:hover{background:var(--bg)}
+.srchwrap{position:relative}
+.srchwrap .sic{position:absolute;left:13px;top:calc(var(--hc) / 2);transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.top .search{height:var(--hc);box-sizing:border-box;padding:0 14px 0 37px;width:250px;border-radius:11px;transition:border-color .15s,box-shadow .15s}
+.top .search:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft);background:var(--panel)}
+#results{top:calc(var(--hc) + 6px)!important}
+.top .labbtn{height:var(--hc);box-sizing:border-box;padding:0 14px 0 5px;border-radius:11px;gap:9px}
+.top .labbtn .lbi{width:28px;height:28px;border-radius:8px}
+.htools{display:inline-flex;align-items:center;gap:2px;height:var(--hc);box-sizing:border-box;padding:3px;border:1px solid var(--line);border-radius:11px;background:var(--bg);flex:none}
+.htool{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:100%;min-width:30px;padding:0 11px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-size:13.5px;font-weight:600;white-space:nowrap}
+.htool:hover{color:var(--ink);background:var(--panel)}
+.htool .ti{display:inline-grid;place-items:center;width:18px;height:18px;font-size:16px;font-weight:700;line-height:1}
+.htool.on{background:var(--panel);color:var(--brand);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.top :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.layout{min-height:calc(100vh - var(--hdr,57px))}
+nav.side{top:var(--hdr,57px);height:calc(100vh - var(--hdr,57px))}
+@media (max-width:1060px){.htool{padding:0}.htool .tl{display:none}.top .search{width:210px}}
+@media (max-width:860px){
+  .top{flex-wrap:wrap;gap:8px;padding:8px 12px;--hc:38px}
+  .top .grow{display:block}
+  .srchwrap{order:10;flex-basis:100%}
+  .top .search{width:100%}
+  .logo .lgt small{display:none}
+  .top .labbtn{padding:0 12px 0 5px}
+  .htool{min-width:32px}
+  nav.side{top:var(--hdr,100px);height:calc(100vh - var(--hdr,100px))}
+}
+@media (max-width:520px){.logo .lgw,.top .labbtn .lgw{display:none}.top .logo .atom{width:34px;height:34px}}
+@media (max-width:350px){.logo .lgt{display:none}}
+@media print{.htools,.srchwrap,.top .hbtn{display:none}}
