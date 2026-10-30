@@ -286,3 +286,10 @@ nav.side a.sidelab small{color:inherit;opacity:.85;font-weight:600}
 .revwhy{margin-top:8px;border-left:3px solid var(--brand)}
 .expal button.skip{background:var(--bad-soft);border:1.5px dashed var(--bad);color:var(--bad)}
 .exkey .k.skip{background:var(--bad-soft);border:1.5px dashed var(--bad)}
+/* real-life examples: one row per example, icon on the side */
+.lifelist{display:flex;flex-direction:column;margin-top:6px}
+.life{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+.life:first-child{border-top:0;padding-top:6px}
+.life .lic{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--bg);font-size:21px}
+.life .lbody{flex:1;min-width:0}
+.life p{margin:2px 0 6px}
