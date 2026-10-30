@@ -91,10 +91,15 @@
       const after = rest.slice(m[0].length), u = after.match(/^\s*([^\s,()→=]*)/), tail = after.slice(u[0].length);
       if (!/^\s*($|[,(→;]|=\s*[A-Za-zΑ-ω]|at\b|in\b)/.test(tail) || /^[−+\-·×/]/.test(u[1])) continue;
       let t = m[1].replace(/\s/g, '').replace(/−/g, '-');
-      if (/^10[⁻⁰-⁹]/.test(t)) t = '1×' + t;
+      if (/^10[⁻⁰¹²³⁴⁵⁶⁷⁸⁹]/.test(t)) t = '1×' + t;
       return { pre: s.slice(0, i + 1) + ' ', num: t, unit: u[1], post: tail };
     }
     return null;
+  }
+
+  const VARY = window.VARY || {};
+  function workedLis(steps) {
+    return steps.map((s, i) => { const b = stepBlank(s); return `<li data-i="${i}"${b ? ` data-num="${esc(b.num)}"` : ''}><div class="wq">${b ? `${b.pre}<input type="text" inputmode="decimal" aria-label="Result of step ${i + 1}" placeholder="?"> ${esc(b.unit)}${b.post} <button class="btn small wchk">Check</button>` : `<span class="muted">Work this step out on paper, then press <b>Show step</b> to compare. · اكتب هذه الخطوة في ورقتك ثم اضغط «أظهر الخطوة» للمقارنة.</span>`}<div class="wfb"></div></div><div class="wfull">${s}</div></li>`; }).join('');
   }
 
   function logMistake(item, given, lessonId) {
@@ -260,7 +265,7 @@
       ${step(5, 'Laws, symbols & units', 'القوانين والرموز والوحدات', l.formulas.map((f, fi) => `<div class="card" style="margin:8px 0"><b>${f.name}</b><div class="formula big">${f.f}</div>${words(l, fi)}${symTable(f)}${formsHTML(l, fi)}</div>`).join(''))}
       ${step(6, 'Assumptions & when to use', 'الافتراضات وشروط الاستخدام', conds.length ? `<ul class="clean">${conds.map(f => `<li><b>${f.name}:</b> ${f.cond}</li>`).join('')}</ul>` : '<p class="muted">No special conditions beyond the definitions above.</p>')}
       ${step(7, 'Real‑life example', 'مثال من الحياة', `<div class="addbox">${ADD}<p style="margin:6px 0">${l.life.en}</p><div class="ar">${l.life.ar}</div></div>`)}
-      ${step(8, 'Worked example, step by step', 'مثال محلول خطوة بخطوة', `<div class="card">${srcPill(l.worked.src)}<span class="pill add" title="Solving it step by step yourself is additional design">step-by-step solver 🧩</span><p><b>${l.worked.q}</b></p>${arLine((ARL(l.id) || {}).w)}<div class="wprompt" id="wprompt"></div><ol class="clean wsteps" id="wsteps">${l.worked.steps.map((s, i) => { const b = stepBlank(s); return `<li data-i="${i}"${b ? ` data-num="${esc(b.num)}"` : ''}><div class="wq">${b ? `${b.pre}<input type="text" inputmode="decimal" aria-label="Result of step ${i + 1}" placeholder="?"> ${esc(b.unit)}${b.post} <button class="btn small wchk">Check</button>` : `<span class="muted">Work this step out on paper, then press <b>Show step</b> to compare. · اكتب هذه الخطوة في ورقتك ثم اضغط «أظهر الخطوة» للمقارنة.</span>`}<div class="wfb"></div></div><div class="wfull">${s}</div></li>`; }).join('')}</ol><div class="row noprint wbtns"><button class="btn small" id="wnext">Show step · أظهر الخطوة</button><button class="btn small ghost" id="wall">Show all · أظهر الكل</button><button class="btn small ghost" id="wreset" disabled>↺ Reset · إعادة تعيين</button></div><div id="wscore"></div><p id="wans" style="display:none"><b>Answer:</b> ${l.worked.ans}</p>${l.worked.note ? `<div class="note">⚠ ${l.worked.note}</div>` : ''}</div>`)}
+      ${step(8, 'Worked example, step by step', 'مثال محلول خطوة بخطوة', `<div class="card"><span id="wsrc">${srcPill(l.worked.src)}</span><span class="pill add" title="Solving it step by step yourself is additional design">step-by-step solver 🧩</span><p><b id="wq">${l.worked.q}</b></p><div id="war">${arLine((ARL(l.id) || {}).w)}</div><div class="wprompt" id="wprompt"></div><ol class="clean wsteps" id="wsteps">${workedLis(l.worked.steps)}</ol><div class="row noprint wbtns"><button class="btn small" id="wnext">Show step · أظهر الخطوة</button><button class="btn small ghost" id="wall">Show all · أظهر الكل</button><button class="btn small ghost" id="wreset" disabled>↺ Reset · إعادة تعيين</button>${VARY[l.id] ? '<button class="btn small ghost" id="wnew">🎲 New numbers · أرقام جديدة</button><button class="btn small ghost" id="worig" style="display:none">📘 Original numbers · الأرقام الأصلية</button>' : ''}</div><div id="wscore"></div><p id="wans" style="display:none"><b>Answer:</b> <span id="wansv">${l.worked.ans}</span></p>${l.worked.note ? `<div class="note" id="wnote">⚠ ${l.worked.note}</div>` : ''}</div>`)}
       ${step(9, 'Your turn: solve it yourself', 'دورك: حلّ بنفسك', `<div class="card" id="tryit">${srcPill(l.tryit.src)} <span class="pill add" title="The worked solution shown after you answer is additional design">solution 🧩</span>${qHTML({ q: l.tryit.q + arLine((ARL(l.id) || {}).t), num: l.tryit.ans, unit: l.tryit.unit }, 'try')}<div class="row noprint"><button class="btn small ghost" id="hintbtn">Need a hint?</button></div><div id="hintbox"></div></div>`)}
       ${step(10, 'Quick checks', 'أسئلة تحقق سريعة', `${ADD} <span class="muted" style="font-size:13px">(some reuse course examples, cited inside)</span><div id="checks">${l.checks.map((c, i) => `<div data-c="${i}">${qHTML(c, 'c' + i)}</div>`).join('')}</div>`)}
       ${step(11, 'Common mistakes & why they happen', 'أخطاء شائعة وأسبابها', `<div class="addbox">${ADD}<table>${l.mistakes.map((m, mi) => `<tr><td>✘ ${m[0]}</td><td>✔ ${m[1]}</td></tr>${ARL(l.id) && ARL(l.id).m[mi] ? `<tr class="armr"><td colspan="2"><div class="ar arsub">${ARL(l.id).m[mi]}</div></td></tr>` : ''}`).join('')}</table></div>`)}
@@ -276,7 +281,7 @@
   function afterLesson(id) {
     const l = lessonById(id), st = L(id);
     // worked example stepper
-    const lis = [...document.querySelectorAll('#wsteps li')], wst = [];
+    let lis = [], wst = [];
     const wupd = () => {
       const k = wst.length;
       lis.forEach((li, i) => { li.className = i < k ? 'done ' + wst[i] : i === k ? 'cur' : 'todo'; });
@@ -284,25 +289,38 @@
       $('#wans').style.display = k >= lis.length ? '' : 'none';
       const self = wst.filter(x => x === 'self').length, nb = lis.filter(li => li.dataset.num).length;
       $('#wprompt').innerHTML = k >= lis.length ? '' : `Step ${k + 1} of ${lis.length}: ${lis[k].dataset.num ? 'fill in the result, then press Check · اكتب الناتج ثم اضغط Check' : 'think it through first · فكّر في الخطوة أولًا'}`;
-      $('#wscore').innerHTML = k >= lis.length ? `<div class="fb ${self === nb ? 'ok' : ''}">${self === nb ? '🎉 ' : ''}You solved ${self} of ${nb} result steps yourself. · حللت ${self} من ${nb} خطوات بنفسك.${self < nb ? ' Press Reset to try again without help. · اضغط «إعادة تعيين» لتحاول من جديد دون مساعدة.' : ''}</div>` : '';
+      $('#wscore').innerHTML = k >= lis.length ? `<div class="fb ${self === nb ? 'ok' : ''}">${self === nb ? '🎉 ' : ''}You solved ${self} of ${nb} result steps yourself. · حللت ${self} من ${nb} خطوات بنفسك.${self < nb ? ' Press Reset to try again without help. · اضغط «إعادة تعيين» لتحاول من جديد دون مساعدة.' : ''}${VARY[id] ? ' Press 🎲 New numbers to test your understanding on fresh data. · اضغط «أرقام جديدة» لتقيس فهمك بأرقام مختلفة.' : ''}</div>` : '';
       if (k < lis.length) { const inp = lis[k].querySelector('input'); if (inp && document.activeElement && document.activeElement.closest && document.activeElement.closest('#wsteps,.wbtns')) inp.focus(); }
     };
-    lis.forEach((li, i) => {
-      const inp = li.querySelector('input'); if (!inp) return;
-      const chk = () => {
-        if (wst.length !== i) return;
-        const g = parseNum(inp.value), fb = li.querySelector('.wfb');
-        if (isNaN(g)) { fb.innerHTML = '<div class="fb bad">Type a number, e.g. 2.5 or 1.6e-19 · اكتب رقمًا</div>'; return; }
-        if (numOk(g, parseNum(li.dataset.num), 0.02)) { fb.innerHTML = ''; wst.push('self'); wupd(); }
-        else fb.innerHTML = '<div class="fb bad">✘ Not yet. Check your arithmetic and powers of ten, try again, or press Show step. · ليس بعد؛ راجع الحساب وقوى العشرة، أو اضغط «أظهر الخطوة».</div>';
-      };
-      li.querySelector('.wchk').onclick = chk;
-      inp.onkeydown = e => { if (e.key === 'Enter') chk(); };
-    });
+    const wwire = () => {
+      lis = [...document.querySelectorAll('#wsteps li')]; wst.length = 0;
+      lis.forEach((li, i) => {
+        const inp = li.querySelector('input'); if (!inp) return;
+        const chk = () => {
+          if (wst.length !== i) return;
+          const g = parseNum(inp.value), fb = li.querySelector('.wfb');
+          if (isNaN(g)) { fb.innerHTML = '<div class="fb bad">Type a number, e.g. 2.5 or 1.6e-19 · اكتب رقمًا</div>'; return; }
+          if (numOk(g, parseNum(li.dataset.num), 0.02)) { fb.innerHTML = ''; wst.push('self'); wupd(); }
+          else fb.innerHTML = '<div class="fb bad">✘ Not yet. Check your arithmetic and powers of ten, try again, or press Show step. · ليس بعد؛ راجع الحساب وقوى العشرة، أو اضغط «أظهر الخطوة».</div>';
+        };
+        li.querySelector('.wchk').onclick = chk;
+        inp.onkeydown = e => { if (e.key === 'Enter') chk(); };
+      });
+      wupd();
+    };
     $('#wnext').onclick = () => { if (wst.length < lis.length) { wst.push('shown'); wupd(); } };
     $('#wall').onclick = () => { while (wst.length < lis.length) wst.push('shown'); wupd(); };
     $('#wreset').onclick = () => { wst.length = 0; lis.forEach(li => { const inp = li.querySelector('input'); if (inp) inp.value = ''; li.querySelector('.wfb').innerHTML = ''; }); wupd(); };
-    wupd();
+    // 🎲 same method, new data (content_vary.js); 📘 back to the course's own numbers
+    const wset = (w, varied) => {
+      $('#wq').innerHTML = fx(w.q); $('#wansv').innerHTML = fx(w.ans); $('#wsteps').innerHTML = fx(workedLis(w.steps));
+      $('#wsrc').innerHTML = varied ? `<span class="pill add" title="New numbers are additional design; the method is the course's">🧩 new numbers · method from ${esc(l.worked.src)}</span>` : srcPill(l.worked.src);
+      $('#war').style.display = varied ? 'none' : ''; if ($('#wnote')) $('#wnote').style.display = varied ? 'none' : '';
+      if ($('#worig')) $('#worig').style.display = varied ? '' : 'none';
+      wwire();
+    };
+    if ($('#wnew')) { $('#wnew').onclick = () => wset(VARY[id](), true); $('#worig').onclick = () => wset(l.worked, false); }
+    wwire();
     // try it
     let hintN = 0;
     $('#hintbtn').onclick = () => { hintN++; $('#hintbox').innerHTML = `<div class="hint">💡 ${l.tryit.hint}</div>` + (hintN > 1 ? `<div class="hint">If you are still stuck, answer anyway: the full solution appears after you check.</div>` : ''); };
