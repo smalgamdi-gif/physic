@@ -14,3 +14,61 @@ nav.side a{flex-direction:column;align-items:flex-start;gap:0}
 @media (max-width:860px){nav.side{top:54px;height:calc(100vh - 54px)}}
 @media print{canvas#sim,.controls,.row button,#noise{display:none!important} textarea{border:none}}
 main{min-width:0;overflow-wrap:anywhere}
+/* experiment page: navigation, four steps, readable drawings, record bar */
+.lnav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.lnav a[aria-disabled]{opacity:.35;pointer-events:none}
+.lpick{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;min-width:0;font-size:12.5px}
+.lpick select{max-width:100%;width:100%;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:6px 8px;font:inherit;font-size:14px;font-weight:600}
+.ltitle{margin:8px 0 2px;text-wrap:balance}
+.ltabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:12px 0 4px;position:sticky;top:var(--hdr,54px);z-index:6;background:var(--bg);padding:6px 0}
+.ltab{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 4px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:inherit;cursor:pointer;line-height:1.2}
+.ltab b{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--bg);font-size:12.5px}
+.ltab span{font-weight:700;font-size:13.5px}
+.ltab small{font-size:11.5px;color:var(--muted)}
+.ltab.on{border-color:var(--brand);background:var(--brand-soft);color:var(--brand)}
+.ltab.on b{background:var(--brand);color:var(--brand-ink)}
+.ltab:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.lcount{position:absolute;top:-6px;right:-4px;min-width:20px;padding:1px 6px;border-radius:999px;background:var(--brand);color:var(--brand-ink);font:700 11px/1.5 "Segoe UI",sans-serif;font-style:normal}
+.lcount:empty{display:none}
+.lsimwrap{margin:8px 0}
+#sim{width:100%;max-width:640px;display:block;margin:0 auto;border-radius:10px}
+#plot{width:100%;display:block}
+.lastread{min-height:0;font-size:14px;margin:4px 0}
+.lastread:not(:empty){padding:7px 10px;border-radius:8px;background:var(--ok-soft);color:var(--ink)}
+.lastread.flash{animation:labflash .9s ease}
+@keyframes labflash{from{box-shadow:0 0 0 3px var(--ok)}to{box-shadow:0 0 0 0 transparent}}
+.lrecbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px}
+.lrecbar #rec{font-size:15px;padding:10px 16px}
+.lmore{margin-top:8px}
+.minihead{margin-top:12px;font-size:14px}
+.minitbl{font-size:13.5px;margin-top:4px}
+@media (max-width:860px){
+  .ltabs{gap:4px}
+  .ltab{padding:6px 2px}
+  .ltab small{display:none}
+  .ltab span{font-size:12.5px}
+  /* keep the drawing in view while moving the sliders */
+  .lsimwrap{position:sticky;top:calc(var(--hdr,54px) + var(--tabs,0px));z-index:4;background:var(--panel);margin:6px -4px;padding:4px;border-radius:12px;box-shadow:0 6px 12px -8px rgba(0,0,0,.25)}
+  .controls{grid-template-columns:1fr}
+  /* record bar fixed at the bottom of the screen in the Experiment step */
+  body.lab-run .lrecbar{position:fixed;left:0;right:0;bottom:0;z-index:20;margin:0;padding:10px max(14px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px));background:var(--panel);border-top:1px solid var(--line);box-shadow:0 -6px 16px -10px rgba(0,0,0,.3)}
+  body.lab-run .lrecbar #rec{flex:1}
+  body.lab-run main{padding-bottom:110px}
+  .lpick span{font-size:11.5px}
+}
+@media (prefers-reduced-motion:reduce){.lastread.flash{animation:none}}
+@media print{.lpanel[hidden]{display:block!important}.lrecbar,.lmore,.ltabs,.lnav{display:none!important}}
+#rec .rs,.lseeres .rs,.top .lgs{display:none}
+.lastread:not(:empty){display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;text-align:left}
+.rchips{display:flex;flex-wrap:wrap;gap:6px}
+.rchip{display:inline-flex;flex-direction:column;padding:3px 9px;border-radius:8px;background:var(--panel);border:1px solid var(--line);font-weight:700;font-variant-numeric:tabular-nums;line-height:1.25}
+.rchip small{font-weight:500;font-size:11px;color:var(--muted)}
+@media (max-width:860px){
+  #rec .rl,.lseeres .rl{display:none} #rec .rs,.lseeres .rs,.top .lgs{display:inline}
+  /* one-row header on phones */
+  .top{flex-wrap:nowrap}
+  .top .lgw{display:none}
+  .top .labbtn{padding:6px 10px 6px 7px}
+  .ltitle{font-size:22px;margin-top:4px}
+  .sub .pill{white-space:normal}
+}
