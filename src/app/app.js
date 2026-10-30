@@ -32,11 +32,24 @@
   const CAN_SAY = 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined';
   const plain = h => String(h).replace(/<[^>]+>/g, '').replace(/&[a-z]+;/g, ' ').trim();
   const say = h => CAN_SAY ? `<button class="say noprint" data-say="${esc(plain(h))}" title="Listen · استمع" aria-label="Listen to ${esc(plain(h))}">🔊</button>` : '';
+  // spoken form of a term: read symbols and dashes the way a teacher would say them
+  const SAYW = { 'α': ' alpha', 'β': ' beta', 'γ': ' gamma', 'δ': ' delta', 'Δ': ' delta', 'ε': ' epsilon', 'θ': ' theta', 'λ': ' lambda', 'μ': ' mu', 'ρ': ' rho', 'σ': ' sigma', 'τ': ' tau', 'φ': ' phi', 'ω': ' omega', 'Ω': ' ohms', 'π': ' pi', '₀': ' zero', '₁': ' one', '₂': ' two' };
+  const sayText = t => t.replace(/[‑‐]/g, '-').replace(/\s+[–—]\s+/g, ', ').replace(/[–—]/g, '-').replace(/\s*\/\s*/g, ', ').replace(/&/g, ' and ').replace(/…/g, '')
+    .replace(/_/g, ' ').replace(/[αβγδΔεθλμρστφωΩπ₀₁₂]/g, c => SAYW[c]).replace(/\s+/g, ' ').trim();
+  // pick a clear English voice: neural/online voices first, then well-known US voices, then any en-US, then any English
+  let VOICE = null;
+  function pickVoice() {
+    const vs = CAN_SAY ? speechSynthesis.getVoices() : []; if (!vs.length) return;
+    const en = vs.filter(v => /^en[-_]/i.test(v.lang)), us = en.filter(v => /^en[-_]US/i.test(v.lang));
+    const score = v => (/natural|online|neural/i.test(v.name) ? 8 : 0) + (/google us english|aria|jenny|guy|zira|samantha|alex/i.test(v.name) ? 4 : 0) + (/^en[-_]US/i.test(v.lang) ? 2 : /^en[-_]GB/i.test(v.lang) ? 1 : 0) + (v.localService ? 0 : 1);
+    VOICE = (us.length ? us : en).sort((a, b) => score(b) - score(a))[0] || null;
+  }
+  if (CAN_SAY) { pickVoice(); try { speechSynthesis.addEventListener('voiceschanged', pickVoice); } catch (e) { /* older browsers */ } }
   function speak(text, btn) {
     try {
-      speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.9;
-      const v = speechSynthesis.getVoices().find(x => /^en(-|_)/i.test(x.lang)); if (v) u.voice = v;
+      speechSynthesis.cancel(); if (!VOICE) pickVoice();
+      const u = new SpeechSynthesisUtterance(sayText(text)); u.lang = VOICE ? VOICE.lang : 'en-US'; u.rate = 0.85; u.pitch = 1;
+      if (VOICE) u.voice = VOICE;
       if (btn) { btn.classList.add('on'); u.onend = u.onerror = () => btn.classList.remove('on'); }
       speechSynthesis.speak(u);
     } catch (e) { /* speech not available */ }
