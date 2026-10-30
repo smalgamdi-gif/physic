@@ -344,7 +344,13 @@
 
   let t0 = performance.now();
   function loop(now) { const cv = $('#sim'); if (cv && cur.draw) cur.draw(cv, state[cur.id], now - t0); requestAnimationFrame(loop); }
-  function route() { const id = location.hash.slice(1); cur = EX.find(e => e.id === id) || EX[0]; renderList(); render(); window.scrollTo(0, 0); }
+  // a refresh keeps the experiment you were on: from the address, or the last one opened if the address is empty
+  function route() {
+    let id = location.hash.slice(1);
+    if (!id) { try { id = localStorage.getItem('lab-last') || ''; if (id) history.replaceState(null, '', '#' + id); } catch (e) { /* no storage */ } }
+    cur = EX.find(e => e.id === id) || EX[0]; try { localStorage.setItem('lab-last', cur.id); } catch (e) { /* no storage */ }
+    renderList(); render(); window.scrollTo(0, 0);
+  }
   window.addEventListener('hashchange', route);
   document.addEventListener('DOMContentLoaded', () => {
     $('#theme').onclick = () => { const r = document.documentElement, cur = r.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); r.dataset.theme = cur === 'dark' ? 'light' : 'dark'; analyse(); };

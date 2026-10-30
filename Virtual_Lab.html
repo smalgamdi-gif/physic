@@ -272,6 +272,78 @@ nav.side a.sidelab small{color:inherit;opacity:.85;font-weight:600}
 .ar.arsub{display:block;margin:6px 0 2px;font-size:14.5px;line-height:1.75;font-weight:400}
 .lessonlink .ar.arsub{margin:4px 0 0;padding:3px 10px;font-size:13.5px;color:var(--muted)}
 tr.armr td{border-bottom:1px solid var(--line);padding-top:0}
+/* A4 formula sheet */
+.a4sheet{background:#fff;color:#111;width:210mm;max-width:100%;min-height:297mm;margin:0 auto;padding:7mm 7mm 5mm;box-shadow:var(--shadow);border:1px solid var(--line);font-size:8.4pt;line-height:1.28;font-family:"Segoe UI",system-ui,Arial,sans-serif}
+.a4head{display:flex;flex-direction:column;gap:1mm;border-bottom:1.2pt solid #2f5bd3;padding-bottom:1.5mm;margin-bottom:2mm}
+.a4head b{font-size:11pt;color:#2f5bd3}
+.a4head span{font-size:7.2pt;color:#333}
+.a4cols{column-count:3;column-gap:4mm;column-rule:0.5pt solid #ddd}
+.a4ch{break-inside:auto;margin:0 0 1.6mm}
+.a4ch h4{margin:0 0 0.8mm;padding:0.6mm 1.5mm;font-size:8.8pt;background:#e8eefc;color:#1d3f9e;border-radius:1mm;break-after:avoid;display:flex;justify-content:space-between;gap:2mm}
+.a4ch h4 bdi{font-weight:600}
+.a4f{break-inside:avoid;padding:0.5mm 0.5mm 0.7mm;border-bottom:0.4pt dotted #ccc}
+.a4eq{font-family:"Cambria Math",Cambria,"Times New Roman",serif;font-size:9.6pt}
+.a4eq .frac{font-size:0.95em}
+.a4u{color:#555;font-size:7.3pt}
+.a4u i{font-style:normal;font-weight:600;color:#222}
+.a4foot{margin-top:1.5mm;border-top:0.5pt solid #ccc;padding-top:1mm;font-size:6.3pt;color:#666}
+@media print{
+  @page{size:A4 portrait;margin:0}
+  body{background:#fff}
+  main{padding:0!important;max-width:none!important}
+  .a4sheet{box-shadow:none;border:none;margin:0;width:210mm;height:297mm;overflow:hidden}
+}
+/* 🔊 listen button */
+.say{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:0 6px;font-size:12px;line-height:1.6;vertical-align:middle;margin-left:4px;cursor:pointer}
+.say:hover{border-color:var(--brand)} .say.on{background:var(--brand-soft);border-color:var(--brand)}
+h1 .say{font-size:15px;padding:1px 8px}
+/* entry screen */
+#welcome{position:fixed;inset:0;z-index:100;background:rgba(15,22,40,.55);backdrop-filter:blur(3px);display:grid;place-items:center;padding:16px}
+#welcome .wcard{background:var(--panel);color:var(--ink);border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.25);width:min(440px,100%);padding:26px 24px;text-align:center}
+#welcome .watom{width:54px;height:54px;margin:0 auto 8px;border-radius:14px;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;font-size:28px}
+#welcome h2{margin:6px 0 10px;font-size:21px}
+#welcome .ar{text-align:right}
+#welcome .wlab{display:flex;flex-direction:column;gap:6px;text-align:left;margin-top:12px;font-weight:600;font-size:14px}
+#welcome .wlab input{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;font-size:16px}
+#welcome .wstats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+#welcome .wstats div{background:var(--bg);border-radius:10px;padding:10px}
+#welcome .wstats b{font-size:22px;display:block} #welcome .wstats small{color:var(--muted)}
+/* worked-example solver */
+.wprompt{background:#23231f;color:#f0a830;border-radius:8px;padding:8px 12px;font-size:14px;margin:8px 0}
+.wprompt:empty{display:none}
+.wsteps li{margin:6px 0}
+.wsteps li.todo{display:none}
+.wsteps li .wfull{display:none}
+.wsteps li.done .wq{display:none}
+.wsteps li.done .wfull{display:block}
+.wsteps li.done.self .wfull::after{content:" ✔";color:var(--ok);font-weight:700}
+.wsteps li.done.shown .wfull::after{content:" 👁 shown";color:var(--muted);font-size:12px}
+.wsteps li.cur .wq{border:1px dashed var(--line);border-radius:8px;padding:6px 8px}
+.wsteps .wq input{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:4px 8px;width:120px}
+@media print{.wsteps li{display:list-item!important}.wsteps li .wq{display:none!important}.wsteps li .wfull{display:block!important}}
+/* number answers: key bar and the value the answer reads as */
+.numin{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.numin input{font-family:Consolas,"Cambria Math",monospace}
+.mkeys{flex-basis:100%;display:none;flex-wrap:wrap;gap:5px;margin-top:4px}
+.numin.kb .mkeys{display:flex}
+.mk{min-width:36px;height:32px;padding:0 9px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font:600 14px "Cambria Math","Cambria",serif;cursor:pointer}
+.mk:hover{border-color:var(--brand);color:var(--brand)}
+.mk[data-del]{color:var(--bad)}
+.mprev{flex-basis:100%;font-size:13.5px;color:var(--muted);min-height:0}
+.mprev b{color:var(--ink);font-family:"Cambria Math","Cambria",serif;font-size:15px}
+.extimer.up{background:var(--bg);color:var(--ink);font-size:24px}
+/* review after a test: one block per question */
+.rev{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;background:var(--panel);padding:12px 14px;margin:10px 0}
+.rev.ok{border-left-color:var(--ok)} .rev.bad{border-left-color:var(--bad)}
+.revhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:4px;font-size:13.5px}
+.revhead .pill{margin-left:auto}
+.revans{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px}
+.revans>div,.revwhy{background:var(--bg);border-radius:8px;padding:8px 10px;min-width:0}
+.revans small,.revwhy small{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:2px}
+.okv{color:var(--ok);font-weight:600} .badv{color:var(--bad);font-weight:600}
+.revwhy{margin-top:8px;border-left:3px solid var(--brand)}
+.expal button.skip{background:var(--bad-soft);border:1.5px dashed var(--bad);color:var(--bad)}
+.exkey .k.skip{background:var(--bad-soft);border:1.5px dashed var(--bad)}
 :root{--accent:#e0742b}
 :root[data-theme="dark"]{--accent:#ffa45c}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--accent:#ffa45c}}
@@ -706,7 +778,13 @@ main{min-width:0;overflow-wrap:anywhere}
 
   let t0 = performance.now();
   function loop(now) { const cv = $('#sim'); if (cv && cur.draw) cur.draw(cv, state[cur.id], now - t0); requestAnimationFrame(loop); }
-  function route() { const id = location.hash.slice(1); cur = EX.find(e => e.id === id) || EX[0]; renderList(); render(); window.scrollTo(0, 0); }
+  // a refresh keeps the experiment you were on: from the address, or the last one opened if the address is empty
+  function route() {
+    let id = location.hash.slice(1);
+    if (!id) { try { id = localStorage.getItem('lab-last') || ''; if (id) history.replaceState(null, '', '#' + id); } catch (e) { /* no storage */ } }
+    cur = EX.find(e => e.id === id) || EX[0]; try { localStorage.setItem('lab-last', cur.id); } catch (e) { /* no storage */ }
+    renderList(); render(); window.scrollTo(0, 0);
+  }
   window.addEventListener('hashchange', route);
   document.addEventListener('DOMContentLoaded', () => {
     $('#theme').onclick = () => { const r = document.documentElement, cur = r.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); r.dataset.theme = cur === 'dark' ? 'light' : 'dark'; analyse(); };
