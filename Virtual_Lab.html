@@ -268,6 +268,29 @@ nav.side a.sidelab small{color:inherit;opacity:.85;font-weight:600}
 @media (max-width:860px){.labbtn{padding:6px 11px 6px 8px;font-size:13px}.labbtn .lba{display:none}}
 @media (prefers-reduced-motion:reduce){.labbtn{transition:none}.labbtn:hover{transform:none}}
 @media print{.labbtn{display:none}}
+/* number answers: key bar and the value the answer reads as */
+.numin{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.numin input{font-family:Consolas,"Cambria Math",monospace}
+.mkeys{flex-basis:100%;display:none;flex-wrap:wrap;gap:5px;margin-top:4px}
+.numin.kb .mkeys{display:flex}
+.mk{min-width:36px;height:32px;padding:0 9px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font:600 14px "Cambria Math","Cambria",serif;cursor:pointer}
+.mk:hover{border-color:var(--brand);color:var(--brand)}
+.mk[data-del]{color:var(--bad)}
+.mprev{flex-basis:100%;font-size:13.5px;color:var(--muted);min-height:0}
+.mprev b{color:var(--ink);font-family:"Cambria Math","Cambria",serif;font-size:15px}
+.extimer.up{background:var(--bg);color:var(--ink);font-size:24px}
+/* review after a test: one block per question */
+.rev{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;background:var(--panel);padding:12px 14px;margin:10px 0}
+.rev.ok{border-left-color:var(--ok)} .rev.bad{border-left-color:var(--bad)}
+.revhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:4px;font-size:13.5px}
+.revhead .pill{margin-left:auto}
+.revans{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px}
+.revans>div,.revwhy{background:var(--bg);border-radius:8px;padding:8px 10px;min-width:0}
+.revans small,.revwhy small{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:2px}
+.okv{color:var(--ok);font-weight:600} .badv{color:var(--bad);font-weight:600}
+.revwhy{margin-top:8px;border-left:3px solid var(--brand)}
+.expal button.skip{background:var(--bad-soft);border:1.5px dashed var(--bad);color:var(--bad)}
+.exkey .k.skip{background:var(--bad-soft);border:1.5px dashed var(--bad)}
 :root{--accent:#e0742b}
 :root[data-theme="dark"]{--accent:#ffa45c}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--accent:#ffa45c}}
@@ -702,7 +725,13 @@ main{min-width:0;overflow-wrap:anywhere}
 
   let t0 = performance.now();
   function loop(now) { const cv = $('#sim'); if (cv && cur.draw) cur.draw(cv, state[cur.id], now - t0); requestAnimationFrame(loop); }
-  function route() { const id = location.hash.slice(1); cur = EX.find(e => e.id === id) || EX[0]; renderList(); render(); window.scrollTo(0, 0); }
+  // a refresh keeps the experiment you were on: from the address, or the last one opened if the address is empty
+  function route() {
+    let id = location.hash.slice(1);
+    if (!id) { try { id = localStorage.getItem('lab-last') || ''; if (id) history.replaceState(null, '', '#' + id); } catch (e) { /* no storage */ } }
+    cur = EX.find(e => e.id === id) || EX[0]; try { localStorage.setItem('lab-last', cur.id); } catch (e) { /* no storage */ }
+    renderList(); render(); window.scrollTo(0, 0);
+  }
   window.addEventListener('hashchange', route);
   document.addEventListener('DOMContentLoaded', () => {
     $('#theme').onclick = () => { const r = document.documentElement, cur = r.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); r.dataset.theme = cur === 'dark' ? 'light' : 'dark'; analyse(); };

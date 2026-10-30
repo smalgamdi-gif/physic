@@ -196,7 +196,7 @@
     if (dev && (!next || ls.indexOf(dev) < ls.indexOf(next))) return { l: dev, why: `You are close on “${dev.title}” (${mastery(dev.id)}%). One more quiz attempt should lock it in.`, whyAr: 'أنت قريب من الإتقان؛ محاولة أخرى في الاختبار تكفي.' };
     if (!S.placement && !ls.some(l => mastery(l.id) != null)) return { href: '#placement', label: 'Take the placement test', why: 'New here? A 15‑minute placement test checks the maths and reading skills the course assumes, then tells you where to start.', whyAr: 'أول مرة؟ اختبار تحديد المستوى (ربع ساعة) يقيس المهارات التي يفترضها المقرر، ثم يخبرك من أين تبدأ.' };
     if (next) { const gap = (PREREQ[next.ch.id] || []).map(skillById).find(k => { const m = skillScore(k.id); return m != null && m < 80; });
-      if (gap) return { href: `#skill/${gap.id}`, label: `Open: ${gap.title}`, why: `Before “${next.title}”, strengthen a skill chapter ${next.ch.n} needs: “${gap.title}” (${skillScore(gap.id)}%).`, whyAr: `قبل هذا الدرس قوِّ مهارة يحتاجها الفصل: ${gap.ar}.` }; }
+      if (gap) return { href: `#skill-${gap.id}`, label: `Open: ${gap.title}`, why: `Before “${next.title}”, strengthen a skill chapter ${next.ch.n} needs: “${gap.title}” (${skillScore(gap.id)}%).`, whyAr: `قبل هذا الدرس قوِّ مهارة يحتاجها الفصل: ${gap.ar}.` }; }
     if (next) return { l: next, why: `Next topic in the course order: “${next.title}”.`, whyAr: 'الموضوع التالي حسب ترتيب المقرر.' };
     return { l: null, why: 'All lessons are at 80% or more. Use the Exam simulator to train under time pressure.', whyAr: 'أتقنت كل الدروس؛ تدرّب الآن على محاكي الاختبار.' };
   }
@@ -227,11 +227,11 @@
       <div class="card">
         <h3 style="margin-top:0">🎯 Recommended next step</h3>
         <p>${r.why}</p><div class="ar">${r.whyAr}</div>
-        ${r.href ? `<a class="btn" href="${r.href}">${esc(r.label)}</a>` : r.l ? `<a class="btn" href="#lesson/${r.l.id}">Open: ${esc(r.l.title)}</a>` : `<a class="btn" href="#exam">Open the exam simulator</a>`}
+        ${r.href ? `<a class="btn" href="${r.href}">${esc(r.label)}</a>` : r.l ? `<a class="btn" href="#lesson-${r.l.id}">Open: ${esc(r.l.title)}</a>` : `<a class="btn" href="#exam">Open the exam simulator</a>`}
         ${S.mistakes.filter(m => !m.reviewed).length ? ` <a class="btn ghost" href="#mistakes">Review ${S.mistakes.filter(m => !m.reviewed).length} mistakes</a>` : ''}
       </div>
       <h2>Chapters</h2>
-      <div class="grid g2">${COURSE.map(c => { const cm = chapterMastery(c); return `<a class="card" style="text-decoration:none;color:inherit" href="#chapter/${c.id}"><div class="chap"><div><b>Ch ${c.n}. ${esc(c.title)}</b><div class="muted" style="font-size:13px">${c.lessons.length} lessons · <bdi>${c.ar}</bdi></div></div><b>${cm.avg}%</b></div>${bar(cm.avg)}</a>`; }).join('')}</div>
+      <div class="grid g2">${COURSE.map(c => { const cm = chapterMastery(c); return `<a class="card" style="text-decoration:none;color:inherit" href="#chapter-${c.id}"><div class="chap"><div><b>Ch ${c.n}. ${esc(c.title)}</b><div class="muted" style="font-size:13px">${c.lessons.length} lessons · <bdi>${c.ar}</bdi></div></div><b>${cm.avg}%</b></div>${bar(cm.avg)}</a>`; }).join('')}</div>
       <h2>How to use this tutor <span class="pill add">🧩</span></h2>
       <div class="card"><ol class="clean">
         <li>New to the course? Take the <a href="#placement">Placement test</a>, then study the <a href="#found">Unit 0</a> skills it marks.</li>
@@ -249,8 +249,8 @@
     return `<h1>Chapter ${c.n}: ${esc(c.title)}</h1><p class="sub"><bdi>${c.ar}</bdi> · ${srcPill(c.src)}</p>
       <div class="card"><div class="chap"><b>Chapter mastery</b><b>${cm.avg}%</b></div>${bar(cm.avg)}</div>
       ${readyBox(c)}
-      ${c.lessons.map((l, i) => { const m = mastery(l.id); const [lv, cls] = level(m); return `<a class="lessonlink" href="#lesson/${l.id}"><span><b>${c.n}.${i + 1} ${esc(l.title)}</b><br><small class="muted">${l.ar}</small></span><span class="row"><span class="${cls}">${lv}${m != null ? ' · ' + m + '%' : ''}</span></span></a>`; }).join('')}
-      <div class="row noprint" style="margin-top:14px"><a class="btn ghost" href="#exam/${c.id}">Chapter exam</a><a class="btn ghost" href="#practice/${c.id}">Unlimited practice</a><a class="btn ghost" href="#formulas/${c.id}">Formula sheet</a></div>`;
+      ${c.lessons.map((l, i) => { const m = mastery(l.id); const [lv, cls] = level(m); return `<a class="lessonlink" href="#lesson-${l.id}"><span><b>${c.n}.${i + 1} ${esc(l.title)}</b><br><small class="muted">${l.ar}</small></span><span class="row"><span class="${cls}">${lv}${m != null ? ' · ' + m + '%' : ''}</span></span></a>`; }).join('')}
+      <div class="row noprint" style="margin-top:14px"><a class="btn ghost" href="#exam-${c.id}">Chapter exam</a><a class="btn ghost" href="#practice-${c.id}">Unlimited practice</a><a class="btn ghost" href="#formulas-${c.id}">Formula sheet</a></div>`;
   };
 
   views.lesson = (id) => {
@@ -261,7 +261,7 @@
     const step = (n, title, arTitle, body) => `<div class="step"><div class="num">${n}</div><h3>${title} <span class="muted" style="font-weight:400;font-size:14px">· ${arTitle}</span></h3></div><div class="stepbody">${body}</div>`;
     const conds = l.formulas.filter(f => f.cond && f.cond !== '—');
     return `
-      <div class="row muted" style="font-size:13px"><a href="#chapter/${l.ch.id}">Ch ${l.ch.n}. ${esc(l.ch.title)}</a> › lesson</div>
+      <div class="row muted" style="font-size:13px"><a href="#chapter-${l.ch.id}">Ch ${l.ch.n}. ${esc(l.ch.title)}</a> › lesson</div>
       <h1>${esc(l.title)}</h1>
       <p class="sub"><bdi>${l.ar}</bdi> · ${srcPill(l.src)}</p>
       ${step(1, 'What will you learn?', 'ماذا ستتعلم؟', `<ul class="clean">${l.goals.map(g => `<li>${g}</li>`).join('')}</ul><div class="ar">${l.goalsAr}</div>`)}
@@ -282,7 +282,7 @@
         <div class="muted" style="font-size:13px">Extra problems on this same topic (odd‑numbered, paraphrased with the book's data). Serway uses g = 9.80 m/s² and k = 8.99×10⁹, so answers within about ±1% are accepted.</div>
         <div id="serway">${SW(l.id).probs.map((p, i) => `<div data-s="${i}">${qHTML(swItem(p), 's' + i)}</div>`).join('')}</div></div>` : ''}
       ${step(14, 'What next?', 'ماذا بعد؟', `<div class="card" id="nextbox"></div>`)}
-      <div class="row noprint" style="margin-top:24px;justify-content:space-between">${prev ? `<a class="btn ghost" href="#lesson/${prev.id}">← ${esc(prev.title)}</a>` : '<span></span>'}${next ? `<a class="btn ghost" href="#lesson/${next.id}">${esc(next.title)} →</a>` : ''}</div>`;
+      <div class="row noprint" style="margin-top:24px;justify-content:space-between">${prev ? `<a class="btn ghost" href="#lesson-${prev.id}">← ${esc(prev.title)}</a>` : '<span></span>'}${next ? `<a class="btn ghost" href="#lesson-${next.id}">${esc(next.title)} →</a>` : ''}</div>`;
   };
   function afterLesson(id) {
     const l = lessonById(id), st = L(id);
@@ -320,7 +320,7 @@
       else if (m >= 80) { msg = nx ? `Great: move on to “${nx.title}”. Add the formulas to your flashcards review.` : 'You finished the last lesson. Try a full exam.'; ar = 'ممتاز، انتقل للدرس التالي.'; }
       else if (m >= 60) { msg = 'Almost there: re‑read step 6 (conditions) and step 11 (mistakes), then retake the quiz.'; ar = 'اقتربت؛ راجع الشروط والأخطاء الشائعة ثم أعد الاختبار.'; }
       else { msg = 'Stay on this lesson: replay the worked example one step at a time, then use Unlimited practice for this chapter.'; ar = 'ابقَ في هذا الدرس؛ أعد المثال المحلول خطوة بخطوة وتدرّب أكثر.'; }
-      $('#nextbox').innerHTML = `<div class="row"><span class="${cls}">${lv}${m != null ? ' · ' + m + '%' : ''}</span></div>${bar(m)}<p>${msg}</p><div class="ar">${ar}</div><div class="row noprint">${nx && m != null && m >= 80 ? `<a class="btn" href="#lesson/${nx.id}">Next lesson →</a>` : ''}<a class="btn ghost" href="#practice/${l.ch.id}">Practice this chapter</a></div>`;
+      $('#nextbox').innerHTML = `<div class="row"><span class="${cls}">${lv}${m != null ? ' · ' + m + '%' : ''}</span></div>${bar(m)}<p>${msg}</p><div class="ar">${ar}</div><div class="row noprint">${nx && m != null && m >= 80 ? `<a class="btn" href="#lesson-${nx.id}">Next lesson →</a>` : ''}<a class="btn ghost" href="#practice-${l.ch.id}">Practice this chapter</a></div>`;
     }
   }
 
@@ -571,7 +571,7 @@
     return `<h1>Mistake journal</h1><p class="sub">Every wrong answer is saved here so you can learn from it. ${ADD}</p>
       <div class="ar">دفتر الأخطاء: كل إجابة خاطئة تُحفظ هنا لتراجعها. اكتب لنفسك سبب الخطأ ثم علّمها كمراجَعة.</div>
       <div class="row noprint"><span class="pill ${open.length ? 'bad' : 'ok'}">${open.length} to review</span>${S.mistakes.length ? '<button class="btn small ghost" id="mclear">Delete reviewed</button>' : ''}</div>
-      ${S.mistakes.length ? S.mistakes.map((m, i) => `<div class="card" style="${m.reviewed ? 'opacity:.55' : ''}"><div class="qt"><b>${m.q}</b></div><div>Your answer: <span class="pill bad">${esc(m.given)}</span> · Correct: <span class="pill ok">${m.correct}</span></div>${m.sol ? `<div class="muted" style="margin-top:6px">${m.sol}</div>` : ''}<div class="row noprint" style="margin-top:8px">${m.lessonId ? `<a class="btn small ghost" href="#lesson/${m.lessonId}">Open lesson</a>` : ''}<button class="btn small" data-rev="${i}">${m.reviewed ? 'Mark as open' : 'Mark reviewed'}</button><small class="muted">${new Date(m.ts).toLocaleDateString()}</small></div></div>`).join('') : '<div class="card">No mistakes yet. Answer some questions!</div>'}`;
+      ${S.mistakes.length ? S.mistakes.map((m, i) => `<div class="card" style="${m.reviewed ? 'opacity:.55' : ''}"><div class="qt"><b>${m.q}</b></div><div>Your answer: <span class="pill bad">${esc(m.given)}</span> · Correct: <span class="pill ok">${m.correct}</span></div>${m.sol ? `<div class="muted" style="margin-top:6px">${m.sol}</div>` : ''}<div class="row noprint" style="margin-top:8px">${m.lessonId ? `<a class="btn small ghost" href="#lesson-${m.lessonId}">Open lesson</a>` : ''}<button class="btn small" data-rev="${i}">${m.reviewed ? 'Mark as open' : 'Mark reviewed'}</button><small class="muted">${new Date(m.ts).toLocaleDateString()}</small></div></div>`).join('') : '<div class="card">No mistakes yet. Answer some questions!</div>'}`;
   };
   function afterMistakes() {
     document.querySelectorAll('[data-rev]').forEach(b => b.onclick = () => { const m = S.mistakes[+b.dataset.rev]; m.reviewed = !m.reviewed; save(); route(); });
@@ -652,9 +652,9 @@
   // formula in words: Arabic line, then the same in English
   const words = (l, i) => { const w = (window.WORDS || {})[l.id + '#' + i]; return w ? `<div class="words"><div class="ar"><bdi>🗣 ${w[0]}</bdi></div><div class="en">🗣 <b>In words:</b> ${w[1]}</div></div>` : ''; };
   views.formulas = (chId) => `<h1>Formula & unit sheet</h1><p class="sub">Every law in the course with symbols, units and conditions. Print it for revision. <span class="pill src">📘 course files</span></p>
-    <div class="row noprint"><button class="btn small printbtn" onclick="window.print()">Print / save as PDF</button>${COURSE.map(c => `<a class="btn small ghost" href="#formulas/${c.id}">Ch ${c.n}</a>`).join('')}<a class="btn small ghost" href="#formulas">All</a></div>
+    <div class="row noprint"><button class="btn small printbtn" onclick="window.print()">Print / save as PDF</button>${COURSE.map(c => `<a class="btn small ghost" href="#formulas-${c.id}">Ch ${c.n}</a>`).join('')}<a class="btn small ghost" href="#formulas">All</a></div>
     <div class="card noprint">🔀 Under each law you see all its forms: the <b>bold symbol</b> is what that form finds. Open a lesson to see how each form comes from the course law, or read <a href="#rearrange">Rearranging a law</a>.<div class="ar">تحت كل قانون تجد كل أشكاله، والرمز العريض هو ما يحسبه ذلك الشكل. وطريقة الوصول لكل شكل موجودة داخل الدرس وفي صفحة «ترتيب القوانين».</div></div>
-    ${COURSE.filter(c => !chId || c.id === chId).map(c => `<h2>Ch ${c.n}. ${esc(c.title)} <span class="muted" style="font-size:14px;font-weight:400"><bdi>${c.ar}</bdi> · ${c.src}</span></h2>${c.lessons.map(l => l.formulas.map((f, fi) => `<div class="card"><div class="row" style="justify-content:space-between"><b>${f.name}</b><a class="muted" style="font-size:13px" href="#lesson/${l.id}">${esc(l.title)}</a></div><div class="formula">${f.f}</div>${words(l, fi)}<div style="font-size:14px">${f.sym.map(s => `<b>${s[0]}</b>: ${s[1]} (${s[2]})`).join(' · ')}</div>${f.cond !== '—' ? `<div class="muted" style="font-size:14px">Condition: ${f.cond}</div>` : ''}${FM(l, fi) ? `<div class="fchips">${FM(l, fi).map(x => `<span class="fchip" title="${esc(x.en)}"><b>${x.find}</b>${x.f}</span>`).join('')}</div>` : ''}</div>`).join('')).join('')}`).join('')}`;
+    ${COURSE.filter(c => !chId || c.id === chId).map(c => `<h2>Ch ${c.n}. ${esc(c.title)} <span class="muted" style="font-size:14px;font-weight:400"><bdi>${c.ar}</bdi> · ${c.src}</span></h2>${c.lessons.map(l => l.formulas.map((f, fi) => `<div class="card"><div class="row" style="justify-content:space-between"><b>${f.name}</b><a class="muted" style="font-size:13px" href="#lesson-${l.id}">${esc(l.title)}</a></div><div class="formula">${f.f}</div>${words(l, fi)}<div style="font-size:14px">${f.sym.map(s => `<b>${s[0]}</b>: ${s[1]} (${s[2]})`).join(' · ')}</div>${f.cond !== '—' ? `<div class="muted" style="font-size:14px">Condition: ${f.cond}</div>` : ''}${FM(l, fi) ? `<div class="fchips">${FM(l, fi).map(x => `<span class="fchip" title="${esc(x.en)}"><b>${x.find}</b>${x.f}</span>`).join('')}</div>` : ''}</div>`).join('')).join('')}`).join('')}`;
 
   // ---------- tools ----------
   const UNITS = {
@@ -759,7 +759,7 @@
       for (let k = 0; k < Math.min(studyDays, 60); k++) {
         const items = todo.slice(k * perDay, (k + 1) * perDay);
         const date = new Date(d.getTime() + k * 86400000).toISOString().slice(0, 10);
-        rows.push(`<tr><td>${date}</td><td>${items.length ? items.map(x => `<a href="#lesson/${x.l.id}">${esc(x.l.title)}</a>${x.m != null ? ` <span class="pill bad">${x.m}%</span>` : ''}`).join('<br>') : 'Flashcards + Unlimited practice'}</td><td>${k % 3 === 2 ? 'Mistake journal review' : 'Flashcards (10 min)'}</td></tr>`);
+        rows.push(`<tr><td>${date}</td><td>${items.length ? items.map(x => `<a href="#lesson-${x.l.id}">${esc(x.l.title)}</a>${x.m != null ? ` <span class="pill bad">${x.m}%</span>` : ''}`).join('<br>') : 'Flashcards + Unlimited practice'}</td><td>${k % 3 === 2 ? 'Mistake journal review' : 'Flashcards (10 min)'}</td></tr>`);
       }
       rows.push(`<tr><td>${new Date(new Date(p.exam).getTime() - 86400000).toISOString().slice(0, 10)}</td><td><b>Full exam simulation</b> (30 Qs, 45 min), then re‑read the formula sheet</td><td>Sleep well</td></tr>`);
       body = `<div class="card"><b>${days} day(s)</b> until your exam on ${p.exam}. ${todo.length} lesson(s) still below 80%, about ${perDay} per day, weakest first.</div><div class="card"><table><tr><th>Day</th><th>Lessons</th><th>Daily habit</th></tr>${rows.join('')}</table></div>`;
@@ -785,8 +785,8 @@
       <h2>Lessons</h2><div class="card"><table><tr><th>Lesson</th><th>Quiz best</th><th>Attempts</th><th>Mastery</th></tr>${ls.map(l => { const st = S.lessons[l.id] || {}; const m = mastery(l.id); const [lv, cls] = level(m); return `<tr><td>${l.ch.n}. ${esc(l.title)}</td><td>${st.quizBest != null ? st.quizBest + '%' : '—'}</td><td>${st.quizAttempts || 0}</td><td><span class="${cls}">${lv}${m != null ? ' ' + m + '%' : ''}</span></td></tr>`; }).join('')}</table></div>
       <h2>Study time (last 14 days)</h2><div class="card"><svg viewBox="0 0 700 160" width="100%" role="img" aria-label="Minutes studied per day">${last14.map((x, k) => { const h = x[1] / maxM * 120; return `<rect x="${k * 50 + 8}" y="${130 - h}" width="34" height="${h}" rx="4" fill="var(--brand)"><title>${x[0]}: ${x[1]} min</title></rect><text x="${k * 50 + 25}" y="148" font-size="11" text-anchor="middle" fill="var(--muted)">${x[0]}</text>${x[1] ? `<text x="${k * 50 + 25}" y="${124 - h}" font-size="11" text-anchor="middle" fill="var(--ink)">${x[1]}</text>` : ''}`; }).join('')}</svg></div>
       <h2>Where mistakes happen</h2><div class="card">${Object.keys(mByCh).length ? `<table>${Object.entries(mByCh).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<tr><td>${esc(k)}</td><td><b>${v}</b></td></tr>`).join('')}</table>` : 'No mistakes recorded yet.'}</div>
-      <h2>Unit 0: Foundations</h2><div class="card"><table><tr><th>Skill</th><th>Level</th><th style="width:35%"></th></tr>${SKILLS().map(k => `<tr><td><a href="#skill/${k.id}">${esc(k.title)}</a></td><td>${skillPill(k.id)}</td><td>${bar(skillScore(k.id))}</td></tr>`).join('')}</table>${S.placement ? `<p class="muted">Placement test: ${S.placement.pct}% on ${new Date(S.placement.ts).toLocaleDateString()}</p>` : '<p class="muted">Placement test not taken yet.</p>'}</div>
-      <h2>Recommendations</h2><div class="card"><ul class="clean">${weak.length ? weak.map(x => `<li>Review <a href="#lesson/${x.l.id}">${esc(x.l.title)}</a> (${x.m}%)</li>`).join('') : '<li>No lesson below 60%. Keep going.</li>'}<li>${recommend().why}</li></ul></div>`;
+      <h2>Unit 0: Foundations</h2><div class="card"><table><tr><th>Skill</th><th>Level</th><th style="width:35%"></th></tr>${SKILLS().map(k => `<tr><td><a href="#skill-${k.id}">${esc(k.title)}</a></td><td>${skillPill(k.id)}</td><td>${bar(skillScore(k.id))}</td></tr>`).join('')}</table>${S.placement ? `<p class="muted">Placement test: ${S.placement.pct}% on ${new Date(S.placement.ts).toLocaleDateString()}</p>` : '<p class="muted">Placement test not taken yet.</p>'}</div>
+      <h2>Recommendations</h2><div class="card"><ul class="clean">${weak.length ? weak.map(x => `<li>Review <a href="#lesson-${x.l.id}">${esc(x.l.title)}</a> (${x.m}%)</li>`).join('') : '<li>No lesson below 60%. Keep going.</li>'}<li>${recommend().why}</li></ul></div>`;
   };
   function afterReport() {
     $('#exp').onclick = () => {
@@ -830,9 +830,9 @@
     const out = [];
     allLessons().forEach(l => {
       const hay = [l.title, l.ar, ...l.terms.map(t => t.join(' ')), ...l.formulas.map(f => f.name + ' ' + f.f)].join(' ').replace(/<[^>]+>/g, '').toLowerCase();
-      if (hay.includes(qs)) out.push(`<a href="#lesson/${l.id}">Ch ${l.ch.n} · ${esc(l.title)}</a>`);
+      if (hay.includes(qs)) out.push(`<a href="#lesson-${l.id}">Ch ${l.ch.n} · ${esc(l.title)}</a>`);
     });
-    SKILLS().forEach(k => { if ((k.title + ' ' + k.ar).toLowerCase().includes(qs)) out.push(`<a href="#skill/${k.id}">Unit 0 · ${esc(k.title)}</a>`); });
+    SKILLS().forEach(k => { if ((k.title + ' ' + k.ar).toLowerCase().includes(qs)) out.push(`<a href="#skill-${k.id}">Unit 0 · ${esc(k.title)}</a>`); });
     return out.slice(0, 12);
   }
 
@@ -846,12 +846,12 @@
   const skillById = id => SKILLS().find(k => k.id === id);
   function skillScore(id) { const st = S.found[id]; if (st && st.best != null) return st.best; const p = S.placement && S.placement.res[id]; return p ? Math.round(p[0] / p[1] * 100) : null; }
   const skillPill = id => { const m = skillScore(id); const [lv, cls] = level(m); return `<span class="${cls}">${lv}${m != null ? ' · ' + m + '%' : ''}</span>`; };
-  const usesLinks = k => k.uses.map(u => u[0] === 'lab' ? `<a href="Virtual_Lab.html">⚗ Virtual lab</a> <span class="muted">(${u[1]})</span>` : `<a href="#lesson/${u[0]}">${esc(lessonById(u[0]).title)}</a> <span class="muted">(${u[1]})</span>`).join('<br>');
+  const usesLinks = k => k.uses.map(u => u[0] === 'lab' ? `<a href="Virtual_Lab.html">⚗ Virtual lab</a> <span class="muted">(${u[1]})</span>` : `<a href="#lesson-${u[0]}">${esc(lessonById(u[0]).title)}</a> <span class="muted">(${u[1]})</span>`).join('<br>');
   function readyBox(c) {
     const ks = (PREREQ[c.id] || []).map(skillById).filter(Boolean); if (!ks.length) return '';
     return `<div class="card ready"><h3 style="margin-top:0">🧱 Are you ready for this chapter? <span class="muted" style="font-weight:400">· هل أنت جاهز؟</span></h3>
       <div class="ar">هذا الفصل يعتمد على هذه المهارات من الوحدة صفر. حل سؤالًا واحدًا لكل مهارة لتعرف هل تحتاج مراجعتها قبل البدء.</div>
-      ${ks.map(k => `<div class="lessonlink"><span><a href="#skill/${k.id}"><b>${esc(k.title)}</b></a><br><small class="muted">${k.ar}</small></span>${skillPill(k.id)}</div>`).join('')}
+      ${ks.map(k => `<div class="lessonlink"><span><a href="#skill-${k.id}"><b>${esc(k.title)}</b></a><br><small class="muted">${k.ar}</small></span>${skillPill(k.id)}</div>`).join('')}
       <div class="row noprint" style="margin-top:8px"><button class="btn small" id="rdygo" data-ch="${c.id}">Quick readiness check (${ks.length} questions)</button></div><div id="rdybox"></div></div>`;
   }
   function afterChapter(id) {
@@ -861,7 +861,7 @@
       $('#rdybox').innerHTML = items.map((it, i) => `<div data-rd="${i}"><div class="muted" style="font-size:13px;margin-top:8px">${esc(ks[i].title)}</div>${qHTML(it, 'rd' + i)}</div>`).join('') + '<div id="rdyres"></div>';
       checkAllBtn($('#rdyres'), items.map((it, i) => wireQ(document.querySelector(`[data-rd="${i}"]`), it, ok => { res[ks[i].id] = ok; if (!ok) logMistake(it, '(readiness)', null); }, { deferred: true })), () => {
         const miss = ks.filter(k => !res[k.id]);
-        $('#rdyres').innerHTML = `<div class="card">${miss.length ? `<b>Review before you start:</b> ${miss.map(k => `<a href="#skill/${k.id}">${esc(k.title)}</a>`).join(' · ')}<div class="ar">راجع هذه المهارات قبل البدء بالفصل: ${miss.map(k => k.ar).join('، ')}.</div>` : '<b>✔ You are ready. Start the first lesson.</b><div class="ar">أنت جاهز، ابدأ بالدرس الأول.</div>'}</div>`;
+        $('#rdyres').innerHTML = `<div class="card">${miss.length ? `<b>Review before you start:</b> ${miss.map(k => `<a href="#skill-${k.id}">${esc(k.title)}</a>`).join(' · ')}<div class="ar">راجع هذه المهارات قبل البدء بالفصل: ${miss.map(k => k.ar).join('، ')}.</div>` : '<b>✔ You are ready. Start the first lesson.</b><div class="ar">أنت جاهز، ابدأ بالدرس الأول.</div>'}</div>`;
       });
     };
   }
@@ -869,7 +869,7 @@
     <p class="sub">The maths and reading skills the course uses without teaching them. ${ADD}</p>
     <div class="ar">مقرر الفيزياء يفترض أنك تعرف هذه المهارات (سجل الفجوات G‑03). كل مهارة فيها شرح عربي مبسط، ومثال محلول، وتمارين بأرقام جديدة كل مرة، وروابط للدروس التي تستخدمها.</div>
     <div class="card row" style="justify-content:space-between"><span>${S.placement ? `Placement test taken on ${new Date(S.placement.ts).toLocaleDateString()}: <b>${S.placement.pct}%</b>` : 'Not sure where to start? Take the placement test first.'}</span><a class="btn ${S.placement ? 'ghost' : ''}" href="#placement">${S.placement ? 'Retake placement test' : 'Placement test'}</a></div>
-    <div class="grid g2">${SKILLS().map((k, i) => `<a class="card" style="text-decoration:none;color:inherit" href="#skill/${k.id}"><div class="chap"><div><b>0.${i + 1} ${esc(k.title)}</b><div class="muted" style="font-size:13px"><bdi>${k.ar}</bdi></div></div>${skillPill(k.id)}</div>${bar(skillScore(k.id))}<div class="muted" style="font-size:12.5px;margin-top:6px">Used in: ${k.uses.map(u => u[0] === 'lab' ? 'lab' : 'Ch ' + lessonById(u[0]).ch.n).filter((x, j, a) => a.indexOf(x) === j).join(', ')}</div></a>`).join('')}</div>`;
+    <div class="grid g2">${SKILLS().map((k, i) => `<a class="card" style="text-decoration:none;color:inherit" href="#skill-${k.id}"><div class="chap"><div><b>0.${i + 1} ${esc(k.title)}</b><div class="muted" style="font-size:13px"><bdi>${k.ar}</bdi></div></div>${skillPill(k.id)}</div>${bar(skillScore(k.id))}<div class="muted" style="font-size:12.5px;margin-top:6px">Used in: ${k.uses.map(u => u[0] === 'lab' ? 'lab' : 'Ch ' + lessonById(u[0]).ch.n).filter((x, j, a) => a.indexOf(x) === j).join(', ')}</div></a>`).join('')}</div>`;
   views.skill = id => {
     const k = skillById(id); if (!k) return views.found();
     const i = SKILLS().indexOf(k), nx = SKILLS()[i + 1];
@@ -880,7 +880,7 @@
       <div class="card"><h3 style="margin-top:0">✏️ Worked example · مثال محلول</h3><p><b>${k.example.q}</b></p><ol class="clean">${k.example.steps.map(x => `<li>${x}</li>`).join('')}</ol><p><b>Answer:</b> ${k.example.ans}</p></div>
       <div class="card"><h3 style="margin-top:0">🎯 Practice: 5 fresh questions · تدريب</h3><div class="ar">أجب عن الأسئلة كلها ثم اضغط «تحقق». 4 من 5 تعني أنك أتقنت المهارة.</div><div id="skq"></div><div id="skres"></div></div>
       <div class="card"><h3 style="margin-top:0">📍 Where the course uses it · أين تحتاجها في المقرر</h3>${usesLinks(k)}</div>
-      <div class="row noprint" style="justify-content:space-between;margin-top:18px"><a class="btn ghost" href="#found">← Unit 0</a>${nx ? `<a class="btn ghost" href="#skill/${nx.id}">${esc(nx.title)} →</a>` : `<a class="btn ghost" href="#lesson/ch1-l1">Start Chapter 1 →</a>`}</div>`;
+      <div class="row noprint" style="justify-content:space-between;margin-top:18px"><a class="btn ghost" href="#found">← Unit 0</a>${nx ? `<a class="btn ghost" href="#skill-${nx.id}">${esc(nx.title)} →</a>` : `<a class="btn ghost" href="#lesson-ch1-l1">Start Chapter 1 →</a>`}</div>`;
   };
   function afterSkill(id) {
     const k = skillById(id); if (!k) return;
@@ -917,18 +917,18 @@
     S.placement = { ts: Date.now(), res, pct }; save();
     const weak = SKILLS().filter(k => res[k.id][0] < 2);
     $('#plbox').innerHTML = fx(`<div class="card"><h2 style="margin-top:0">Result: ${pct}% (${good}/${qs.length})</h2><p class="muted">Time used: ${Math.floor(st.used / 60)} min ${st.used % 60} s</p>
-      <table><tr><th>Skill</th><th>Correct</th><th>Next step</th></tr>${SKILLS().map(k => { const r = res[k.id]; return `<tr><td><a href="#skill/${k.id}">${esc(k.title)}</a><br><small class="muted">${k.ar}</small></td><td><b>${r[0]}/${r[1]}</b></td><td>${r[0] === 2 ? '<span class="pill ok">skip it</span>' : r[0] === 1 ? '<span class="pill warn">quick review</span>' : '<span class="pill bad">study it</span>'}</td></tr>`; }).join('')}</table>
-      ${weak.length ? `<p><b>Your plan:</b> study ${weak.map(k => `<a href="#skill/${k.id}">${esc(k.title)}</a>`).join(', ')}, then start Chapter 1. Each chapter page also shows which of these it needs.</p><div class="ar">خطتك: راجع المهارات المعلَّمة أعلاه بالترتيب، ثم ابدأ الفصل الأول. وصفحة كل فصل تذكّرك بالمهارات التي يحتاجها.</div><div class="row"><a class="btn" href="#skill/${weak[0].id}">Start with: ${esc(weak[0].title)}</a><button class="btn ghost" onclick="location.reload()">Retake the test</button></div>` : `<p><b>Your foundations are solid.</b> Start Chapter 1.</p><div class="ar">أساسك قوي، ابدأ الفصل الأول مباشرة.</div><a class="btn" href="#lesson/ch1-l1">Start Chapter 1</a>`}
+      <table><tr><th>Skill</th><th>Correct</th><th>Next step</th></tr>${SKILLS().map(k => { const r = res[k.id]; return `<tr><td><a href="#skill-${k.id}">${esc(k.title)}</a><br><small class="muted">${k.ar}</small></td><td><b>${r[0]}/${r[1]}</b></td><td>${r[0] === 2 ? '<span class="pill ok">skip it</span>' : r[0] === 1 ? '<span class="pill warn">quick review</span>' : '<span class="pill bad">study it</span>'}</td></tr>`; }).join('')}</table>
+      ${weak.length ? `<p><b>Your plan:</b> study ${weak.map(k => `<a href="#skill-${k.id}">${esc(k.title)}</a>`).join(', ')}, then start Chapter 1. Each chapter page also shows which of these it needs.</p><div class="ar">خطتك: راجع المهارات المعلَّمة أعلاه بالترتيب، ثم ابدأ الفصل الأول. وصفحة كل فصل تذكّرك بالمهارات التي يحتاجها.</div><div class="row"><a class="btn" href="#skill-${weak[0].id}">Start with: ${esc(weak[0].title)}</a><button class="btn ghost" onclick="location.reload()">Retake the test</button></div>` : `<p><b>Your foundations are solid.</b> Start Chapter 1.</p><div class="ar">أساسك قوي، ابدأ الفصل الأول مباشرة.</div><a class="btn" href="#lesson-ch1-l1">Start Chapter 1</a>`}
       <p class="muted" style="font-size:13px">Wrong answers were added to your mistake journal.</p></div>
       <h2>Review: every question · مراجعة كل الأسئلة</h2><div class="ar">لكل سؤال: إجابتك، والإجابة الصحيحة، وتوضيح طريقة الوصول لها. الأسئلة الخاطئة مكتوب تحتها رابط المهارة لتراجعها.</div>` +
-      reviewHTML(qs, ans, q => `<a href="#skill/${q.skill}">${esc(skillById(q.skill).title)}</a>`));
+      reviewHTML(qs, ans, q => `<a href="#skill-${q.skill}">${esc(skillById(q.skill).title)}</a>`));
   }
   // ---------- glossary & problem language ----------
   views.glossary = () => `<h1>Course glossary <span class="muted" style="font-size:18px;font-weight:400">· قاموس المقرر</span></h1>
     <p class="sub">Every English term from the lessons with its Arabic and meaning. <span class="pill src">📘 terms from the lessons</span></p>
     <div class="ar">كل المصطلحات الإنجليزية في الدروس مع معناها بالعربي. ابحث بالعربي أو بالإنجليزي.</div>
     <div class="card row noprint"><input id="gq" class="search" style="width:260px" placeholder="Search · ابحث"><select id="gch"><option value="">All chapters</option>${COURSE.map(c => `<option value="${c.id}">Ch ${c.n}. ${esc(c.title)}</option>`).join('')}</select><span class="muted" id="gn"></span></div>
-    <div class="card"><table id="gtab"><tr><th>Term</th><th class="arcell">بالعربية</th><th>Meaning</th><th>Lesson</th></tr>${allLessons().flatMap(l => l.terms.map(t => `<tr data-ch="${l.ch.id}" data-h="${esc((t.join(' ')).toLowerCase())}"><td><b>${t[0]}</b></td><td class="arcell">${t[1]}</td><td>${t[2]}</td><td><a href="#lesson/${l.id}">${l.ch.n}. ${esc(l.title)}</a></td></tr>`)).join('')}</table></div>`;
+    <div class="card"><table id="gtab"><tr><th>Term</th><th class="arcell">بالعربية</th><th>Meaning</th><th>Lesson</th></tr>${allLessons().flatMap(l => l.terms.map(t => `<tr data-ch="${l.ch.id}" data-h="${esc((t.join(' ')).toLowerCase())}"><td><b>${t[0]}</b></td><td class="arcell">${t[1]}</td><td>${t[2]}</td><td><a href="#lesson-${l.id}">${l.ch.n}. ${esc(l.title)}</a></td></tr>`)).join('')}</table></div>`;
   function afterGlossary() {
     const f = () => { const q = $('#gq').value.trim().toLowerCase(), ch = $('#gch').value; let n = 0; document.querySelectorAll('#gtab tr[data-h]').forEach(r => { const ok = (!ch || r.dataset.ch === ch) && (!q || r.dataset.h.includes(q)); r.style.display = ok ? '' : 'none'; if (ok) n++; }); $('#gn').textContent = `${n} terms`; };
     $('#gq').oninput = f; $('#gch').onchange = f; f();
@@ -951,10 +951,10 @@
   }
 
   const FNAV = [['placement', '🧭 Placement', 'تحديد المستوى'], ['found', '🧱 Unit 0', 'الوحدة صفر'], ['glossary', '🔤 Glossary', 'قاموس المقرر'], ['phrases', '🗝️ Problem words', 'لغة المسائل']];
-  views.course = () => `<h1>Course map</h1><p class="sub">General Physics · 10 chapters as ordered in your textbook. <span class="pill src">📘 BK chapter openers</span></p>` + COURSE.map(c => { const cm = chapterMastery(c); return `<div class="card"><div class="chap"><a href="#chapter/${c.id}"><b>Ch ${c.n}. ${esc(c.title)}</b></a><span class="muted"><bdi>${c.ar}</bdi> · ${c.src}</span></div>${bar(cm.avg)}${c.lessons.map((l, i) => { const m = mastery(l.id); const [lv, cls] = level(m); return `<a class="lessonlink" href="#lesson/${l.id}"><span>${c.n}.${i + 1} ${esc(l.title)}</span><span class="${cls}">${lv}${m != null ? ' ' + m + '%' : ''}</span></a>`; }).join('')}</div>`; }).join('');
+  views.course = () => `<h1>Course map</h1><p class="sub">General Physics · 10 chapters as ordered in your textbook. <span class="pill src">📘 BK chapter openers</span></p>` + COURSE.map(c => { const cm = chapterMastery(c); return `<div class="card"><div class="chap"><a href="#chapter-${c.id}"><b>Ch ${c.n}. ${esc(c.title)}</b></a><span class="muted"><bdi>${c.ar}</bdi> · ${c.src}</span></div>${bar(cm.avg)}${c.lessons.map((l, i) => { const m = mastery(l.id); const [lv, cls] = level(m); return `<a class="lessonlink" href="#lesson-${l.id}"><span>${c.n}.${i + 1} ${esc(l.title)}</span><span class="${cls}">${lv}${m != null ? ' ' + m + '%' : ''}</span></a>`; }).join('')}</div>`; }).join('');
 
   function sidebar(active) {
-    const chs = COURSE.map(c => { const cm = chapterMastery(c); return `<a href="#chapter/${c.id}" class="nl chl ${active === 'chapter/' + c.id ? 'active' : ''}"><span>${c.n}. ${esc(c.title)}</span><small>${cm.avg}%</small></a>`; }).join('');
+    const chs = COURSE.map(c => { const cm = chapterMastery(c); return `<a href="#chapter-${c.id}" class="nl chl ${active === 'chapter/' + c.id || active.startsWith('lesson/' + c.id + '-') ? 'active' : ''}"><span>${c.n}. ${esc(c.title)}</span><small>${cm.avg}%</small></a>`; }).join('');
     const on = n => active.split('/')[0] === n[0] || (n[0] === 'found' && active.startsWith('skill'));
     const link = n => `<a href="#${n[0]}" class="nl ${on(n) ? 'active' : ''}" title="${n[1].replace(/^\S+\s/, '')} · ${n[2]}"><span>${n[1]}</span><small>${n[2]}</small></a>`;
     // collapsible groups; the group holding the open page always stays open
@@ -966,7 +966,9 @@
       + `<a class="sidelab" href="Virtual_Lab.html"><span>⚗ Virtual Lab</span><small dir="rtl">المعمل الافتراضي · 11 تجربة</small></a>`;
   }
   function route() {
-    const h = (location.hash || '#home').slice(1); const [v, arg] = h.split('/');
+    // addresses look like #lesson-ch6-l1 (older links #lesson/ch6-l1 still work)
+    const m = (location.hash || '#home').slice(1).match(/^([a-z]+)(?:[-/](.+))?$/) || [, 'home'];
+    const v = m[1], arg = m[2], h = arg ? `${v}/${arg}` : v;
     const view = views[v] || views.home;
     $('#main').innerHTML = fx(view(arg));
     $('#side').innerHTML = sidebar(h); $('#side').classList.remove('open');
@@ -984,8 +986,18 @@
     if (v === 'phrases') afterPhrases();
     if (v === 'plan') afterPlan();
     if (v === 'report') afterReport();
-    window.scrollTo(0, 0);
+    // remember the page, so a refresh (or reopening the site) comes back here
+    if (location.hash) { S.prefs.last = location.hash; save(); }
+    if (restoreY != null) { const y = restoreY; restoreY = null; requestAnimationFrame(() => window.scrollTo(0, y)); } else window.scrollTo(0, 0);
   }
+  // on load: no address in the link → reopen the last page, and return to where it was scrolled
+  let restoreY = null;
+  try {
+    if (!location.hash && S.prefs.last) history.replaceState(null, '', S.prefs.last);
+    if (S.prefs.scroll && S.prefs.scroll.h === location.hash) restoreY = S.prefs.scroll.y;
+  } catch (e) { /* the address cannot be changed here */ }
+  let scrollT = 0;
+  window.addEventListener('scroll', () => { clearTimeout(scrollT); scrollT = setTimeout(() => { if (EXAM) return; S.prefs.scroll = { h: location.hash, y: Math.round(window.scrollY) }; save(); }, 400); }, { passive: true });
 
   const effTheme = () => document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   function applyPrefs() {
