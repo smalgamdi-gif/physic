@@ -303,3 +303,16 @@ h1 .say{font-size:15px;padding:1px 8px}
 #welcome .wstats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 #welcome .wstats div{background:var(--bg);border-radius:10px;padding:10px}
 #welcome .wstats b{font-size:22px;display:block} #welcome .wstats small{color:var(--muted)}
+/* worked-example solver */
+.wprompt{background:#23231f;color:#f0a830;border-radius:8px;padding:8px 12px;font-size:14px;margin:8px 0}
+.wprompt:empty{display:none}
+.wsteps li{margin:6px 0}
+.wsteps li.todo{display:none}
+.wsteps li .wfull{display:none}
+.wsteps li.done .wq{display:none}
+.wsteps li.done .wfull{display:block}
+.wsteps li.done.self .wfull::after{content:" ✔";color:var(--ok);font-weight:700}
+.wsteps li.done.shown .wfull::after{content:" 👁 shown";color:var(--muted);font-size:12px}
+.wsteps li.cur .wq{border:1px dashed var(--line);border-radius:8px;padding:6px 8px}
+.wsteps .wq input{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:4px 8px;width:120px}
+@media print{.wsteps li{display:list-item!important}.wsteps li .wq{display:none!important}.wsteps li .wfull{display:block!important}}
