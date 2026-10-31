@@ -390,3 +390,7 @@ nav.side{top:var(--hdr,57px);height:calc(100vh - var(--hdr,57px))}
 .rights span{font-size:11.5px}
 #welcome .rights{margin:14px 0 0;padding-top:10px}
 @media print{main>.rights{display:none}}
+/* instructor-style exam */
+.drf .drmeta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13.5px}
+.drf .row{margin-top:6px}
+.exq u,.rev u{text-decoration-thickness:2px;text-underline-offset:3px}

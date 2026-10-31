@@ -611,6 +611,99 @@
       <h2>Review: every question · مراجعة كل الأسئلة</h2>` + reviewHTML(qs, ans, st.label));
   }
 
+  // ---------- the instructor's exam style (content_drexam.js, docs/Old_Exams.md) ----------
+  const DRX = window.DREXAM || null;
+  // a number answer turned into four choices, with the slips seen in the instructor's distractors (×10, ÷10, ×2, sign)
+  function toMCQ(q, num, unit, sol, extra) {
+    const u = unit ? ' ' + unit : '', key = x => pretty(x) + u, seen = new Set([key(num)]), o = [key(num)];
+    for (const f of shuffle([10, 0.1, 2, 0.5, 3, 1 / 3, -1, 1.5])) { if (o.length === 4) break; const x = num * f; if (!isFinite(x) || x === num || seen.has(key(x))) continue; seen.add(key(x)); o.push(key(x)); }
+    if (o.length < 4 || num === 0) return null;
+    const so = shuffle(o); return Object.assign({ q, o: so, a: so.indexOf(key(num)), why: sol || '' }, extra);
+  }
+  function drPools(F, onlyOld) {
+    const chs = F.chs || COURSE.map(c => c.id), pool = { '1.1': [], '2.1': [] };
+    const add = it => { if (it && chs.includes(it.ch)) pool[it.clo].push(it); };
+    DRX.OLD.forEach(q => add(Object.assign({ old: true }, q)));
+    if (onlyOld) return { chs, pool };
+    DRX.STYLE.forEach(g => { for (let k = 0; k < 3; k++) { const r = g.f(), o = shuffle([r.ans, ...r.wrong]); if (new Set(o).size < 4) continue; add({ ch: r.ch || g.ch, clo: g.clo, q: r.q, o, a: o.indexOf(r.ans), why: r.why, src: 'Dr‑style, new numbers 🧩' }); } });
+    COURSE.forEach(c => c.lessons.forEach(l => l.quiz.concat(l.checks).forEach(q => {
+      if (q.o) { const keep = q.o.some(o => /above|both|none/i.test(o)), o = keep ? q.o : shuffle(q.o); add(Object.assign({ ch: c.id, clo: '1.1', lessonId: l.id, src: 'Lesson ' + c.n + ' · ' + l.title }, q, { o, a: o.indexOf(q.o[q.a]) })); }
+      else if (q.num) add(toMCQ(q.q, q.num, q.unit, q.sol, { ch: c.id, clo: '2.1', lessonId: l.id, src: 'Lesson ' + c.n + ' · ' + l.title }));
+    })));
+    G.forEach(g => { const p = g.f(); add(toMCQ(p.q, p.ans, p.unit, p.sol, { ch: g.ch, clo: '2.1', src: 'Practice generator 🧩' })); });
+    return { chs, pool };
+  }
+  // spread the questions over the chapters, the instructor's own questions first in each chapter, CLO 1.1 before CLO 2.1
+  function drBuild(fmt, onlyOld) {
+    const F = DRX.FORMATS[fmt], { chs, pool } = drPools(F, onlyOld);
+    if (onlyOld) return pool['1.1'].concat(pool['2.1']);
+    const take = (clo, n) => {
+      const by = {}; chs.forEach(c => { const all = pool[clo].filter(q => q.ch === c); by[c] = shuffle(all.filter(q => q.old)).concat(shuffle(all.filter(q => !q.old))); });
+      // interleave old and new so a test is not all old questions
+      chs.forEach(c => { const o = by[c].filter(q => q.old), r = by[c].filter(q => !q.old), m = []; while (o.length || r.length) { if (o.length) m.push(o.shift()); if (r.length) m.push(r.shift()); if (r.length) m.push(r.shift()); } by[c] = m; });
+      const out = [], seen = new Set(); let order = shuffle(chs), guard = 0;
+      while (out.length < n && guard++ < 2000) { for (const c of order) { if (out.length >= n) break; const q = by[c].shift(); if (q && !seen.has(q.q)) { seen.add(q.q); out.push(q); } } if (chs.every(c => !by[c].length)) break; order = shuffle(chs); }
+      return out;
+    };
+    return take('1.1', F.k).concat(take('2.1', F.n - F.k));
+  }
+  views.drexam = () => {
+    if (!DRX) return '<h1>Not available</h1>';
+    S.drx = S.drx || [];
+    const F = DRX.FORMATS, best = f => { const a = S.drx.filter(x => x.fmt === f); return a.length ? Math.max(...a.map(x => x.marks)) : null; };
+    const card = (k, f) => `<div class="card drf"><h3 style="margin-top:0">${f.title} <span class="muted" style="font-weight:400">· ${f.ar}</span></h3>
+      <div class="drmeta"><span>📝 ${f.n} questions</span><span>⏱ ${f.mins} min</span><span>🎯 ${f.n * f.mark} marks (${f.mark} each)</span><span>📚 ${f.chs ? 'Ch 1–4' : 'all chapters'}</span></div>
+      <p class="muted" style="font-size:13px;margin:6px 0">📘 ${f.src}${f.assumed ? `<br>⚠ ${f.assumed}` : ''}</p>
+      <div class="row"><button class="btn" data-drgo="${k}">Start · ابدأ</button><button class="btn ghost small" data-drold="${k}">Only the instructor's questions</button>${best(k) != null ? `<span class="pill ${best(k) === f.n * f.mark ? 'ok' : ''}">Best: ${best(k)}/${f.n * f.mark}</span>` : ''}</div></div>`;
+    const hist = S.drx.slice(0, 8).map(e => `<tr><td>${new Date(e.ts).toLocaleString()}</td><td>${F[e.fmt].title}${e.only ? ' (old Qs)' : ''}</td><td><b>${e.marks}/${e.total}</b></td></tr>`).join('');
+    return `<h1>Exam in your instructor's style <span class="muted" style="font-size:18px;font-weight:400">· اختبار بأسلوب الدكتور</span></h1>
+      <p class="sub">Built from the instructor's old final, midterm and LMS assignment. <span class="pill src">📘 old exams</span> ${ADD}</p>
+      <div class="ar">نفس شكل اختبارات الدكتور: اختيار من متعدد بأربعة خيارات، درجة لكل سؤال، أسئلة الوحدات والتعريفات والقوانين (CLO 1.1) أولًا ثم المسائل القصيرة (CLO 2.1). تجد أسئلة الدكتور القديمة نفسها مع أسئلة جديدة بنفس أسلوبه. هدفك الدرجة الكاملة: بعد التسليم يظهر لك ما ينقصك وأين تراجعه، وتعيد الأسئلة التي أخطأت فيها حتى تتقنها.</div>
+      <div class="card"><b>His style, from the photos:</b><ul class="clean" style="margin:6px 0 0">
+        <li>All questions are multiple choice A–D, one mark each (0.5 in the LMS assignment). No written solutions.</li>
+        <li>CLO 1.1 first: SI units, prefixes, definitions, Newton's laws as equations. Then CLO 2.1: one formula, one substitution, round numbers.</li>
+        <li>The key word is underlined. Typical traps: distance vs displacement, × instead of ÷ in unit conversion, adding magnitudes instead of Pythagoras, v ≠ 0 at maximum height.</li></ul>
+        <p class="muted" style="font-size:13px;margin:6px 0 0">Full transcription: docs/Old&#95;Exams.md · نص الأسئلة الكامل في ملف Old&#95;Exams.md</p></div>
+      <div class="grid g3">${Object.entries(F).map(([k, f]) => card(k, f)).join('')}</div>
+      <div id="drbox"></div>
+      ${hist ? `<h2>Your attempts</h2><div class="card"><table><tr><th>Date</th><th>Exam</th><th>Marks</th></tr>${hist}</table></div>` : ''}`;
+  };
+  function afterDrexam() {
+    if (!DRX) return;
+    const start = (fmt, only, qsIn) => {
+      const F = DRX.FORMATS[fmt], qs = qsIn || drBuild(fmt, only);
+      const mins = qsIn ? Math.max(5, Math.ceil(qs.length * F.mins / F.n)) : only ? Math.ceil(qs.length * 1.5) : F.mins;
+      const chName = id => COURSE.find(c => c.id === id);
+      openTest({ qs, mins, hash: '#drexam', noun: 'exam', nounAr: 'الاختبار',
+        title: `🎓 ${F.title} <span class="muted" style="font-weight:400">· ${F.ar}</span>`, sub: `${qsIn ? 'Retry of your wrong questions · ' : ''}${qs.length} questions · ${mins} min · ${qs.length * F.mark} marks`,
+        label: q => `CLO ${q.clo} · Ch ${chName(q.ch).n} · ${q.old ? '📘 ' + esc(q.src) : esc(q.src || '')}`, onFinish: (st, timeUp) => drResults(st, timeUp, fmt, only, !!qsIn) });
+    };
+    document.querySelectorAll('[data-drgo]').forEach(b => b.onclick = () => start(b.dataset.drgo, false));
+    document.querySelectorAll('[data-drold]').forEach(b => b.onclick = () => start(b.dataset.drold, true));
+    window.__drStart = start;
+  }
+  function drResults(st, timeUp, fmt, only, retry) {
+    const F = DRX.FORMATS[fmt], { qs, ans } = st, mark = F.mark;
+    const by = {}, clo = { '1.1': [0, 0], '2.1': [0, 0] }, wrong = [];
+    qs.forEach((q, i) => { const ok = !!(ans[i] && ans[i].ok); by[q.ch] = by[q.ch] || [0, 0]; by[q.ch][1]++; clo[q.clo][1]++; if (ok) { by[q.ch][0]++; clo[q.clo][0]++; } else { wrong.push(q); logMistake(q, ans[i] ? ans[i].given : '(blank)', q.lessonId); } });
+    const good = qs.length - wrong.length, marks = +(good * mark).toFixed(1), total = +(qs.length * mark).toFixed(1), full = !wrong.length;
+    if (!retry) { S.drx = S.drx || []; S.drx.unshift({ ts: Date.now(), fmt, only, marks, total }); save(); }
+    const chName = id => COURSE.find(c => c.id === id);
+    const plan = Object.entries(by).filter(([, v]) => v[0] < v[1]).map(([c, v]) => { const ch = chName(c), ls = [...new Set(wrong.filter(q => q.ch === c).map(q => q.lessonId).filter(Boolean))];
+      return `<li><b>Ch ${ch.n}. ${esc(ch.title)}</b>: ${v[1] - v[0]} lost mark(s) → ${ls.length ? ls.map(id => `<a href="#lesson-${id}">${esc(lessonById(id).title)}</a>`).join(', ') : `<a href="#chapter-${c}">review the chapter</a>`}</li>`; }).join('');
+    $('#drbox').innerHTML = fx(`<div class="card"><h2 style="margin-top:0">${full ? '🏆 ' : ''}Marks: ${marks} / ${total} <span class="muted" style="font-size:16px;font-weight:400">(${good}/${qs.length} correct)</span></h2>
+      ${timeUp ? '<p class="note">⏰ Time was up: the exam was submitted automatically. · انتهى الوقت وسُلِّم الاختبار تلقائيًا.</p>' : ''}
+      <table><tr><th>Part</th><th>Correct</th><th></th></tr>${Object.entries(clo).filter(([, v]) => v[1]).map(([k, v]) => `<tr><td>CLO ${k} · ${k === '1.1' ? 'units, definitions, laws' : 'calculations'}</td><td>${v[0]}/${v[1]}</td><td style="width:40%">${bar(Math.round(v[0] / v[1] * 100))}</td></tr>`).join('')}
+      ${Object.entries(by).map(([c, v]) => `<tr><td>Ch ${chName(c).n}. ${esc(chName(c).title)}</td><td>${v[0]}/${v[1]}</td><td>${bar(Math.round(v[0] / v[1] * 100))}</td></tr>`).join('')}</table>
+      ${full ? '<p class="fb ok">Full mark! Try a new exam: the questions change every time. · الدرجة الكاملة! جرّب اختبارًا جديدًا، فالأسئلة تتغير كل مرة.</p>'
+        : `<h3>Road to full mark · طريقك للدرجة الكاملة</h3><ol class="clean">${plan}</ol><div class="ar">راجع الدروس المذكورة، ثم أعد الأسئلة التي أخطأت فيها فقط حتى تحلها كلها صحيحة، ثم اختبارًا جديدًا كاملًا.</div>`}
+      <div class="row" style="margin-top:10px">${full ? '' : `<button class="btn" id="drretry">Retry my ${wrong.length} wrong question(s) · أعد الخاطئة</button>`}<button class="btn ${full ? '' : 'ghost'}" id="drnew">New ${F.title.toLowerCase()} · اختبار جديد</button></div></div>
+      <h2>Review: every question · مراجعة كل الأسئلة</h2>` + reviewHTML(qs, ans, st.label));
+    if ($('#drretry')) $('#drretry').onclick = () => window.__drStart(fmt, only, shuffle(wrong).map(q => Object.assign({}, q)));
+    $('#drnew').onclick = () => window.__drStart(fmt, only);
+    $('#drbox').scrollIntoView({ block: 'start' });
+  }
+
   // ---------- flashcards (Leitner) ----------
   const INTERVALS = [0, 1, 3, 7, 14, 30];
   function allCards() {
@@ -943,7 +1036,7 @@
   function subs(html) { return html.split(/(<[^>]*>)/).map(p => p.startsWith('<') ? p : p.replace(/([A-Za-zθρΔσεμλαΣ])_([A-Za-z0-9]{1,6})/g, '$1<sub>$2</sub>')).join(''); }
 
   // ---------- router ----------
-  const NAV = [['home', '🏠 Home', 'الرئيسية'], ['course', '📚 Course map', 'خريطة المقرر'], ['practice', '♾️ Practice', 'تدريب'], ['exam', '⏱️ Exam', 'الاختبار'], ['flashcards', '🃏 Flashcards', 'البطاقات'], ['mistakes', '📓 Mistakes', 'دفتر الأخطاء'], ['formulas', '∑ Formulas', 'القوانين'], ['a4', '🖨 A4 sheet', 'ورقة A4'], ['rearrange', '🔀 Law forms', 'أشكال القانون'], ['tools', '🧰 Tools', 'أدوات'], ['plan', '🗓️ Planner', 'مخطط المذاكرة'], ['report', '📈 Progress', 'تقرير الإنجاز'], ['sources', '📘 Sources', 'المصادر']];
+  const NAV = [['home', '🏠 Home', 'الرئيسية'], ['course', '📚 Course map', 'خريطة المقرر'], ['practice', '♾️ Practice', 'تدريب'], ['exam', '⏱️ Exam', 'الاختبار'], ['drexam', '🎓 Dr\'s exam style', 'بأسلوب الدكتور'], ['flashcards', '🃏 Flashcards', 'البطاقات'], ['mistakes', '📓 Mistakes', 'دفتر الأخطاء'], ['formulas', '∑ Formulas', 'القوانين'], ['a4', '🖨 A4 sheet', 'ورقة A4'], ['rearrange', '🔀 Law forms', 'أشكال القانون'], ['tools', '🧰 Tools', 'أدوات'], ['plan', '🗓️ Planner', 'مخطط المذاكرة'], ['report', '📈 Progress', 'تقرير الإنجاز'], ['sources', '📘 Sources', 'المصادر']];
   // ---------- Unit 0: foundation skills, placement test, readiness checks (content_found.js) ----------
   const SKILLS = () => window.FOUND || [];
   const skillById = id => SKILLS().find(k => k.id === id);
@@ -1078,6 +1171,7 @@
     if (v === 'lesson') afterLesson(arg);
     if (v === 'practice') afterPractice(arg);
     if (v === 'exam') afterExam();
+    if (v === 'drexam') afterDrexam();
     if (v === 'flashcards') afterFlash(arg);
     if (v === 'mistakes') afterMistakes();
     if (v === 'tools') afterTools();
