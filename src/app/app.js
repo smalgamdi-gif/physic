@@ -881,7 +881,7 @@
     const maxM = Math.max(10, ...last14.map(x => x[1]));
     const weak = ls.map(l => ({ l, m: mastery(l.id) })).filter(x => x.m != null && x.m < 60);
     const mByCh = {}; S.mistakes.forEach(m => { const l = m.lessonId && lessonById(m.lessonId); const k = l ? l.ch.title : 'Practice / exam'; mByCh[k] = (mByCh[k] || 0) + 1; });
-    return `<h1>Progress report</h1><p class="sub">Generated ${new Date().toLocaleString()} · ${ADD}</p>
+    return `<h1>Progress report</h1>${S.prefs.name ? `<p class="sub"><b>${esc(S.prefs.name)}</b>${S.prefs.sid ? ` · Trainee ID · رقم المتدرب: <b dir="ltr">${esc(S.prefs.sid)}</b>` : ''}</p>` : ''}<p class="sub">Generated ${new Date().toLocaleString()} · ${ADD}</p>
       <div class="row noprint"><button class="btn small printbtn" onclick="window.print()">Print / save as PDF</button><button class="btn small ghost" id="exp">Export backup</button><label class="btn small ghost">Import backup<input type="file" id="imp" accept=".json" style="display:none"></label><button class="btn small ghost" id="reset">Reset progress</button></div><div id="repmsg"></div>
       <div class="grid g3" style="margin-top:12px"><div class="card"><div class="stat">${ls.filter(l => (mastery(l.id) ?? 0) >= 80).length}/${ls.length}<small>lessons mastered</small></div></div><div class="card"><div class="stat">${mins} min<small>total study time</small></div></div><div class="card"><div class="stat">${S.exams[0] ? S.exams[0].pct + '%' : '—'}<small>last exam score (${S.exams.length} taken)</small></div></div></div>
       <h2>Mastery by chapter</h2><div class="card"><table><tr><th>Chapter</th><th>Lessons started</th><th>Mastery</th><th style="width:35%"></th></tr>${COURSE.map(c => { const cm = chapterMastery(c); return `<tr><td>Ch ${c.n}. ${esc(c.title)}</td><td>${cm.started}/${cm.total}</td><td><b>${cm.avg}%</b></td><td>${bar(cm.avg)}</td></tr>`; }).join('')}</table></div>
@@ -1073,7 +1073,7 @@
     const m = (location.hash || '#home').slice(1).match(/^([a-z]+)(?:[-/](.+))?$/) || [, 'home'];
     const v = m[1], arg = m[2], h = arg ? `${v}/${arg}` : v;
     const view = views[v] || views.home;
-    $('#main').innerHTML = fx(view(arg));
+    $('#main').innerHTML = fx(view(arg)) + RIGHTS;
     $('#side').innerHTML = sidebar(h); $('#side').classList.remove('open');
     if (v === 'lesson') afterLesson(arg);
     if (v === 'practice') afterPractice(arg);
@@ -1138,29 +1138,39 @@
     $('#who').onclick = () => welcome(true);
     showWho();
     let seen = false; try { seen = sessionStorage.getItem('pll-welcomed') === '1'; } catch (e) { /* ignore */ }
-    if (!S.prefs.name || !seen) welcome(false);
+    if (!S.prefs.name || !S.prefs.sid || !seen) welcome(false);
   });
-  function showWho() { const n = S.prefs.name || 'Sign in'; $('#whon').textContent = n; $('#who').title = `${n} · اسمك`; }
+  function showWho() { const n = S.prefs.name || 'Sign in'; $('#whon').textContent = n; $('#who').title = `${n}${S.prefs.sid ? ' · ' + S.prefs.sid : ''} · بياناتك`; }
   // entry screen: asks the student's name the first time, then greets them on each visit
+  // © line shown on the entry screen, at the foot of every page and in the lab
+  const RIGHTS = `<footer class="rights">© 2026 Physics Learning Lab · All rights reserved · جميع الحقوق محفوظة<br><span>Course slides and textbook content (📘) belong to their authors and are quoted for study only. · محتوى المقرر ملك لمؤلفيه، ومقتبس هنا للمذاكرة فقط.</span></footer>`;
+  // entry screen: asks the trainee's name and ID the first time, then greets them on each visit
   function welcome(edit) {
-    const name = S.prefs.name || '', first = !name || edit;
+    const name = S.prefs.name || '', sid = S.prefs.sid || '', first = !name || !sid || edit;
     const all = allLessons(), done = all.filter(l => mastery(l.id) != null).length;
     const avg = done ? Math.round(all.reduce((t, l) => t + (mastery(l.id) || 0), 0) / all.length) : 0;
     const r = !first ? recommend() : null;
     const box = document.createElement('div'); box.id = 'welcome'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true');
     box.innerHTML = fx(`<div class="wcard"><div class="watom">⚛</div>
       <h2>${first ? 'Welcome to Physics Learning Lab' : `Welcome back, ${esc(name)}!`}</h2>
-      <div class="ar">${first ? 'أهلاً بك في مختبر تعلم الفيزياء. اكتب اسمك ليرحّب بك الموقع ويحفظ تقدمك على هذا الجهاز.' : `أهلاً بعودتك يا ${esc(name)}! أكملت ${done} من ${all.length} درساً، ومتوسط إتقانك ${avg}%.`}</div>
-      ${first ? `<label class="wlab">Your name · اسمك<input id="wname" maxlength="40" value="${esc(name)}" placeholder="e.g. Saad · مثلاً سعد" autocomplete="name"></label><div class="hint" id="wmsg"></div>`
-        : `<div class="wstats"><div><b>${done}/${all.length}</b><small>lessons started</small></div><div><b>${avg}%</b><small>average mastery</small></div></div>${r && r.l ? `<p class="muted" style="margin:6px 0 0">Next: <a href="#lesson-${r.l.id}" id="wgonext">${esc(r.l.title)}</a></p>` : ''}`}
-      <div class="row" style="justify-content:center;margin-top:14px"><button class="btn" id="wgo">${first ? 'Start · ابدأ' : 'Continue · متابعة'}</button>${!first ? '<button class="btn ghost" id="wchg">Not you? · غيّر الاسم</button>' : ''}</div>
-      <p class="muted" style="font-size:12.5px;margin:12px 0 0">Your name and progress stay in this browser only. · اسمك وتقدمك محفوظان في هذا المتصفح فقط.</p></div>`);
+      <div class="ar">${first ? 'أهلاً بك في مختبر تعلم الفيزياء. اكتب اسمك ورقم المتدرب ليرحّب بك الموقع ويحفظ تقدمك على هذا الجهاز.' : `أهلاً بعودتك يا ${esc(name)}! أكملت ${done} من ${all.length} درساً، ومتوسط إتقانك ${avg}%.`}</div>
+      ${first ? `<label class="wlab">Your name · الاسم<input id="wname" maxlength="40" value="${esc(name)}" placeholder="e.g. Saad · مثلاً سعد" autocomplete="name"></label>
+        <label class="wlab">Trainee ID · رقم المتدرب<input id="wsid" maxlength="15" value="${esc(sid)}" inputmode="numeric" dir="ltr" placeholder="e.g. 443012345" autocomplete="off"></label><div class="hint" id="wmsg"></div>`
+        : `<p class="wid">🪪 Trainee ID · رقم المتدرب: <b dir="ltr">${esc(sid)}</b></p><div class="wstats"><div><b>${done}/${all.length}</b><small>lessons started</small></div><div><b>${avg}%</b><small>average mastery</small></div></div>${r && r.l ? `<p class="muted" style="margin:6px 0 0">Next: <a href="#lesson-${r.l.id}" id="wgonext">${esc(r.l.title)}</a></p>` : ''}`}
+      <div class="row" style="justify-content:center;margin-top:14px"><button class="btn" id="wgo">${first ? 'Start · ابدأ' : 'Continue · متابعة'}</button>${!first ? '<button class="btn ghost" id="wchg">Not you? · غيّر البيانات</button>' : ''}</div>
+      <p class="muted" style="font-size:12.5px;margin:12px 0 0">Your name, ID and progress stay in this browser only. · بياناتك وتقدمك محفوظة في هذا المتصفح فقط.</p>${RIGHTS}</div>`);
     document.body.appendChild(box);
     const close = () => { box.remove(); try { sessionStorage.setItem('pll-welcomed', '1'); } catch (e) { /* ignore */ } showWho(); route(); };
     if (first) {
-      const inp = $('#wname'); setTimeout(() => inp.focus(), 50);
-      const go = () => { const v = inp.value.trim().replace(/\s+/g, ' '); if (!v) { $('#wmsg').textContent = 'Please write your name. · اكتب اسمك من فضلك.'; return; } S.prefs.name = v; save(); close(); };
-      $('#wgo').onclick = go; inp.onkeydown = e => { if (e.key === 'Enter') go(); };
+      const inp = $('#wname'), idf = $('#wsid'); setTimeout(() => (name && !edit ? idf : inp).focus(), 50);
+      idf.oninput = () => { $('#wmsg').textContent = ''; idf.value = idf.value.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\D/g, ''); };
+      const go = () => {
+        const v = inp.value.trim().replace(/\s+/g, ' '), id = idf.value.trim();
+        if (!v) { $('#wmsg').textContent = 'Please write your name. · اكتب اسمك من فضلك.'; inp.focus(); return; }
+        if (!/^\d{4,15}$/.test(id)) { $('#wmsg').textContent = 'Write your trainee ID in digits (4–15). · اكتب رقم المتدرب بالأرقام.'; idf.focus(); return; }
+        S.prefs.name = v; S.prefs.sid = id; save(); close();
+      };
+      $('#wgo').onclick = go; inp.onkeydown = idf.onkeydown = e => { if (e.key === 'Enter') go(); };
     } else {
       $('#wgo').onclick = close; $('#wchg').onclick = () => { box.remove(); welcome(true); };
       if ($('#wgonext')) $('#wgonext').onclick = () => { box.remove(); try { sessionStorage.setItem('pll-welcomed', '1'); } catch (e) { /* ignore */ } };
