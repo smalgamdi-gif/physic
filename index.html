@@ -4924,7 +4924,7 @@ window.DREXAM = (function () {
       <p class="muted" style="font-size:13px;margin:6px 0">📘 ${f.src}${f.assumed ? `<br>⚠ ${f.assumed}` : ''}</p>
       <div class="row"><button class="btn" data-drgo="${k}">Start · ابدأ</button><button class="btn ghost small" data-drold="${k}">Only the instructor's questions</button>${best(k) != null ? `<span class="pill ${best(k) === f.n * f.mark ? 'ok' : ''}">Best: ${best(k)}/${f.n * f.mark}</span>` : ''}</div></div>`;
     const hist = S.drx.slice(0, 8).map(e => `<tr><td>${new Date(e.ts).toLocaleString()}</td><td>${F[e.fmt].title}${e.only ? ' (old Qs)' : ''}</td><td><b>${e.marks}/${e.total}</b></td></tr>`).join('');
-    return `<h1>Exam in your instructor's style <span class="muted" style="font-size:18px;font-weight:400">· اختبار بأسلوب الدكتور</span></h1>
+    return `<h1>Exam simulator <span class="muted" style="font-size:18px;font-weight:400">· محاكي الاختبار</span></h1>
       <p class="sub">Built from the instructor's old final, midterm and LMS assignment. <span class="pill src">📘 old exams</span> ${ADD}</p>
       <div class="ar">نفس شكل اختبارات الدكتور: اختيار من متعدد بأربعة خيارات، درجة لكل سؤال، أسئلة الوحدات والتعريفات والقوانين (CLO 1.1) أولًا ثم المسائل القصيرة (CLO 2.1). تجد أسئلة الدكتور القديمة نفسها مع أسئلة جديدة بنفس أسلوبه. هدفك الدرجة الكاملة: بعد التسليم يظهر لك ما ينقصك وأين تراجعه، وتعيد الأسئلة التي أخطأت فيها حتى تتقنها.</div>
       <div class="card"><b>His style, from the photos:</b><ul class="clean" style="margin:6px 0 0">
@@ -5304,7 +5304,7 @@ window.DREXAM = (function () {
   function subs(html) { return html.split(/(<[^>]*>)/).map(p => p.startsWith('<') ? p : p.replace(/([A-Za-zθρΔσεμλαΣ])_([A-Za-z0-9]{1,6})/g, '$1<sub>$2</sub>')).join(''); }
 
   // ---------- router ----------
-  const NAV = [['home', '🏠 Home', 'الرئيسية'], ['course', '📚 Course map', 'خريطة المقرر'], ['practice', '♾️ Practice', 'تدريب'], ['exam', '⏱️ Exam', 'الاختبار'], ['drexam', '🎓 Dr\'s exam style', 'بأسلوب الدكتور'], ['flashcards', '🃏 Flashcards', 'البطاقات'], ['mistakes', '📓 Mistakes', 'دفتر الأخطاء'], ['formulas', '∑ Formulas', 'القوانين'], ['a4', '🖨 A4 sheet', 'ورقة A4'], ['rearrange', '🔀 Law forms', 'أشكال القانون'], ['tools', '🧰 Tools', 'أدوات'], ['plan', '🗓️ Planner', 'مخطط المذاكرة'], ['report', '📈 Progress', 'تقرير الإنجاز'], ['sources', '📘 Sources', 'المصادر']];
+  const NAV = [['home', '🏠 Home', 'الرئيسية'], ['course', '📚 Course map', 'خريطة المقرر'], ['practice', '♾️ Practice', 'تدريب'], ['exam', '⏱️ Exam', 'الاختبار'], ['drexam', '🎓 Exam simulator', 'محاكي الاختبار'], ['flashcards', '🃏 Flashcards', 'البطاقات'], ['mistakes', '📓 Mistakes', 'دفتر الأخطاء'], ['formulas', '∑ Formulas', 'القوانين'], ['a4', '🖨 A4 sheet', 'ورقة A4'], ['rearrange', '🔀 Law forms', 'أشكال القانون'], ['tools', '🧰 Tools', 'أدوات'], ['plan', '🗓️ Planner', 'مخطط المذاكرة'], ['report', '📈 Progress', 'تقرير الإنجاز'], ['sources', '📘 Sources', 'المصادر']];
   // ---------- Unit 0: foundation skills, placement test, readiness checks (content_found.js) ----------
   const SKILLS = () => window.FOUND || [];
   const skillById = id => SKILLS().find(k => k.id === id);
