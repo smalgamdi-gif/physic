@@ -1,7 +1,7 @@
-/* Physics Learning Lab — the instructor's old exams (docs/Old_Exams.md) and the exam formats seen in them.
+/* Physics Learning Lab — the course's old exams (docs/Old_Exams.md) and the exam formats seen in them.
    OLD: questions copied from the photos of Final Theory exam 1445, Midterm 2023 and LMS assignment 1 (📘 old exam).
         The answer keys are computed by us (🧩) except where the LMS attempt graded 5/5.
-   STYLE: generators that copy the instructor's question patterns with new numbers (🧩 additional design). */
+   STYLE: generators that copy the old exams' question patterns with new numbers (🧩 additional design). */
 window.DREXAM = (function () {
   const R = (a, b, d = 0) => { const p = 10 ** d; return Math.round((a + Math.random() * (b - a)) * p) / p; };
   const pick = a => a[Math.floor(Math.random() * a.length)];
@@ -61,7 +61,7 @@ window.DREXAM = (function () {
     { src: HW + ' (other attempt)', ch: 'ch4', clo: '1.1', q: 'An example of an <u>inertial reference frame</u> is:', o: ['any reference frame that is not accelerating', 'a frame attached to a particle on which there are no forces', 'any reference frame that is at rest', 'a reference frame attached to the center of the universe'], a: 0, why: 'An inertial frame is any frame that does not accelerate; Newton\'s first law holds in it.' }
   ];
 
-  // the instructor's patterns with new numbers (🧩). Each returns {q, ans, wrong:[3], why}
+  // the old exams' patterns with new numbers (🧩). Each returns {q, ans, wrong:[3], why}
   const SI = [['Time', 'Second (s)'], ['length', 'Meter (m)'], ['mass', 'Kilogram (kg)'], ['electric current', 'Ampere (A)'], ['temperature', 'Kelvin (K)'], ['luminous intensity', 'Candle (cd)'], ['amount of substance', 'Mole (mol)']];
   const DER = [['velocity', 'm/s', 'ch1'], ['acceleration', 'm/s²', 'ch1'], ['Force', 'Newton (N)', 'ch4'], ['work', 'Joule (J)', 'ch5'], ['power', 'Watt (W)', 'ch5'], ['pressure', 'Pascal (Pa)', 'ch6'], ['electric charge', 'Coulomb (C)', 'ch8'], ['electric potential', 'Volt (V)', 'ch8'], ['resistance', 'Ohm (Ω)', 'ch9'], ['capacitance', 'Farad (F)', 'ch8'], ['density', 'kg/m³', 'ch1']];
   const PRE = [['pico', '10⁻¹²'], ['nano', '10⁻⁹'], ['micro', '10⁻⁶'], ['milli', '10⁻³'], ['centi', '10⁻²'], ['kilo', '10³'], ['mega', '10⁶'], ['giga', '10⁹']];

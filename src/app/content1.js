@@ -194,7 +194,7 @@ COURSE.push({
         { f: '|A×B| = AB sin θ', name: 'Vector product magnitude', sym: [['|A×B|', 'size of the vector product', 'product of units', 'مقدار الضرب الاتجاهي'], ['θ', 'angle between A and B', '°', 'الزاوية بين المتجهين'], ['n̂', 'unit vector ⟂ to A and B', '—', 'متجه وحدة عمودي على A و B']], cond: 'A×B = −B×A' }
       ],
       life: { en: 'Pushing a trolley with a handle at an angle: only F cos θ moves it forward (dot product idea).', ar: 'عند دفع عربة بزاوية، الجزء المفيد من القوة هو F cos θ.' },
-      worked: { src: 'S02 Ex 2.7 · BK p.32–33 (see gap G‑05)', q: 'Angle between A = 2î + 2ĵ − k̂ and B = 6î + 3ĵ + 2k̂.', steps: ['A·B = 12 + 6 − 2 = 16', 'A = √9 = 3, B = √49 = 7', 'θ = cos⁻¹( {{16 // 21}} ) = cos⁻¹(0.762)', 'θ = 40.4° (the source prints 40.1°; 40.4° is the computed value)'], ans: 'θ ≈ 40.4°', note: 'Source value 40.1° differs from the calculation: logged as G‑05 for instructor review.' },
+      worked: { src: 'S02 Ex 2.7 · BK p.32–33 (see gap G‑05)', q: 'Angle between A = 2î + 2ĵ − k̂ and B = 6î + 3ĵ + 2k̂.', steps: ['A·B = 12 + 6 − 2 = 16', 'A = √9 = 3, B = √49 = 7', 'θ = cos⁻¹( {{16 // 21}} ) = cos⁻¹(0.762)', 'θ = 40.4° (the source prints 40.1°; 40.4° is the computed value)'], ans: 'θ ≈ 40.4°', note: 'Source value 40.1° differs from the calculation: logged as G‑05 for review.' },
       tryit: { src: 'BK p.37 Exercise 10', q: 'A = 3î − 4ĵ + 2k̂, B = −2î + 3ĵ + 3k̂. Find the x‑component of A×B.', ans: -18, tol: 0, unit: '', hint: 'x: A_yB_z − A_zB_y = (−4)(3) − (2)(3).', sol: 'A×B = −18î − 13ĵ + k̂' },
       checks: [
         { q: 'A·B for A = 100, B = 20, θ = 60°:', o: ['2000', '1000', '1732', '0'], a: 1, why: 'S02 Ex 2.5: 100·20·cos60 = 1000.' },

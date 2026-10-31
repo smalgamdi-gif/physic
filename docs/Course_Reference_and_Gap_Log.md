@@ -24,7 +24,7 @@
 | 11 | Ch 9 Updated.pdf | Slides | 17 | Current and Resistance (updated) | Text extraction | ✅ |
 | 12 | G-Physics-Eng.pdf | Scanned textbook (CamScanner, images only, no text layer) | 152 scans | "General Physics" textbook, Ch 1–10, exercises, appendix, references | Every page reviewed visually; exercise pages re-rendered at higher resolution | ⚠️ pages are shuffled; some printed page numbers were not seen (see Gap G-24) |
 
-All slide decks carry: *"Prepared by Dr. Ahmed Abdelbaset"*.
+All slide decks carry the author's name on the title slide.
 
 ---
 
@@ -36,7 +36,6 @@ All slide decks carry: *"Prepared by Dr. Ahmed Abdelbaset"*.
 | Course code | ❌ Not found in any file | — |
 | Level | ❌ Not stated in files (user states: first university level) | user's spec |
 | Language of instruction | English (all slides & book in English; some Arabic handwritten notes on BK p.13) | 📘 |
-| Instructor / slides author | Dr. Ahmed Abdelbaset | 📘 S01–S10 |
 | Chapters | 1 Units and Dimension · 2 Vectors · 3 Motion in one dimension · 4 Laws of Motion · 5 Work and Energy · 6 Elasticity and Fluid Mechanics · 7 Heat · 8 Static Electricity · 9 Current and Resistance · 10 Light | 📘 BK chapter openers |
 | Objectives / learning outcomes | ❌ No formal CLOs. Only chapter intro paragraphs (e.g., Ch 1: "The main objectives of physics are to identify a limited number of fundamental laws…") | 📘 BK p.13 opener |
 | Textbook references | 14 English references incl.: Serway & Jewett *Physics for Scientists and Engineers* 9th ed. (2014); Halliday, Resnick, Walker *Fundamentals of Physics Extended* 10th ed. (2013); *Principles of Physics* 10th ed. (2015); Wagh & Deshpande *Essentials of Physics* Vol 1–2 (2012); Edexcel A Level Physics Books 1–2 (2015); Serway *Principles of Physics* 5th ed.; Amstutz *General Physics* (2001); Kimball *A College Text-Book of Physics* (1970); Huggins *Physics 2000*; Bueche & Hecht *College Physics* (2000); Beiser *Applied Physics* (2003); Woan *Cambridge Handbook of Physics Formulas* (2000) | 📘 BK p.179–180 |
@@ -196,7 +195,7 @@ Because the course's actual experiments are unknown, the Virtual Lab delivered w
 
 ## D. Gap log (سجل الفجوات)
 
-| ID | What the file says | What is missing / conflicting | Impact | Action taken | Needs instructor review? |
+| ID | What the file says | What is missing / conflicting | Impact | Action taken | Needs review? |
 |---|---|---|---|---|---|
 | G-01 | No lab material in any file | Experiments, apparatus, procedures, rubrics | Practical part cannot be quoted | Virtual Lab built from course laws, fully labelled 🧩 | **Yes**: please provide the lab manual |
 | G-02 | — | Assessment methods, grade distribution, exam format | Exam simulator format is a guess | Exam simulator labelled 🧩; mixes MCQ + numeric like the book's Quiz/Exercises | **Yes** |

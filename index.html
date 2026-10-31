@@ -397,7 +397,7 @@ nav.side{top:var(--hdr,57px);height:calc(100vh - var(--hdr,57px))}
 .rights span{font-size:11.5px}
 #welcome .rights{margin:14px 0 0;padding-top:10px}
 @media print{main>.rights{display:none}}
-/* instructor-style exam */
+/* exam simulator */
 .drf .drmeta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13.5px}
 .drf .row{margin-top:6px}
 .exq u,.rev u{text-decoration-thickness:2px;text-underline-offset:3px}
@@ -672,7 +672,7 @@ COURSE.push({
         { f: '|A×B| = AB sin θ', name: 'Vector product magnitude', sym: [['|A×B|', 'size of the vector product', 'product of units', 'مقدار الضرب الاتجاهي'], ['θ', 'angle between A and B', '°', 'الزاوية بين المتجهين'], ['n̂', 'unit vector ⟂ to A and B', '—', 'متجه وحدة عمودي على A و B']], cond: 'A×B = −B×A' }
       ],
       life: { en: 'Pushing a trolley with a handle at an angle: only F cos θ moves it forward (dot product idea).', ar: 'عند دفع عربة بزاوية، الجزء المفيد من القوة هو F cos θ.' },
-      worked: { src: 'S02 Ex 2.7 · BK p.32–33 (see gap G‑05)', q: 'Angle between A = 2î + 2ĵ − k̂ and B = 6î + 3ĵ + 2k̂.', steps: ['A·B = 12 + 6 − 2 = 16', 'A = √9 = 3, B = √49 = 7', 'θ = cos⁻¹( {{16 // 21}} ) = cos⁻¹(0.762)', 'θ = 40.4° (the source prints 40.1°; 40.4° is the computed value)'], ans: 'θ ≈ 40.4°', note: 'Source value 40.1° differs from the calculation: logged as G‑05 for instructor review.' },
+      worked: { src: 'S02 Ex 2.7 · BK p.32–33 (see gap G‑05)', q: 'Angle between A = 2î + 2ĵ − k̂ and B = 6î + 3ĵ + 2k̂.', steps: ['A·B = 12 + 6 − 2 = 16', 'A = √9 = 3, B = √49 = 7', 'θ = cos⁻¹( {{16 // 21}} ) = cos⁻¹(0.762)', 'θ = 40.4° (the source prints 40.1°; 40.4° is the computed value)'], ans: 'θ ≈ 40.4°', note: 'Source value 40.1° differs from the calculation: logged as G‑05 for review.' },
       tryit: { src: 'BK p.37 Exercise 10', q: 'A = 3î − 4ĵ + 2k̂, B = −2î + 3ĵ + 3k̂. Find the x‑component of A×B.', ans: -18, tol: 0, unit: '', hint: 'x: A_yB_z − A_zB_y = (−4)(3) − (2)(3).', sol: 'A×B = −18î − 13ĵ + k̂' },
       checks: [
         { q: 'A·B for A = 100, B = 20, θ = 60°:', o: ['2000', '1000', '1732', '0'], a: 1, why: 'S02 Ex 2.5: 100·20·cos60 = 1000.' },
@@ -1386,7 +1386,7 @@ COURSE.push({
       terms: [['Resistance', 'المقاومة', 'Ω'], ['Resistivity ρ', 'المقاومة النوعية', 'Ω·m'], ['Conductivity σ', 'الموصلية', '1/(Ω·m)'], ['Ohmic', 'أومي', 'Obeys V ∝ I']],
       formulas: [{ f: 'V = R I', name: '(9.5)', sym: [['V', 'voltage', 'V', 'فرق الجهد'], ['R', 'resistance', 'Ω', 'المقاومة'], ['I', 'current', 'A', 'التيار']], cond: 'Constant temperature.' }, { f: 'R = {{ρ ℓ // A}} ,  ρ = {{1 // σ}}', name: '(9.4)', sym: [['R', 'resistance', 'Ω', 'المقاومة'], ['ρ', 'resistivity', 'Ω·m', 'المقاومية'], ['ℓ', 'length', 'm', 'الطول'], ['A', 'cross‑section area = πr²', 'm²', 'مساحة المقطع'], ['σ', 'conductivity', '(Ω·m)⁻¹', 'الموصلية']], cond: 'A uses the radius: r = d/2.' }],
       life: { en: 'Extension cords for heaters are thick: a larger A means less resistance and less heating.', ar: 'تمديدات السخانات سميكة لتقليل المقاومة.' },
-      worked: { src: 'S09U Ex 9.5 · BK p.152 (see G‑11)', q: 'Nichrome wire 1 m, "0.2 mm diameter", ρ = 10⁻⁶ Ω·m, 20 V. R and I?', steps: ['Source solution uses r = 0.2 mm: R = {{10⁻⁶ × 1 // π × (0.2×10⁻³)²}} = 7.96 Ω → I = {{20 // 7.96}} = 2.5 A', 'If 0.2 mm is the diameter, r = 0.1 mm: R = 31.8 Ω → I = 0.63 A'], ans: 'Source: 7.96 Ω, 2.5 A', note: 'Ask your instructor which reading is intended (G‑11).' },
+      worked: { src: 'S09U Ex 9.5 · BK p.152 (see G‑11)', q: 'Nichrome wire 1 m, "0.2 mm diameter", ρ = 10⁻⁶ Ω·m, 20 V. R and I?', steps: ['Source solution uses r = 0.2 mm: R = {{10⁻⁶ × 1 // π × (0.2×10⁻³)²}} = 7.96 Ω → I = {{20 // 7.96}} = 2.5 A', 'If 0.2 mm is the diameter, r = 0.1 mm: R = 31.8 Ω → I = 0.63 A'], ans: 'Source: 7.96 Ω, 2.5 A', note: 'Check which reading is intended (G‑11).' },
       tryit: { src: 'BK p.158 Exercise 3', q: 'Silver 10 cm long across 20 V, ρ = 1.59×10⁻⁸ Ω·m. Current density?', ans: 1.258e10, tol: 0.02, unit: 'A/m²', hint: 'E = {{V // ℓ}}, J = {{E // ρ}}', sol: 'E = {{20 // 0.1}} = 200 V/m → J = {{200 // 1.59×10⁻⁸}} = 1.26×10¹⁰ A/m²' },
       checks: [{ q: 'Doubling length and radius makes R…', o: ['double', 'half', '4×', 'same'], a: 1, why: 'ℓ×2, A×4 → R/2 (Ex 9.4).' }],
       mistakes: [['Using diameter for r', 'Halve it.']],
@@ -4170,10 +4170,10 @@ window.VARY = (function () {
   };
 })();
 
-/* Physics Learning Lab — the instructor's old exams (docs/Old_Exams.md) and the exam formats seen in them.
+/* Physics Learning Lab — the course's old exams (docs/Old_Exams.md) and the exam formats seen in them.
    OLD: questions copied from the photos of Final Theory exam 1445, Midterm 2023 and LMS assignment 1 (📘 old exam).
         The answer keys are computed by us (🧩) except where the LMS attempt graded 5/5.
-   STYLE: generators that copy the instructor's question patterns with new numbers (🧩 additional design). */
+   STYLE: generators that copy the old exams' question patterns with new numbers (🧩 additional design). */
 window.DREXAM = (function () {
   const R = (a, b, d = 0) => { const p = 10 ** d; return Math.round((a + Math.random() * (b - a)) * p) / p; };
   const pick = a => a[Math.floor(Math.random() * a.length)];
@@ -4233,7 +4233,7 @@ window.DREXAM = (function () {
     { src: HW + ' (other attempt)', ch: 'ch4', clo: '1.1', q: 'An example of an <u>inertial reference frame</u> is:', o: ['any reference frame that is not accelerating', 'a frame attached to a particle on which there are no forces', 'any reference frame that is at rest', 'a reference frame attached to the center of the universe'], a: 0, why: 'An inertial frame is any frame that does not accelerate; Newton\'s first law holds in it.' }
   ];
 
-  // the instructor's patterns with new numbers (🧩). Each returns {q, ans, wrong:[3], why}
+  // the old exams' patterns with new numbers (🧩). Each returns {q, ans, wrong:[3], why}
   const SI = [['Time', 'Second (s)'], ['length', 'Meter (m)'], ['mass', 'Kilogram (kg)'], ['electric current', 'Ampere (A)'], ['temperature', 'Kelvin (K)'], ['luminous intensity', 'Candle (cd)'], ['amount of substance', 'Mole (mol)']];
   const DER = [['velocity', 'm/s', 'ch1'], ['acceleration', 'm/s²', 'ch1'], ['Force', 'Newton (N)', 'ch4'], ['work', 'Joule (J)', 'ch5'], ['power', 'Watt (W)', 'ch5'], ['pressure', 'Pascal (Pa)', 'ch6'], ['electric charge', 'Coulomb (C)', 'ch8'], ['electric potential', 'Volt (V)', 'ch8'], ['resistance', 'Ohm (Ω)', 'ch9'], ['capacitance', 'Farad (F)', 'ch8'], ['density', 'kg/m³', 'ch1']];
   const PRE = [['pico', '10⁻¹²'], ['nano', '10⁻⁹'], ['micro', '10⁻⁶'], ['milli', '10⁻³'], ['centi', '10⁻²'], ['kilo', '10³'], ['mega', '10⁶'], ['giga', '10⁹']];
@@ -4879,9 +4879,9 @@ window.DREXAM = (function () {
       <h2>Review: every question · مراجعة كل الأسئلة</h2>` + reviewHTML(qs, ans, st.label));
   }
 
-  // ---------- the instructor's exam style (content_drexam.js, docs/Old_Exams.md) ----------
+  // ---------- old-exam simulator (content_drexam.js, docs/Old_Exams.md) ----------
   const DRX = window.DREXAM || null;
-  // a number answer turned into four choices, with the slips seen in the instructor's distractors (×10, ÷10, ×2, sign)
+  // a number answer turned into four choices, with the slips seen in the old exams' distractors (×10, ÷10, ×2, sign)
   function toMCQ(q, num, unit, sol, extra) {
     const u = unit ? ' ' + unit : '', key = x => pretty(x) + u, seen = new Set([key(num)]), o = [key(num)];
     for (const f of shuffle([10, 0.1, 2, 0.5, 3, 1 / 3, -1, 1.5])) { if (o.length === 4) break; const x = num * f; if (!isFinite(x) || x === num || seen.has(key(x))) continue; seen.add(key(x)); o.push(key(x)); }
@@ -4893,7 +4893,7 @@ window.DREXAM = (function () {
     const add = it => { if (it && chs.includes(it.ch)) pool[it.clo].push(it); };
     DRX.OLD.forEach(q => add(Object.assign({ old: true }, q)));
     if (onlyOld) return { chs, pool };
-    DRX.STYLE.forEach(g => { for (let k = 0; k < 3; k++) { const r = g.f(), o = shuffle([r.ans, ...r.wrong]); if (new Set(o).size < 4) continue; add({ ch: r.ch || g.ch, clo: g.clo, q: r.q, o, a: o.indexOf(r.ans), why: r.why, src: 'Dr‑style, new numbers 🧩' }); } });
+    DRX.STYLE.forEach(g => { for (let k = 0; k < 3; k++) { const r = g.f(), o = shuffle([r.ans, ...r.wrong]); if (new Set(o).size < 4) continue; add({ ch: r.ch || g.ch, clo: g.clo, q: r.q, o, a: o.indexOf(r.ans), why: r.why, src: 'Same style, new numbers 🧩' }); } });
     COURSE.forEach(c => c.lessons.forEach(l => l.quiz.concat(l.checks).forEach(q => {
       if (q.o) { const keep = q.o.some(o => /above|both|none/i.test(o)), o = keep ? q.o : shuffle(q.o); add(Object.assign({ ch: c.id, clo: '1.1', lessonId: l.id, src: 'Lesson ' + c.n + ' · ' + l.title }, q, { o, a: o.indexOf(q.o[q.a]) })); }
       else if (q.num) add(toMCQ(q.q, q.num, q.unit, q.sol, { ch: c.id, clo: '2.1', lessonId: l.id, src: 'Lesson ' + c.n + ' · ' + l.title }));
@@ -4901,7 +4901,7 @@ window.DREXAM = (function () {
     G.forEach(g => { const p = g.f(); add(toMCQ(p.q, p.ans, p.unit, p.sol, { ch: g.ch, clo: '2.1', src: 'Practice generator 🧩' })); });
     return { chs, pool };
   }
-  // spread the questions over the chapters, the instructor's own questions first in each chapter, CLO 1.1 before CLO 2.1
+  // spread the questions over the chapters, the old exam questions first in each chapter, CLO 1.1 before CLO 2.1
   function drBuild(fmt, onlyOld) {
     const F = DRX.FORMATS[fmt], { chs, pool } = drPools(F, onlyOld);
     if (onlyOld) return pool['1.1'].concat(pool['2.1']);
@@ -4922,12 +4922,12 @@ window.DREXAM = (function () {
     const card = (k, f) => `<div class="card drf"><h3 style="margin-top:0">${f.title} <span class="muted" style="font-weight:400">· ${f.ar}</span></h3>
       <div class="drmeta"><span>📝 ${f.n} questions</span><span>⏱ ${f.mins} min</span><span>🎯 ${f.n * f.mark} marks (${f.mark} each)</span><span>📚 ${f.chs ? 'Ch 1–4' : 'all chapters'}</span></div>
       <p class="muted" style="font-size:13px;margin:6px 0">📘 ${f.src}${f.assumed ? `<br>⚠ ${f.assumed}` : ''}</p>
-      <div class="row"><button class="btn" data-drgo="${k}">Start · ابدأ</button><button class="btn ghost small" data-drold="${k}">Only the instructor's questions</button>${best(k) != null ? `<span class="pill ${best(k) === f.n * f.mark ? 'ok' : ''}">Best: ${best(k)}/${f.n * f.mark}</span>` : ''}</div></div>`;
+      <div class="row"><button class="btn" data-drgo="${k}">Start · ابدأ</button><button class="btn ghost small" data-drold="${k}">Old exam questions only · الأسئلة السابقة فقط</button>${best(k) != null ? `<span class="pill ${best(k) === f.n * f.mark ? 'ok' : ''}">Best: ${best(k)}/${f.n * f.mark}</span>` : ''}</div></div>`;
     const hist = S.drx.slice(0, 8).map(e => `<tr><td>${new Date(e.ts).toLocaleString()}</td><td>${F[e.fmt].title}${e.only ? ' (old Qs)' : ''}</td><td><b>${e.marks}/${e.total}</b></td></tr>`).join('');
     return `<h1>Exam simulator <span class="muted" style="font-size:18px;font-weight:400">· محاكي الاختبار</span></h1>
-      <p class="sub">Built from the instructor's old final, midterm and LMS assignment. <span class="pill src">📘 old exams</span> ${ADD}</p>
-      <div class="ar">نفس شكل اختبارات الدكتور: اختيار من متعدد بأربعة خيارات، درجة لكل سؤال، أسئلة الوحدات والتعريفات والقوانين (CLO 1.1) أولًا ثم المسائل القصيرة (CLO 2.1). تجد أسئلة الدكتور القديمة نفسها مع أسئلة جديدة بنفس أسلوبه. هدفك الدرجة الكاملة: بعد التسليم يظهر لك ما ينقصك وأين تراجعه، وتعيد الأسئلة التي أخطأت فيها حتى تتقنها.</div>
-      <div class="card"><b>His style, from the photos:</b><ul class="clean" style="margin:6px 0 0">
+      <p class="sub">Built from the course's old final, midterm and LMS assignment. <span class="pill src">📘 old exams</span> ${ADD}</p>
+      <div class="ar">نفس شكل الاختبارات السابقة: اختيار من متعدد بأربعة خيارات، درجة لكل سؤال، أسئلة الوحدات والتعريفات والقوانين (CLO 1.1) أولًا ثم المسائل القصيرة (CLO 2.1). تجد أسئلة الاختبارات السابقة نفسها مع أسئلة جديدة بنفس الأسلوب. هدفك الدرجة الكاملة: بعد التسليم يظهر لك ما ينقصك وأين تراجعه، وتعيد الأسئلة التي أخطأت فيها حتى تتقنها.</div>
+      <div class="card"><b>Exam style, from the old papers:</b><ul class="clean" style="margin:6px 0 0">
         <li>All questions are multiple choice A–D, one mark each (0.5 in the LMS assignment). No written solutions.</li>
         <li>CLO 1.1 first: SI units, prefixes, definitions, Newton's laws as equations. Then CLO 2.1: one formula, one substitution, round numbers.</li>
         <li>The key word is underlined. Typical traps: distance vs displacement, × instead of ÷ in unit conversion, adding magnitudes instead of Pythagoras, v ≠ 0 at maximum height.</li></ul>
@@ -5270,8 +5270,8 @@ window.DREXAM = (function () {
     ['G‑05', 'Ex 2.7 prints 40.1°; calculation gives 40.4°.', 'Both shown.'],
     ['G‑06', 'Ex 3.1 has different numbers in slides and book.', 'Both versions shown.'],
     ['G‑07', 'Book Ex 5.5 gives KE_f = 15 J; correct is 25 J (slides).', '25 J used.'],
-    ['G‑08', 'Ex 5.9 statement uses 5t², solution 3t²; "from static" contradicts v(0) = −6 m/s.', 'Instructor review.'],
-    ['G‑10', 'Ex 6.2 units (cm vs m).', 'Instructor review.'],
+    ['G‑08', 'Ex 5.9 statement uses 5t², solution 3t²; "from static" contradicts v(0) = −6 m/s.', 'Needs review.'],
+    ['G‑10', 'Ex 6.2 units (cm vs m).', 'Needs review.'],
     ['G‑11', 'Ex 9.5 uses 0.2 mm diameter as radius.', 'Both readings shown.'],
     ['G‑12', 'Ex 9.2 converts cm² with 10⁻².', 'Correct value 2×10⁵ A/m² shown.'],
     ['G‑13', 'Old S09 vs S09U current definition.', 'S09U used.'],

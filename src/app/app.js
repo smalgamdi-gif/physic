@@ -611,9 +611,9 @@
       <h2>Review: every question · مراجعة كل الأسئلة</h2>` + reviewHTML(qs, ans, st.label));
   }
 
-  // ---------- the instructor's exam style (content_drexam.js, docs/Old_Exams.md) ----------
+  // ---------- old-exam simulator (content_drexam.js, docs/Old_Exams.md) ----------
   const DRX = window.DREXAM || null;
-  // a number answer turned into four choices, with the slips seen in the instructor's distractors (×10, ÷10, ×2, sign)
+  // a number answer turned into four choices, with the slips seen in the old exams' distractors (×10, ÷10, ×2, sign)
   function toMCQ(q, num, unit, sol, extra) {
     const u = unit ? ' ' + unit : '', key = x => pretty(x) + u, seen = new Set([key(num)]), o = [key(num)];
     for (const f of shuffle([10, 0.1, 2, 0.5, 3, 1 / 3, -1, 1.5])) { if (o.length === 4) break; const x = num * f; if (!isFinite(x) || x === num || seen.has(key(x))) continue; seen.add(key(x)); o.push(key(x)); }
@@ -625,7 +625,7 @@
     const add = it => { if (it && chs.includes(it.ch)) pool[it.clo].push(it); };
     DRX.OLD.forEach(q => add(Object.assign({ old: true }, q)));
     if (onlyOld) return { chs, pool };
-    DRX.STYLE.forEach(g => { for (let k = 0; k < 3; k++) { const r = g.f(), o = shuffle([r.ans, ...r.wrong]); if (new Set(o).size < 4) continue; add({ ch: r.ch || g.ch, clo: g.clo, q: r.q, o, a: o.indexOf(r.ans), why: r.why, src: 'Dr‑style, new numbers 🧩' }); } });
+    DRX.STYLE.forEach(g => { for (let k = 0; k < 3; k++) { const r = g.f(), o = shuffle([r.ans, ...r.wrong]); if (new Set(o).size < 4) continue; add({ ch: r.ch || g.ch, clo: g.clo, q: r.q, o, a: o.indexOf(r.ans), why: r.why, src: 'Same style, new numbers 🧩' }); } });
     COURSE.forEach(c => c.lessons.forEach(l => l.quiz.concat(l.checks).forEach(q => {
       if (q.o) { const keep = q.o.some(o => /above|both|none/i.test(o)), o = keep ? q.o : shuffle(q.o); add(Object.assign({ ch: c.id, clo: '1.1', lessonId: l.id, src: 'Lesson ' + c.n + ' · ' + l.title }, q, { o, a: o.indexOf(q.o[q.a]) })); }
       else if (q.num) add(toMCQ(q.q, q.num, q.unit, q.sol, { ch: c.id, clo: '2.1', lessonId: l.id, src: 'Lesson ' + c.n + ' · ' + l.title }));
@@ -633,7 +633,7 @@
     G.forEach(g => { const p = g.f(); add(toMCQ(p.q, p.ans, p.unit, p.sol, { ch: g.ch, clo: '2.1', src: 'Practice generator 🧩' })); });
     return { chs, pool };
   }
-  // spread the questions over the chapters, the instructor's own questions first in each chapter, CLO 1.1 before CLO 2.1
+  // spread the questions over the chapters, the old exam questions first in each chapter, CLO 1.1 before CLO 2.1
   function drBuild(fmt, onlyOld) {
     const F = DRX.FORMATS[fmt], { chs, pool } = drPools(F, onlyOld);
     if (onlyOld) return pool['1.1'].concat(pool['2.1']);
@@ -654,12 +654,12 @@
     const card = (k, f) => `<div class="card drf"><h3 style="margin-top:0">${f.title} <span class="muted" style="font-weight:400">· ${f.ar}</span></h3>
       <div class="drmeta"><span>📝 ${f.n} questions</span><span>⏱ ${f.mins} min</span><span>🎯 ${f.n * f.mark} marks (${f.mark} each)</span><span>📚 ${f.chs ? 'Ch 1–4' : 'all chapters'}</span></div>
       <p class="muted" style="font-size:13px;margin:6px 0">📘 ${f.src}${f.assumed ? `<br>⚠ ${f.assumed}` : ''}</p>
-      <div class="row"><button class="btn" data-drgo="${k}">Start · ابدأ</button><button class="btn ghost small" data-drold="${k}">Only the instructor's questions</button>${best(k) != null ? `<span class="pill ${best(k) === f.n * f.mark ? 'ok' : ''}">Best: ${best(k)}/${f.n * f.mark}</span>` : ''}</div></div>`;
+      <div class="row"><button class="btn" data-drgo="${k}">Start · ابدأ</button><button class="btn ghost small" data-drold="${k}">Old exam questions only · الأسئلة السابقة فقط</button>${best(k) != null ? `<span class="pill ${best(k) === f.n * f.mark ? 'ok' : ''}">Best: ${best(k)}/${f.n * f.mark}</span>` : ''}</div></div>`;
     const hist = S.drx.slice(0, 8).map(e => `<tr><td>${new Date(e.ts).toLocaleString()}</td><td>${F[e.fmt].title}${e.only ? ' (old Qs)' : ''}</td><td><b>${e.marks}/${e.total}</b></td></tr>`).join('');
     return `<h1>Exam simulator <span class="muted" style="font-size:18px;font-weight:400">· محاكي الاختبار</span></h1>
-      <p class="sub">Built from the instructor's old final, midterm and LMS assignment. <span class="pill src">📘 old exams</span> ${ADD}</p>
-      <div class="ar">نفس شكل اختبارات الدكتور: اختيار من متعدد بأربعة خيارات، درجة لكل سؤال، أسئلة الوحدات والتعريفات والقوانين (CLO 1.1) أولًا ثم المسائل القصيرة (CLO 2.1). تجد أسئلة الدكتور القديمة نفسها مع أسئلة جديدة بنفس أسلوبه. هدفك الدرجة الكاملة: بعد التسليم يظهر لك ما ينقصك وأين تراجعه، وتعيد الأسئلة التي أخطأت فيها حتى تتقنها.</div>
-      <div class="card"><b>His style, from the photos:</b><ul class="clean" style="margin:6px 0 0">
+      <p class="sub">Built from the course's old final, midterm and LMS assignment. <span class="pill src">📘 old exams</span> ${ADD}</p>
+      <div class="ar">نفس شكل الاختبارات السابقة: اختيار من متعدد بأربعة خيارات، درجة لكل سؤال، أسئلة الوحدات والتعريفات والقوانين (CLO 1.1) أولًا ثم المسائل القصيرة (CLO 2.1). تجد أسئلة الاختبارات السابقة نفسها مع أسئلة جديدة بنفس الأسلوب. هدفك الدرجة الكاملة: بعد التسليم يظهر لك ما ينقصك وأين تراجعه، وتعيد الأسئلة التي أخطأت فيها حتى تتقنها.</div>
+      <div class="card"><b>Exam style, from the old papers:</b><ul class="clean" style="margin:6px 0 0">
         <li>All questions are multiple choice A–D, one mark each (0.5 in the LMS assignment). No written solutions.</li>
         <li>CLO 1.1 first: SI units, prefixes, definitions, Newton's laws as equations. Then CLO 2.1: one formula, one substitution, round numbers.</li>
         <li>The key word is underlined. Typical traps: distance vs displacement, × instead of ÷ in unit conversion, adding magnitudes instead of Pythagoras, v ≠ 0 at maximum height.</li></ul>
@@ -1002,8 +1002,8 @@
     ['G‑05', 'Ex 2.7 prints 40.1°; calculation gives 40.4°.', 'Both shown.'],
     ['G‑06', 'Ex 3.1 has different numbers in slides and book.', 'Both versions shown.'],
     ['G‑07', 'Book Ex 5.5 gives KE_f = 15 J; correct is 25 J (slides).', '25 J used.'],
-    ['G‑08', 'Ex 5.9 statement uses 5t², solution 3t²; "from static" contradicts v(0) = −6 m/s.', 'Instructor review.'],
-    ['G‑10', 'Ex 6.2 units (cm vs m).', 'Instructor review.'],
+    ['G‑08', 'Ex 5.9 statement uses 5t², solution 3t²; "from static" contradicts v(0) = −6 m/s.', 'Needs review.'],
+    ['G‑10', 'Ex 6.2 units (cm vs m).', 'Needs review.'],
     ['G‑11', 'Ex 9.5 uses 0.2 mm diameter as radius.', 'Both readings shown.'],
     ['G‑12', 'Ex 9.2 converts cm² with 10⁻².', 'Correct value 2×10⁵ A/m² shown.'],
     ['G‑13', 'Old S09 vs S09U current definition.', 'S09U used.'],

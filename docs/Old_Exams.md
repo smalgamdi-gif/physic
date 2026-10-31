@@ -1,6 +1,6 @@
-# Old exams and quizzes by the course instructor
+# Old exams and quizzes for the course
 
-**Source:** 27 photos in `C:\Users\user\Desktop\الفيزياء\old exam` (WhatsApp images, 31 Oct 2026). They show the instructor's screen projected in class (two PDFs) and screenshots of an LMS assignment.
+**Source:** 27 photos in `C:\Users\user\Desktop\الفيزياء\old exam` (WhatsApp images, 31 Oct 2026). They show a screen projected in class (two PDFs) and screenshots of an LMS assignment.
 
 **Answer keys:**
 - No official answer key is in the photos.
@@ -112,7 +112,7 @@ The saved attempt was submitted on 28/9/2026 and scored **5/5**. Questions appea
 
 ---
 
-## 4. The instructor's style
+## 4. Exam style
 1. **Format:**
    - Every question is multiple choice A–D, one correct answer, one mark each (0.5 in the LMS assignment).
    - No written solutions are asked for.
@@ -134,10 +134,10 @@ The saved attempt was submitted on 28/9/2026 and scored **5/5**. Questions appea
    - LMS assignment 1: chapters 1–4.
    - Final: all chapters, from units to light (Kelvin, reflection, circuits).
 
-## 5. New items for the gap log (for the instructor)
+## 5. New items for the gap log (for review)
 | ID | What the source says | Problem | Action |
 |---|---|---|---|
-| G‑28 | LMS Q: direction of A = 12î − 16ĵ, options −60°, −41°, −30°, 45° | The computed direction is −53.1°, which is not an option | Left out of the simulator. Ask the instructor. |
+| G‑28 | LMS Q: direction of A = 12î − 16ĵ, options −60°, −41°, −30°, 45° | The computed direction is −53.1°, which is not an option | Left out of the simulator. Needs review. |
 | G‑29 | LMS Q: \|A − B\| for A = 12î − 16ĵ, B = 24î − 10ĵ, key 13.2 | Computed value is 13.4 | Kept. 13.2 is the closest option, and the LMS graded it correct. |
 | G‑30 | Midterm 2023 | Duration and marks are not shown | Simulator uses 60 min and 1 mark per question as an **assumption (🧩)** |
 | G‑31 | Final Q39 (W = F·Δr, F = 2 N, Δr = 2 m) | 4 J is not among the visible options (A 8 J, B 10 J); C and D are not visible | In the simulator, options C and D are added by me (🧩) |
